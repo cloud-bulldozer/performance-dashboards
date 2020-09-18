@@ -1,0 +1,57 @@
+name: Jsonnet CI
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - templates/**
+      - .github/**
+  pull_request:
+    branches: [ master ]
+    paths:
+      - templates/**
+      - .github/**
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Compile dashboards
+      run: make build
+
+    - name: Run grafana container
+      run: sudo docker run -d -p 3000:3000 docker.io/grafana/grafana:7.1.2
+
+    - name: Wait for grafana
+      run: while [[ $(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/api/health) != "200" ]]; do  sleep 1; done
+
+    - name: Import dashboards to grafana
+      run: >
+        for t in rendered/*.json; do
+        echo "Importing ${t}";
+        dashboard=$(cat ${t});
+        echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
+        curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
+        "http://admin:admin@localhost:3000/api/dashboards/db" -o /dev/null;
+        done
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: make deps
+
+    - name: Run jsonnetfmt
+      run: for t in templates/*.jsonnet; do echo "Testing template ${t}"; ./bin/jsonnetfmt --test $t; echo 'Results:' ${?}; done
