@@ -634,7 +634,7 @@ grafana.dashboard.new(
   ) {
     label: 'Worker',
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: false,
   },
 )
@@ -649,7 +649,7 @@ grafana.dashboard.new(
   ) {
     label: 'Infra',
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: false,
   },
 )
