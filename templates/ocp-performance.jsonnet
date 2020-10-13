@@ -1,45 +1,58 @@
 local grafana = import 'grafonnet-lib/grafonnet/grafana.libsonnet';
 local prometheus = grafana.prometheus;
 
+
 // Helper functions
 
-local nodeMemory(nodeName) =
-  grafana.graphPanel.new(
-    title='System Memory: ' + nodeName,
-    datasource='$datasource',
-    format='bytes'
-  )
-  .addTarget(
-    prometheus.target(
-      'node_memory_Active_bytes{instance=~"' + nodeName + '"}',
-      legendFormat='Active',
-    )
-  )
-  .addTarget(
-    prometheus.target(
-      'node_memory_MemTotal_bytes{instance=~"' + nodeName + '"}',
-      legendFormat='Total',
-    )
-  )
-  .addTarget(
-    prometheus.target(
-      'node_memory_Cached_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"}',
-      legendFormat='Cached + Buffers',
-    )
-  )
-  .addTarget(
-    prometheus.target(
-      'node_memory_MemAvailable_bytes{instance=~"' + nodeName + '"} - (node_memory_Cached_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"})',
-      legendFormat='Available',
-    )
-  );
-
-
-local nodeCPU(nodeName) = grafana.graphPanel.new(
-  title='CPU Basic: ' + nodeName,
+local genericGraphPanel(title, format) = grafana.graphPanel.new(
+  title=title,
   datasource='$datasource',
-  format='percent',
+  format=format,
+  nullPointMode='null as zero',
+  sort='decreasing',
+  legend_alignAsTable=true,
+);
+
+local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
+  title=title,
+  datasource='$datasource',
+  format=format,
+  legend_values=true,
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_hideEmpty=true,
+  legend_hideZero=true,
+  legend_sort='max',
+  nullPointMode='null as zero',
+  sort='decreasing',
+);
+
+
+local nodeMemory(nodeName) = genericGraphPanel('System Memory: ' + nodeName, 'bytes').addTarget(
+  prometheus.target(
+    'node_memory_Active_bytes{instance=~"' + nodeName + '"}',
+    legendFormat='Active',
+  )
 ).addTarget(
+  prometheus.target(
+    'node_memory_MemTotal_bytes{instance=~"' + nodeName + '"}',
+    legendFormat='Total',
+  )
+).addTarget(
+  prometheus.target(
+    'node_memory_Cached_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"}',
+    legendFormat='Cached + Buffers',
+  )
+).addTarget(
+  prometheus.target(
+    'node_memory_MemAvailable_bytes{instance=~"' + nodeName + '"} - (node_memory_Cached_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"})',
+    legendFormat='Available',
+  )
+);
+
+
+local nodeCPU(nodeName) = genericGraphPanel('CPU Basic: ' + nodeName, 'percent').addTarget(
   prometheus.target(
     'sum by (instance, mode)(rate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[5m])) * 100',
     legendFormat='Busy {{mode}}',
@@ -47,197 +60,97 @@ local nodeCPU(nodeName) = grafana.graphPanel.new(
 );
 
 
-local diskThroughput(nodeName) =
-  grafana.graphPanel.new(
-    title='Disk throughput: ' + nodeName,
-    datasource='$datasource',
-    format='Bps',
-    legend_values=true,
-    legend_alignAsTable=true,
-    legend_current=true,
-    legend_max=true,
-    legend_min=true,
-    legend_avg=true,
-    legend_hideEmpty=true,
-    legend_hideZero=true,
-  ).addTarget(
-    prometheus.target(
-      'rate(node_disk_read_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
-      legendFormat='{{ device }} - read',
-    )
-  ).addTarget(
-    prometheus.target(
-      'rate(node_disk_written_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
-      legendFormat='{{ device }} - write',
-    )
-  );
-
-local diskIOPS(nodeName) =
-  grafana.graphPanel.new(
-    title='Disk IOPS: ' + nodeName,
-    datasource='$datasource',
-    format='iops',
-    legend_values=true,
-    legend_alignAsTable=true,
-    legend_current=true,
-    legend_max=true,
-    legend_min=true,
-    legend_avg=true,
-    legend_hideEmpty=true,
-    legend_hideZero=true,
-  ).addTarget(
-    prometheus.target(
-      'rate(node_disk_reads_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
-      legendFormat='{{ device }} - read',
-    )
-  ).addTarget(
-    prometheus.target(
-      'rate(node_disk_writes_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
-      legendFormat='{{ device }} - write',
-    )
-  );
-
-local networkUtilization(nodeName) =
-  grafana.graphPanel.new(
-    title='Network Utilization: ' + nodeName,
-    datasource='$datasource',
-    format='bps',
-    legend_values=true,
-    legend_alignAsTable=true,
-    legend_current=true,
-    legend_max=true,
-    legend_min=true,
-    legend_avg=true,
-    legend_hideEmpty=true,
-    legend_hideZero=true,
-  ).addTarget(
-    prometheus.target(
-      'rate(node_network_receive_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
-      legendFormat='{{instance}} - {{device}} - RX',
-    )
-  ).addTarget(
-    prometheus.target(
-      'rate(node_network_transmit_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
-      legendFormat='{{instance}} - {{device}} - TX',
-    )
-  );
-
-local networkPackets(nodeName) =
-  grafana.graphPanel.new(
-    title='Network Packets: ' + nodeName,
-    datasource='$datasource',
-    format='pps',
-    legend_values=true,
-    legend_alignAsTable=true,
-    legend_current=true,
-    legend_max=true,
-    legend_min=true,
-    legend_avg=true,
-    legend_hideEmpty=true,
-    legend_hideZero=true,
-  ).addTarget(
-    prometheus.target(
-      'rate(node_network_receive_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
-      legendFormat='{{instance}} - {{device}} - RX',
-    )
-  ).addTarget(
-    prometheus.target(
-      'rate(node_network_transmit_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
-      legendFormat='{{instance}} - {{device}} - TX',
-    )
-  );
-
-local networkDrop(nodeName) =
-  grafana.graphPanel.new(
-    title='Network packets drop: ' + nodeName,
-    datasource='$datasource',
-    format='pps',
-    legend_values=true,
-    legend_alignAsTable=true,
-    legend_current=true,
-    legend_rightSide=true,
-    legend_sort='max',
-    legend_sortDesc=true,
-    nullPointMode='null as zero',
-    legend_hideZero=true,
-  ).addTarget(
-    prometheus.target(
-      'topk(10, rate(node_network_receive_drop_total{instance=~"' + nodeName + '"}[2m]))',
-      legendFormat='rx-drop-{{ device }}',
-    )
-  ).addTarget(
-    prometheus.target(
-      'topk(10,rate(node_network_transmit_drop_total{instance=~"' + nodeName + '"}[2m]))',
-      legendFormat='tx-drop-{{ device }}',
-    )
-  );
-
-local conntrackStats(nodeName) =
-  grafana.graphPanel.new(
-    title='Conntrack stats: ' + nodeName,
-    datasource='$datasource',
-    legend_min=true,
-    legend_max=true,
-    legend_avg=true,
-    legend_current=true,
-    legend_alignAsTable=true,
-    legend_values=true,
-    legend_hideEmpty=true,
-    legend_hideZero=true,
-    transparent=true,
+local diskThroughput(nodeName) = genericGraphPanel('Disk throughput: ' + nodeName, 'Bps').addTarget(
+  prometheus.target(
+    'rate(node_disk_read_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    legendFormat='{{ device }} - read',
   )
-  {
-    seriesOverrides: [{
-      alias: 'conntrack_limit',
-      yaxis: 2,
-    }],
-    yaxes: [{ show: true }, { show: true }],
-  }
-  .addTarget(
-    prometheus.target(
-      'node_nf_conntrack_entries{instance=~"' + nodeName + '"}',
-      legendFormat='conntrack_entries',
-    )
-  ).addTarget(
-    prometheus.target(
-      'node_nf_conntrack_entries_limit{instance=~"' + nodeName + '"}',
-      legendFormat='conntrack_limit',
-    )
-  );
-
-
-local top10ContainerCPU(nodeName) = grafana.graphPanel.new(
-  title='Top 10 container CPU: ' + nodeName,
-  datasource='$datasource',
-  format='percent',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_avg=true,
-  legend_hideEmpty=true,
-  legend_hideZero=true,
-  nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'topk(10, sum(rate(container_cpu_usage_seconds_total{name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (namespace,name,service) * 100)',
+    'rate(node_disk_written_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    legendFormat='{{ device }} - write',
+  )
+);
+
+local diskIOPS(nodeName) = genericGraphLegendPanel('Disk IOPS: ' + nodeName, 'iops').addTarget(
+  prometheus.target(
+    'rate(node_disk_reads_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    legendFormat='{{ device }} - read',
+  )
+).addTarget(
+  prometheus.target(
+    'rate(node_disk_writes_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    legendFormat='{{ device }} - write',
+  )
+);
+
+local networkUtilization(nodeName) = genericGraphLegendPanel('Network Utilization: ' + nodeName, 'bps').addTarget(
+  prometheus.target(
+    'rate(node_network_receive_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
+    legendFormat='{{instance}} - {{device}} - RX',
+  )
+).addTarget(
+  prometheus.target(
+    'rate(node_network_transmit_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
+    legendFormat='{{instance}} - {{device}} - TX',
+  )
+);
+
+local networkPackets(nodeName) = genericGraphLegendPanel('Network Packets: ' + nodeName, 'pps').addTarget(
+  prometheus.target(
+    'rate(node_network_receive_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
+    legendFormat='{{instance}} - {{device}} - RX',
+  )
+).addTarget(
+  prometheus.target(
+    'rate(node_network_transmit_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
+    legendFormat='{{instance}} - {{device}} - TX',
+  )
+);
+
+local networkDrop(nodeName) = genericGraphLegendPanel('Network packets drop: ' + nodeName, 'pps').addTarget(
+  prometheus.target(
+    'topk(10, rate(node_network_receive_drop_total{instance=~"' + nodeName + '"}[2m]))',
+    legendFormat='rx-drop-{{ device }}',
+  )
+).addTarget(
+  prometheus.target(
+    'topk(10,rate(node_network_transmit_drop_total{instance=~"' + nodeName + '"}[2m]))',
+    legendFormat='tx-drop-{{ device }}',
+  )
+);
+
+local conntrackStats(nodeName) = genericGraphLegendPanel('Conntrack stats: ' + nodeName, '')
+                                 {
+  seriesOverrides: [{
+    alias: 'conntrack_limit',
+    yaxis: 2,
+  }],
+  yaxes: [{ show: true }, { show: true }],
+}
+                                 .addTarget(
+  prometheus.target(
+    'node_nf_conntrack_entries{instance=~"' + nodeName + '"}',
+    legendFormat='conntrack_entries',
+  )
+).addTarget(
+  prometheus.target(
+    'node_nf_conntrack_entries_limit{instance=~"' + nodeName + '"}',
+    legendFormat='conntrack_limit',
+  )
+);
+
+
+local top10ContainerCPU(nodeName) = genericGraphLegendPanel('Top 10 container CPU: ' + nodeName, 'percent').addTarget(
+  prometheus.target(
+    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (namespace,name,service) * 100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
-local top10ContainerRSS(nodeName) = grafana.graphPanel.new(
-  title='Top 10 container RSS: ' + nodeName,
-  datasource='$datasource',
-  format='bytes',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_hideEmpty=true,
-  legend_hideZero=true,
-  nullPointMode='null as zero',
-).addTarget(
+local top10ContainerRSS(nodeName) = genericGraphLegendPanel('Top 10 container RSS: ' + nodeName, 'bytes').addTarget(
   prometheus.target(
-    'topk(10, container_memory_rss{name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})',
+    'topk(10, container_memory_rss{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
@@ -246,44 +159,28 @@ local top10ContainerRSS(nodeName) = grafana.graphPanel.new(
 
 // OVN
 
-local ovnAnnotationLatency = grafana.graphPanel.new(
-  title='Pod Annotation Latency',
-  datasource='$datasource',
-  format='short'
-).addTarget(
+local ovnAnnotationLatency = genericGraphPanel('Pod Annotation Latency', 'none').addTarget(
   prometheus.target(
     'sum by (instance) (rate(ovnkube_master_pod_creation_latency_seconds_sum[5m]))',
     legendFormat='{{instance}}',
   )
 );
 
-local ovnCNIAdd = grafana.graphPanel.new(
-  title='CNI Request ADD Latency',
-  datasource='$datasource',
-  format='short'
-).addTarget(
+local ovnCNIAdd = genericGraphPanel('CNI Request ADD Latency', 'none').addTarget(
   prometheus.target(
     'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="ADD"}[5m]))',
     legendFormat='{{instance}}',
   )
 );
 
-local ovnCNIDel = grafana.graphPanel.new(
-  title='CNI Request DEL Latency',
-  datasource='$datasource',
-  format='short'
-).addTarget(
+local ovnCNIDel = genericGraphPanel('CNI Request DEL Latency', 'none').addTarget(
   prometheus.target(
     'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="DEL"}[5m]))',
     legendFormat='{{instance}}',
   )
 );
 
-local ovnFlowCount = grafana.graphPanel.new(
-  title='br-int Flow Count',
-  datasource='$datasource',
-  format='short'
-).addTarget(
+local ovnFlowCount = genericGraphPanel('br-int Flow Count', 'none').addTarget(
   prometheus.target(
     'ovnkube_node_integration_bridge_openflow_total',
     legendFormat='{{instance}}',
@@ -292,11 +189,7 @@ local ovnFlowCount = grafana.graphPanel.new(
 
 // Monitoring Stack
 
-local promReplMemUsage = grafana.graphPanel.new(
-  title='Prometheus Replica Memory usage',
-  datasource='$datasource',
-  format='bytes'
-).addTarget(
+local promReplMemUsage = genericGraphLegendPanel('Prometheus Replica Memory usage', 'bytes').addTarget(
   prometheus.target(
     'sum(container_memory_rss{pod="prometheus-k8s-1",namespace!="",name!="",container="prometheus"}) by (pod)',
     legendFormat='{{pod}}',
@@ -310,76 +203,28 @@ local promReplMemUsage = grafana.graphPanel.new(
 
 // Kubelet
 
-local kubeletCPU = grafana.graphPanel.new(
-  title='Top 10 Kubelet CPU usage',
-  datasource='$datasource',
-  format='percent',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_max=true,
-  legend_rightSide=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  nullPointMode='null as zero',
-  legend_hideZero=true,
-).addTarget(
+local kubeletCPU = genericGraphLegendPanel('Top 10 Kubelet CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[2m]))*100',
+    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[2m])*100)',
     legendFormat='kubelet - {{node}}',
   )
 );
 
-local crioCPU = grafana.graphPanel.new(
-  title='Top 10 crio CPU usage',
-  datasource='$datasource',
-  format='percent',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_max=true,
-  legend_rightSide=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  nullPointMode='null as zero',
-  legend_hideZero=true,
-).addTarget(
+local crioCPU = genericGraphLegendPanel('Top 10 crio CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="crio"}[2m]))*100',
+    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="crio"}[2m])*100)',
     legendFormat='crio - {{node}}',
   )
 );
 
-local kubeletMemory = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Top 10 Kubelet memory usage',
-  format='bytes',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_max=true,
-  legend_rightSide=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  nullPointMode='null as zero',
-  legend_hideZero=true,
-).addTarget(
+local kubeletMemory = genericGraphLegendPanel('Top 10 Kubelet memory usage', 'bytes').addTarget(
   prometheus.target(
     'topk(10,process_resident_memory_bytes{service="kubelet",job="kubelet"})',
     legendFormat='kubelet - {{node}}',
   )
 );
 
-local crioMemory = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Top 10 crio memory usage',
-  format='bytes',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_max=true,
-  legend_rightSide=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  nullPointMode='null as zero',
-  legend_hideZero=true,
-).addTarget(
+local crioMemory = genericGraphLegendPanel('Top 10 crio memory usage', 'bytes').addTarget(
   prometheus.target(
     'topk(10,process_resident_memory_bytes{service="kubelet",job="crio"})',
     legendFormat='crio - {{node}}',
@@ -427,100 +272,32 @@ local current_pod_count = grafana.statPanel.new(
   )
 );
 
-local nodeCount = grafana.graphPanel.new(
-  title='Number of nodes',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local nodeCount = genericGraphPanel('Number of nodes', 'none').addTarget(
   prometheus.target(
     'sum(kube_node_info{})',
     legendFormat='Number of nodes',
   )
 );
 
-local nsCount = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Namespace count',
-  format='none',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local nsCount = genericGraphPanel('Namespace count', 'none').addTarget(
   prometheus.target(
     'count(kube_namespace_created{})',
     legendFormat='Namespace count',
   )
 );
 
-local podCount = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Pod count',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local podCount = genericGraphPanel('Pod count', 'none').addTarget(
   prometheus.target(
     'sum(kube_pod_status_phase{}) by (phase)',
     legendFormat='{{phase}} pods',
   )
 );
 
-local secretCount = grafana.graphPanel.new(
-  title='Secret count',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local secretCmCount = genericGraphPanel('Secret & configmap count', 'none').addTarget(
   prometheus.target(
     'count(kube_secret_info{})',
     legendFormat='secrets',
   )
-);
-
-local deployCount = grafana.graphPanel.new(
-  title='Deployment count',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
-  prometheus.target(
-    'count(kube_deployment_labels{})',
-    legendFormat='Deployments',
-  )
-);
-
-local cmCount = grafana.graphPanel.new(
-  title='Configmap count',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  legend_hideZero=true,
 ).addTarget(
   prometheus.target(
     'count(kube_configmap_info{})',
@@ -528,98 +305,54 @@ local cmCount = grafana.graphPanel.new(
   )
 );
 
-local servicesCount = grafana.graphPanel.new(
-  title='Services count',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  legend_hideZero=true,
-).addTarget(
+local deployCount = genericGraphPanel('Deployment count', 'none').addTarget(
+  prometheus.target(
+    'count(kube_deployment_labels{})',
+    legendFormat='Deployments',
+  )
+);
+
+
+local servicesCount = genericGraphPanel('Services count', 'none').addTarget(
   prometheus.target(
     'count(kube_service_info{})',
     legendFormat='Services',
   )
 );
 
-local routesCount = grafana.graphPanel.new(
-  title='Routes count',
-  format='none',
-  datasource='$datasource',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-  legend_hideZero=true,
-).addTarget(
+local routesCount = genericGraphPanel('Routes count', 'none').addTarget(
   prometheus.target(
     'count(openshift_route_info{})',
     legendFormat='Routes',
   )
 );
 
-local alerts = grafana.graphPanel.new(
-  title='Alerts',
-  format='none',
-  datasource='$datasource',
-  nullPointMode='null as zero',
-).addTarget(
+local alerts = genericGraphPanel('Alerts', 'none').addTarget(
   prometheus.target(
     'topk(10,sum(ALERTS{severity!="none"}) by (alertname, severity))',
     legendFormat='{{severity}}: {{alertname}}',
   )
 );
 
-local top10ContMem = grafana.graphPanel.new(
-  title='Top 10 container RSS',
-  datasource='$datasource',
-  format='bytes',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_rightSide=true,
-  legend_sideWidth=250,
-  nullPointMode='null as zero',
-).addTarget(
+local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').addTarget(
   prometheus.target(
-    'topk(10, container_memory_rss{namespace!="",name!=""})',
+    'topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
-local top10ContCPU = grafana.graphPanel.new(
-  title='Top 10 container CPU',
-  datasource='$datasource',
-  format='percent',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_rightSide=true,
-  legend_sideWidth=250,
-  nullPointMode='null as zero',
-).addTarget(
+local top10ContCPU = genericGraphLegendPanel('Top 10 container CPU', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(container_cpu_usage_seconds_total{namespace!="",name!=""}[2m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
 
-local goroutines_count = grafana.graphPanel.new(
-  title='Goroutines count',
-  format='none',
-  datasource='$datasource',
-  nullPointMode='null as zero',
-).addTarget(
+local goroutines_count = genericGraphPanel('Goroutines count', 'none').addTarget(
   prometheus.target(
     'topk(10, sum(go_goroutines{}) by (job,instance))',
-    legendFormat='{{job}} - {{instance}}',
+    legendFormat='{{ job }} - {{ instance }}',
   )
 );
 
@@ -635,32 +368,14 @@ local clusterOperatorsOverview = grafana.statPanel.new(
   )
 );
 
-local clusterOperatorsInformation = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Cluster operators information',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local clusterOperatorsInformation = genericGraphLegendPanel('Cluster operators information', 'none').addTarget(
   prometheus.target(
     'cluster_operator_conditions{name!="",reason!=""}',
     legendFormat='{{name}} - {{reason}}',
   )
 );
 
-local clusterOperatorsDegraded = grafana.graphPanel.new(
-  datasource='$datasource',
-  title='Cluster operators degraded',
-  legend_values=true,
-  legend_alignAsTable=true,
-  legend_current=true,
-  legend_max=true,
-  legend_sort='max',
-  legend_sortDesc=true,
-).addTarget(
+local clusterOperatorsDegraded = genericGraphLegendPanel('Cluster operators degraded', 'none').addTarget(
   prometheus.target(
     'cluster_operator_conditions{condition="Degraded",name!="",reason!=""}',
     legendFormat='{{name}} - {{reason}}',
@@ -824,15 +539,14 @@ grafana.dashboard.new(
     nodeCount { gridPos: { x: 0, y: 12, w: 8, h: 8 } },
     nsCount { gridPos: { x: 8, y: 12, w: 8, h: 8 } },
     podCount { gridPos: { x: 16, y: 12, w: 8, h: 8 } },
-    secretCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
+    secretCmCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
     deployCount { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
-    cmCount { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
-    servicesCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
-    routesCount { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
-    alerts { gridPos: { x: 0, y: 28, w: 24, h: 8 } },
-    top10ContMem { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
-    top10ContCPU { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
-    goroutines_count { gridPos: { x: 0, y: 44, w: 24, h: 8 } },
+    servicesCount { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
+    routesCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
+    alerts { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
+    top10ContMem { gridPos: { x: 0, y: 28, w: 24, h: 8 } },
+    top10ContCPU { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
+    goroutines_count { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
   ]
 ), { gridPos: { x: 0, y: 3, w: 24, h: 1 } })
 
