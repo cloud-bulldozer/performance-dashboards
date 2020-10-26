@@ -140,7 +140,6 @@ local conntrackStats(nodeName) = genericGraphLegendPanel('Conntrack stats: ' + n
   )
 );
 
-
 local top10ContainerCPU(nodeName) = genericGraphLegendPanel('Top 10 container CPU: ' + nodeName, 'percent').addTarget(
   prometheus.target(
     'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (namespace,name,service) * 100)',
@@ -152,6 +151,13 @@ local top10ContainerRSS(nodeName) = genericGraphLegendPanel('Top 10 container RS
   prometheus.target(
     'topk(10, container_memory_rss{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})',
     legendFormat='{{ namespace }} - {{ name }}',
+  )
+);
+
+local containerWriteBytes(nodeName) = genericGraphLegendPanel('Container fs write rate: ' + nodeName, 'Bps').addTarget(
+  prometheus.target(
+    'sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", container!=""}[5m])) by (device, container)',
+    legendFormat='{{ container }}: {{ device }}',
   )
 );
 
@@ -267,7 +273,7 @@ local current_pod_count = grafana.statPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(kube_pod_status_phase{namespace=~"$namespace"}) by (phase) > 0',
+    'sum(kube_pod_status_phase{}) by (phase) > 0',
     legendFormat='{{ phase}} Pods',
   )
 );
@@ -570,6 +576,7 @@ grafana.dashboard.new(
     conntrackStats('$_master_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
     top10ContainerCPU('$_master_node') { gridPos: { x: 0, y: 24, w: 12, h: 8 } },
     top10ContainerRSS('$_master_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
+    containerWriteBytes('$_master_node') { gridPos: { x: 0, y: 32, w: 12, h: 8 } },
   ],
 ), { gridPos: { x: 0, y: 1, w: 0, h: 8 } })
 
