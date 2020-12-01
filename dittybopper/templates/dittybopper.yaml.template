@@ -48,7 +48,7 @@ spec:
       containers:
       - name: dittybopper
         imagePullPolicy: Always
-        image: docker.io/grafana/grafana:7.1.5
+        image: quay.io/smalleni/grafana:7.1.5
         ports:
         - name: sc-grafana-http
           containerPort: 3000
