@@ -561,5 +561,5 @@ grafana.dashboard.new(
       heartbeat_failures { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
       compacted_keys { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
     ]
-  ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
+  ), { gridPos: { x: 0, y: 3, w: 24, h: 1 } }
 )
