@@ -247,7 +247,103 @@ local db_size_limit = grafana.singlestat.new(
   )
 );
 
-// Proposals and leaders section
+// Proposals, leaders, and keys section
+
+local keys = grafana.graphPanel.new(
+  title='Keys',
+  datasource='$datasource',
+).addTarget(
+  prometheus.target(
+    'etcd_debugging_mvcc_keys_total{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod }} Num keys',
+  )
+);
+
+local compacted_keys = grafana.graphPanel.new(
+  title='Compacted Keys',
+  datasource='$datasource',
+).addTarget(
+  prometheus.target(
+    'etcd_debugging_mvcc_db_compaction_keys_total{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod  }} keys compacted',
+  )
+);
+
+local heartbeat_failures = grafana.graphPanel.new(
+  title='Heartbeat Failures',
+  datasource='$datasource',
+).addTarget(
+  prometheus.target(
+    'etcd_server_heartbeat_send_failures_total{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod }} heartbeat  failures',
+  )
+).addTarget(
+  prometheus.target(
+    'etcd_server_health_failures{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod }} health failures',
+  )
+);
+
+local total_number_of_failed_proposals = grafana.singlestat.new(
+  title='The total number of failed proposals seen',
+  datasource='$datasource',
+).addTarget(
+  prometheus.target(
+    'max(etcd_server_leader_changes_seen_total{pod=~"$pod",job=~"$cluster"})',
+  )
+);
+
+local key_operations = grafana.graphPanel.new(
+  title='Key Operations',
+  datasource='$datasource',
+) {
+  yaxes: [
+    {
+      format: 'ops',
+      show: 'true',
+    },
+    {
+      format: 'short',
+      show: 'false',
+    },
+  ],
+}.addTarget(
+  prometheus.target(
+    'rate(etcd_debugging_mvcc_put_total{pod=~"$pod",job=~"$cluster"}[5m])',
+    legendFormat='{{ pod }} puts/s',
+  )
+).addTarget(
+  prometheus.target(
+    'rate(etcd_debugging_mvcc_delete_total{pod=~"$pod",job=~"$cluster"}[5m])',
+    legendFormat='{{ pod }} deletes/s',
+  )
+);
+
+local slow_operations = grafana.graphPanel.new(
+  title='Slow Operations',
+  datasource='$datasource',
+) {
+  yaxes: [
+    {
+      format: 'ops',
+      show: 'true',
+    },
+    {
+      format: 'short',
+      show: 'false',
+    },
+  ],
+}.addTarget(
+  prometheus.target(
+    'etcd_server_slow_apply_total{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod }} slow applies',
+  )
+).addTarget(
+  prometheus.target(
+    'etcd_server_slow_read_indexes_total{pod=~"$pod",job=~"$cluster"}',
+    legendFormat='{{ pod }} slow read indexes',
+  )
+);
 
 local raft_proposals = grafana.graphPanel.new(
   title='Raft Proposals',
@@ -322,6 +418,7 @@ local num_failed_proposals = grafana.singlestat.new(
     'max(etcd_server_proposals_committed_total)',
   )
 );
+
 
 // Creating the dashboard from the panels described above.
 
@@ -410,7 +507,7 @@ grafana.dashboard.new(
 )
 
 .addPanel(
-  grafana.row.new(title='General Info', collapse=true).addPanels(
+  grafana.row.new(title='General Resource Usage', collapse=true).addPanels(
     [
       cpu_usage { gridPos: { x: 0, y: 1, w: 12, h: 8 } },
       mem_usage { gridPos: { x: 12, y: 1, w: 12, h: 8 } },
@@ -451,12 +548,18 @@ grafana.dashboard.new(
 )
 
 .addPanel(
-  grafana.row.new(title='Proposals and Leaders', collapse=true).addPanels(
+  grafana.row.new(title='General Info', collapse=true).addPanels(
     [
       raft_proposals { gridPos: { x: 0, y: 1, w: 12, h: 8 } },
       leader_elections_per_day { gridPos: { x: 12, y: 1, w: 12, h: 8 } },
       etcd_has_leader { gridPos: { x: 0, y: 8, w: 6, h: 4 } },
       num_leader_changes { gridPos: { x: 6, y: 8, w: 6, h: 4 } },
+      num_failed_proposals { gridPos: { x: 0, y: 12, w: 12, h: 4 } },
+      keys { gridPos: { x: 12, y: 12, w: 12, h: 8 } },
+      slow_operations { gridPos: { x: 0, y: 20, w: 12, h: 8 } },
+      key_operations { gridPos: { x: 12, y: 20, w: 12, h: 8 } },
+      heartbeat_failures { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
+      compacted_keys { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
