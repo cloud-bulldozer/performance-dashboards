@@ -144,21 +144,6 @@ local peer_traffic_out = grafana.graphPanel.new(
   )
 );
 
-local disk_opeations_latency = grafana.graphPanel.new(
-  title='Disk Operations Latency',
-  datasource='$datasource',
-).addTarget(
-  prometheus.target(
-    'sum(rate(etcd_disk_wal_fsync_duration_seconds_sum[5m]))',
-    legendFormat='The latency distributions of fsync called by wal',
-  )
-).addTarget(
-  prometheus.target(
-    'sum(rate(etcd_disk_backend_commit_duration_seconds_sum[5m]))',
-    legendFormat='The latency distributions of commit called by backend',
-  )
-);
-
 local network_sent_and_received = grafana.graphPanel.new(
   title='Network',
   datasource='$datasource',
