@@ -142,7 +142,7 @@ local conntrackStats(nodeName) = genericGraphLegendPanel('Conntrack stats: ' + n
 
 local top10ContainerCPU(nodeName) = genericGraphLegendPanel('Top 10 container CPU: ' + nodeName, 'percent').addTarget(
   prometheus.target(
-    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (namespace,name,service) * 100)',
+    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (pod,container,namespace,name,service) * 100)',
     legendFormat='{{ pod }}: {{ container }}',
   )
 );
