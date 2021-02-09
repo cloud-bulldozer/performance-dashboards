@@ -157,6 +157,11 @@ if [[ $delete ]]; then
 else
   echo ""
   echo -e "\033[32mCreating namespace...\033[0m"
+  # delete the namespace if it already exists to make sure the latest version of the dashboards are deployed and also to support the case where user wants to redeploy dittybopper without having to delete the namespace manually
+  if [[ $($k8s_cmd get namespaces | grep -w $namespace) ]]; then
+    echo "Looks like the namespace $namespace already exists, deleting it"
+    namespace "delete"
+  fi
   namespace "create"
   echo ""
   echo -e "\033[32mDeploying Grafana...\033[0m"
