@@ -54,7 +54,7 @@ local nodeMemory(nodeName) = genericGraphPanel('System Memory: ' + nodeName, 'by
 
 local nodeCPU(nodeName) = genericGraphPanel('CPU Basic: ' + nodeName, 'percent').addTarget(
   prometheus.target(
-    'sum by (instance, mode)(rate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[5m])) * 100',
+    'sum by (instance, mode)(rate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[$interval])) * 100',
     legendFormat='Busy {{mode}}',
   )
 );
@@ -62,60 +62,60 @@ local nodeCPU(nodeName) = genericGraphPanel('CPU Basic: ' + nodeName, 'percent')
 
 local diskThroughput(nodeName) = genericGraphPanel('Disk throughput: ' + nodeName, 'Bps').addTarget(
   prometheus.target(
-    'rate(node_disk_read_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    'rate(node_disk_read_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[$interval])',
     legendFormat='{{ device }} - read',
   )
 ).addTarget(
   prometheus.target(
-    'rate(node_disk_written_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    'rate(node_disk_written_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[$interval])',
     legendFormat='{{ device }} - write',
   )
 );
 
 local diskIOPS(nodeName) = genericGraphLegendPanel('Disk IOPS: ' + nodeName, 'iops').addTarget(
   prometheus.target(
-    'rate(node_disk_reads_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    'rate(node_disk_reads_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[$interval])',
     legendFormat='{{ device }} - read',
   )
 ).addTarget(
   prometheus.target(
-    'rate(node_disk_writes_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[2m])',
+    'rate(node_disk_writes_completed_total{device=~"$block_device",instance=~"' + nodeName + '"}[$interval])',
     legendFormat='{{ device }} - write',
   )
 );
 
 local networkUtilization(nodeName) = genericGraphLegendPanel('Network Utilization: ' + nodeName, 'bps').addTarget(
   prometheus.target(
-    'rate(node_network_receive_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
+    'rate(node_network_receive_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[$interval]) * 8',
     legendFormat='{{instance}} - {{device}} - RX',
   )
 ).addTarget(
   prometheus.target(
-    'rate(node_network_transmit_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m]) * 8',
+    'rate(node_network_transmit_bytes_total{instance=~"' + nodeName + '",device=~"$net_device"}[$interval]) * 8',
     legendFormat='{{instance}} - {{device}} - TX',
   )
 );
 
 local networkPackets(nodeName) = genericGraphLegendPanel('Network Packets: ' + nodeName, 'pps').addTarget(
   prometheus.target(
-    'rate(node_network_receive_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
+    'rate(node_network_receive_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[$interval])',
     legendFormat='{{instance}} - {{device}} - RX',
   )
 ).addTarget(
   prometheus.target(
-    'rate(node_network_transmit_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[5m])',
+    'rate(node_network_transmit_packets_total{instance=~"' + nodeName + '",device=~"$net_device"}[$interval])',
     legendFormat='{{instance}} - {{device}} - TX',
   )
 );
 
 local networkDrop(nodeName) = genericGraphLegendPanel('Network packets drop: ' + nodeName, 'pps').addTarget(
   prometheus.target(
-    'topk(10, rate(node_network_receive_drop_total{instance=~"' + nodeName + '"}[2m]))',
+    'topk(10, rate(node_network_receive_drop_total{instance=~"' + nodeName + '"}[$interval]))',
     legendFormat='rx-drop-{{ device }}',
   )
 ).addTarget(
   prometheus.target(
-    'topk(10,rate(node_network_transmit_drop_total{instance=~"' + nodeName + '"}[2m]))',
+    'topk(10,rate(node_network_transmit_drop_total{instance=~"' + nodeName + '"}[$interval]))',
     legendFormat='tx-drop-{{ device }}',
   )
 );
@@ -142,7 +142,7 @@ local conntrackStats(nodeName) = genericGraphLegendPanel('Conntrack stats: ' + n
 
 local top10ContainerCPU(nodeName) = genericGraphLegendPanel('Top 10 container CPU: ' + nodeName, 'percent').addTarget(
   prometheus.target(
-    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[5m])) by (pod,container,namespace,name,service) * 100)',
+    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)',
     legendFormat='{{ pod }}: {{ container }}',
   )
 );
@@ -156,7 +156,7 @@ local top10ContainerRSS(nodeName) = genericGraphLegendPanel('Top 10 container RS
 
 local containerWriteBytes(nodeName) = genericGraphLegendPanel('Container fs write rate: ' + nodeName, 'Bps').addTarget(
   prometheus.target(
-    'sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", container!=""}[5m])) by (device, container)',
+    'sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", container!=""}[$interval])) by (device, container)',
     legendFormat='{{ container }}: {{ device }}',
   )
 );
@@ -167,21 +167,21 @@ local containerWriteBytes(nodeName) = genericGraphLegendPanel('Container fs writ
 
 local ovnAnnotationLatency = genericGraphPanel('Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'sum by (instance) (rate(ovnkube_master_pod_creation_latency_seconds_sum[5m]))',
+    'sum by (instance) (rate(ovnkube_master_pod_creation_latency_seconds_sum[$interval]))',
     legendFormat='{{instance}}',
   )
 );
 
 local ovnCNIAdd = genericGraphPanel('CNI Request ADD Latency', 's').addTarget(
   prometheus.target(
-    'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="ADD"}[5m]))',
+    'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="ADD"}[$interval]))',
     legendFormat='{{instance}}',
   )
 );
 
 local ovnCNIDel = genericGraphPanel('CNI Request DEL Latency', 's').addTarget(
   prometheus.target(
-    'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="DEL"}[5m]))',
+    'sum by (instance) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="DEL"}[$interval]))',
     legendFormat='{{instance}}',
   )
 );
@@ -211,14 +211,14 @@ local promReplMemUsage = genericGraphLegendPanel('Prometheus Replica Memory usag
 
 local kubeletCPU = genericGraphLegendPanel('Top 10 Kubelet CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[2m])*100)',
+    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[$interval])*100)',
     legendFormat='kubelet - {{node}}',
   )
 );
 
 local crioCPU = genericGraphLegendPanel('Top 10 crio CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="crio"}[2m])*100)',
+    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="crio"}[$interval])*100)',
     legendFormat='crio - {{node}}',
   )
 );
@@ -349,7 +349,7 @@ local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').ad
 
 local top10ContCPU = genericGraphLegendPanel('Top 10 container CPU', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[2m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[$interval])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
@@ -504,6 +504,20 @@ grafana.dashboard.new(
     type: 'query',
     multi: true,
     includeAll: true,
+  },
+)
+
+.addTemplate(
+  grafana.template.new(
+    'interval',
+    '$datasource',
+    '$__auto_interval_period',
+    label='interval',
+    refresh='time',
+  ) {
+    type: 'interval',
+    query: '2m,3m,4m,5m',
+    auto: false,
   },
 )
 

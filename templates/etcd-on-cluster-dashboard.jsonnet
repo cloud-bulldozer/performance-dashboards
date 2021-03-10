@@ -19,7 +19,7 @@ local fs_writes = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(container_fs_writes_bytes_total{container="etcd",device!~".+dm.+"}[5m])',
+    'rate(container_fs_writes_bytes_total{container="etcd",device!~".+dm.+"}[2m])',
     legendFormat='{{ pod }}: {{ device }}',
   )
 );
@@ -39,7 +39,7 @@ local ptp = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket[5m]))',
+    'histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket[2m]))',
     legendFormat='{{pod}}',
   )
 );
@@ -59,7 +59,7 @@ local disk_wal_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket[5m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} WAL fsync',
   )
 );
@@ -79,7 +79,7 @@ local disk_backend_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket[5m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} DB fsync',
   )
 );
@@ -145,7 +145,7 @@ local mem_usage = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*"}[5m])) BY (pod, namespace)',
+    'sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*"}[2m])) BY (pod, namespace)',
     legendFormat='{{ pod }}',
   )
 );
@@ -165,12 +165,12 @@ local network_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'sum(rate(container_network_receive_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[5m])) BY (namespace, pod)',
+    'sum(rate(container_network_receive_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)',
     legendFormat='rx {{ pod }}'
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(container_network_transmit_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[5m])) BY (namespace, pod)',
+    'sum(rate(container_network_transmit_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)',
     legendFormat='tx {{ pod }}',
   )
 );
@@ -191,12 +191,12 @@ local grpc_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_client_grpc_received_bytes_total[5m])',
+    'rate(etcd_network_client_grpc_received_bytes_total[2m])',
     legendFormat='rx {{pod}}'
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_client_grpc_sent_bytes_total[5m])',
+    'rate(etcd_network_client_grpc_sent_bytes_total[2m])',
     legendFormat='tx {{pod}}',
   )
 );
@@ -216,12 +216,12 @@ local peer_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_peer_received_bytes_total[5m])',
+    'rate(etcd_network_peer_received_bytes_total[2m])',
     legendFormat='rx {{pod}} Peer Traffic'
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_peer_sent_bytes_total[5m])',
+    'rate(etcd_network_peer_sent_bytes_total[2m])',
     legendFormat='tx {{pod}} Peer Traffic',
   )
 );
@@ -248,7 +248,7 @@ local snapshot_duration = grafana.graphPanel.new(
   format='s',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_debugging_snap_save_total_duration_seconds_sum[5m]))',
+    'sum(rate(etcd_debugging_snap_save_total_duration_seconds_sum[2m]))',
     legendFormat='the total latency distributions of save called by snapshot',
   )
 );
@@ -343,12 +343,12 @@ local key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_put_total{pod=~"$pod"}[5m])',
+    'rate(etcd_debugging_mvcc_put_total{pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_delete_total{pod=~"$pod"}[5m])',
+    'rate(etcd_debugging_mvcc_delete_total{pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} deletes/s',
   )
 );
@@ -385,7 +385,7 @@ local raft_proposals = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_failed_total[5m]))',
+    'sum(rate(etcd_server_proposals_failed_total[2m]))',
     legendFormat='Proposal Failure Rate',
   )
 ).addTarget(
@@ -395,12 +395,12 @@ local raft_proposals = grafana.graphPanel.new(
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_committed_total[5m]))',
+    'sum(rate(etcd_server_proposals_committed_total[2m]))',
     legendFormat='Proposal Commit Rate',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_applied_total[5m]))',
+    'sum(rate(etcd_server_proposals_applied_total[2m]))',
     legendFormat='Proposal Apply Rate',
   )
 );
@@ -441,7 +441,7 @@ local num_leader_changes = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_leader_changes_seen_total[5m]))',
+    'sum(rate(etcd_server_leader_changes_seen_total[2m]))',
   )
 );
 
