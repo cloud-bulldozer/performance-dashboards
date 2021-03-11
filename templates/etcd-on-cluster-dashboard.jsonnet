@@ -59,7 +59,7 @@ local disk_wal_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket[2m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(irate(etcd_disk_wal_fsync_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} WAL fsync',
   )
 );
@@ -79,7 +79,7 @@ local disk_backend_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket[2m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(irate(etcd_disk_backend_commit_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} DB fsync',
   )
 );
@@ -370,12 +370,12 @@ local slow_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_server_slow_apply_total{pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_apply_total{pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} slow applies',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_server_slow_read_indexes_total{pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_read_indexes_total{pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} slow read indexes',
   )
 );
