@@ -283,6 +283,11 @@ local nodeCount = genericGraphPanel('Number of nodes', 'none').addTarget(
     'sum(kube_node_info{})',
     legendFormat='Number of nodes',
   )
+).addTarget(
+  prometheus.target(
+    'sum(kube_node_status_condition{status="true"}) by (condition) > 0',
+    legendFormat='Node: {{ condition }}',
+  )
 );
 
 local nsCount = genericGraphPanel('Namespace count', 'none').addTarget(
