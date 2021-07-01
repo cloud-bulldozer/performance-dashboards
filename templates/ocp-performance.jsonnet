@@ -29,7 +29,7 @@ local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
 );
 
 
-local nodeMemory(nodeName) = genericGraphPanel('System Memory: ' + nodeName, 'bytes').addTarget(
+local nodeMemory(nodeName) = genericGraphLegendPanel('System Memory: ' + nodeName, 'bytes').addTarget(
   prometheus.target(
     'node_memory_Active_bytes{instance=~"' + nodeName + '"}',
     legendFormat='Active',
@@ -46,13 +46,13 @@ local nodeMemory(nodeName) = genericGraphPanel('System Memory: ' + nodeName, 'by
   )
 ).addTarget(
   prometheus.target(
-    'node_memory_MemAvailable_bytes{instance=~"' + nodeName + '"} - (node_memory_Cached_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"})',
+    'node_memory_MemAvailable_bytes{instance=~"' + nodeName + '"}',
     legendFormat='Available',
   )
 );
 
 
-local nodeCPU(nodeName) = genericGraphPanel('CPU Basic: ' + nodeName, 'percent').addTarget(
+local nodeCPU(nodeName) = genericGraphLegendPanel('CPU Basic: ' + nodeName, 'percent').addTarget(
   prometheus.target(
     'sum by (instance, mode)(rate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[$interval])) * 100',
     legendFormat='Busy {{mode}}',
@@ -60,7 +60,7 @@ local nodeCPU(nodeName) = genericGraphPanel('CPU Basic: ' + nodeName, 'percent')
 );
 
 
-local diskThroughput(nodeName) = genericGraphPanel('Disk throughput: ' + nodeName, 'Bps').addTarget(
+local diskThroughput(nodeName) = genericGraphLegendPanel('Disk throughput: ' + nodeName, 'Bps').addTarget(
   prometheus.target(
     'rate(node_disk_read_bytes_total{device=~"$block_device",instance=~"' + nodeName + '"}[$interval])',
     legendFormat='{{ device }} - read',
