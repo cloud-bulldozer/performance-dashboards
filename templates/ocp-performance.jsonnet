@@ -262,8 +262,8 @@ local current_namespace_count = grafana.statPanel.new(
   graphMode='none',
 ).addTarget(
   prometheus.target(
-    'count(kube_namespace_created{})',
-    legendFormat='Namespace Count',
+    'sum(kube_namespace_status_phase) by (phase)',
+    legendFormat='Namespaces {{ phase }}',
   )
 );
 
