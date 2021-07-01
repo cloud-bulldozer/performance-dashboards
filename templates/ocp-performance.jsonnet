@@ -256,14 +256,14 @@ local current_node_count = grafana.statPanel.new(
 );
 
 local current_namespace_count = grafana.statPanel.new(
-  title='Current Namespace Count',
+  title='Current namespace Count',
   datasource='$datasource',
   reducerFunction='last',
   graphMode='none',
 ).addTarget(
   prometheus.target(
-    'count(kube_namespace_created{})',
-    legendFormat='Namespace Count',
+    'sum(kube_namespace_status_phase) by (phase)',
+    legendFormat='Namespaces {{ phase }}',
   )
 );
 
@@ -292,8 +292,8 @@ local nodeCount = genericGraphPanel('Number of nodes', 'none').addTarget(
 
 local nsCount = genericGraphPanel('Namespace count', 'none').addTarget(
   prometheus.target(
-    'count(kube_namespace_created{})',
-    legendFormat='Namespace count',
+    'sum(kube_namespace_status_phase) by (phase) > 0',
+    legendFormat='{{ phase }} namespaces',
   )
 );
 
