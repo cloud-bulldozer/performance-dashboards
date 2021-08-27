@@ -467,7 +467,7 @@ grafana.dashboard.new(
     '$datasource',
     'label_values(kube_pod_info, namespace)',
     '',
-    regex='/(openshift-.*|.*ripsaw.*|builder-.*|.*kube.*)/',
+    regex='/(openshift-.*|.*ripsaw.*|.*benchmark.*|builder-.*|.*kube.*)/',
     refresh=2,
   ) {
     label: 'Namespace',
