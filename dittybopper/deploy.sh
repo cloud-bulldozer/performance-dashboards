@@ -109,7 +109,7 @@ fi
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
 export PROMETHEUS_URL=$($k8s_cmd get secrets -n openshift-monitoring grafana-datasources -o go-template='{{index .data "prometheus.yaml" | base64decode }}' | jq '.datasources[0].url')
-export PROMETHEUS_PASSWORD=$($k8s_cmd get secrets -n openshift-monitoring grafana-datasources -o go-template='{{index .data "prometheus.yaml"| base64decode }}' | jq '.datasources[0].basicAuthPassword')
+export PROMETHEUS_PASSWORD=$($k8s_cmd get secrets -n openshift-monitoring grafana-datasources -o go-template='{{index .data "prometheus.yaml"| base64decode }}' | jq 'if .datasources[0].basicAuthPassword != null then .datasources[0].basicAuthPassword else .datasources[0].secureJsonData.basicAuthPassword end')
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
 echo "Prometheus password collected."
 
