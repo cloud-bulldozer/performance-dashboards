@@ -186,12 +186,39 @@ local ovnCNIDel = genericGraphPanel('CNI Request DEL Latency', 's').addTarget(
   )
 );
 
-local ovnFlowCount = genericGraphPanel('br-int Flow Count', 'none').addTarget(
+local ovnKubeMasterMem = genericGraphLegendPanel('ovnkube-master Memory Usage', 'bytes').addTarget(
   prometheus.target(
-    'ovnkube_node_integration_bridge_openflow_total',
-    legendFormat='{{instance}}',
+    'sum(container_memory_working_set_bytes{pod=~"ovnkube-master-.*",namespace="openshift-ovn-kubernetes",container=""}) by (pod, node)',
+    legendFormat='{{node}}',
+  )
+).addTarget(
+  prometheus.target(
+    'sum(container_memory_working_set_bytes{pod=~"ovnkube-master-.*",namespace="openshift-ovn-kubernetes",container!=""}) by (pod, node)',
+    legendFormat='{{container}}-{{node}}',
   )
 );
+
+local ovnKubeMasterCPU = genericGraphLegendPanel('ovnkube-master CPU Usage', 'percent').addTarget(
+  prometheus.target(
+    'rate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!=""}[$interval])*100',
+    legendFormat='{{container}}-{{node}}',
+  )
+);
+
+local topOvnControllerCPU = genericGraphLegendPanel('Top 10 ovn-controller CPU Usage', 'percent').addTarget(
+  prometheus.target(
+    'topk(10, rate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)',
+    legendFormat='{{node}}',
+  )
+);
+
+local topOvnControllerMem = genericGraphLegendPanel('Top 10  ovn-controller Memory Usage', 'bytes').addTarget(
+  prometheus.target(
+    'topk(10, sum(container_memory_working_set_bytes{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (node))',
+    legendFormat='{{node}}',
+  )
+);
+
 
 // Monitoring Stack
 
@@ -348,6 +375,13 @@ local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').ad
   prometheus.target(
     'topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})',
     legendFormat='{{ namespace }} - {{ name }}',
+  )
+);
+
+local podDistribution = genericGraphLegendPanel('Pod Distribution', 'none').addTarget(
+  prometheus.target(
+    'count(kube_pod_info{}) by (node)',
+    legendFormat='{{ node }}',
   )
 );
 
@@ -533,7 +567,10 @@ grafana.dashboard.new(
       ovnAnnotationLatency { gridPos: { x: 0, y: 1, w: 24, h: 12 } },
       ovnCNIAdd { gridPos: { x: 0, y: 13, w: 12, h: 8 } },
       ovnCNIDel { gridPos: { x: 12, y: 13, w: 12, h: 8 } },
-      ovnFlowCount { gridPos: { x: 0, y: 21, w: 24, h: 12 } },
+      ovnKubeMasterCPU { gridPos: { x: 0, y: 21, w: 12, h: 8 } },
+      ovnKubeMasterMem { gridPos: { x: 12, y: 21, w: 12, h: 8 } },
+      topOvnControllerCPU { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
+      topOvnControllerMem { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
@@ -568,6 +605,7 @@ grafana.dashboard.new(
     servicesCount { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
     routesCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
     alerts { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
+    podDistribution { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
     top10ContMem { gridPos: { x: 0, y: 28, w: 24, h: 8 } },
     top10ContCPU { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
     goroutines_count { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
