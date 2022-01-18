@@ -142,14 +142,14 @@ local conntrackStats(nodeName) = genericGraphLegendPanel('Conntrack stats: ' + n
 
 local top10ContainerCPU(nodeName) = genericGraphLegendPanel('Top 10 container CPU: ' + nodeName, 'percent').addTarget(
   prometheus.target(
-    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)',
+    'topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",instance=~"' + nodeName + '",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)',
     legendFormat='{{ pod }}: {{ container }}',
   )
 );
 
 local top10ContainerRSS(nodeName) = genericGraphLegendPanel('Top 10 container RSS: ' + nodeName, 'bytes').addTarget(
   prometheus.target(
-    'topk(10, container_memory_rss{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})',
+    'topk(10, container_memory_rss{container!="POD",name!="",instance=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})',
     legendFormat='{{ pod }}: {{ container }}',
   )
 );
@@ -300,13 +300,6 @@ local servicesCount = genericGraphPanel('Services count', 'none').addTarget(
   )
 );
 
-local routesCount = genericGraphPanel('Routes count', 'none').addTarget(
-  prometheus.target(
-    'count(openshift_route_info{})',
-    legendFormat='Routes',
-  )
-);
-
 local alerts = genericGraphPanel('Alerts', 'none').addTarget(
   prometheus.target(
     'topk(10,sum(ALERTS{severity!="none"}) by (alertname, severity))',
@@ -323,7 +316,7 @@ local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').ad
 
 local podDistribution = genericGraphLegendPanel('Pod Distribution', 'none').addTarget(
   prometheus.target(
-    'count(kube_pod_info{}) by (node)',
+    'count(kube_pod_info{}) by (exported_node)',
     legendFormat='{{ node }}',
   )
 );
@@ -394,24 +387,9 @@ grafana.dashboard.new(
 
 .addTemplate(
   grafana.template.new(
-    '_master_node',
-    '$datasource',
-    'label_values(kube_node_role{role="master"}, node)',
-    '',
-    refresh=2,
-  ) {
-    label: 'Master',
-    type: 'query',
-    multi: true,
-    includeAll: false,
-  }
-)
-
-.addTemplate(
-  grafana.template.new(
     '_worker_node',
     '$datasource',
-    'label_values(kube_node_role{role=~"work.*"}, node)',
+    'label_values(kube_node_labels{}, exported_node)',
     '',
     refresh=2,
   ) {
@@ -424,27 +402,10 @@ grafana.dashboard.new(
 
 .addTemplate(
   grafana.template.new(
-    '_infra_node',
-    '$datasource',
-    'label_values(kube_node_role{role="infra"}, node)',
-    '',
-    refresh=2,
-  ) {
-    label: 'Infra',
-    type: 'query',
-    multi: true,
-    includeAll: false,
-  },
-)
-
-
-.addTemplate(
-  grafana.template.new(
     'namespace',
     '$datasource',
-    'label_values(kube_pod_info, namespace)',
+    'label_values(kube_pod_info, exported_namespace)',
     '',
-    regex='/(openshift-.*|.*ripsaw.*|.*benchmark.*|builder-.*|.*kube.*)/',
     refresh=2,
   ) {
     label: 'Namespace',
@@ -504,23 +465,6 @@ grafana.dashboard.new(
 
 // Dashboard definition
 
-.addPanel(
-  grafana.row.new(title='Monitoring stack', collapse=true)
-  .addPanel(promReplMemUsage, gridPos={ x: 0, y: 2, w: 24, h: 12 })
-  , { gridPos: { x: 0, y: 1, w: 24, h: 1 } }
-)
-
-.addPanel(
-  grafana.row.new(title='Cluster Kubelet', collapse=true).addPanels(
-    [
-      kubeletCPU { gridPos: { x: 0, y: 3, w: 12, h: 8 } },
-      crioCPU { gridPos: { x: 12, y: 3, w: 12, h: 8 } },
-      kubeletMemory { gridPos: { x: 0, y: 11, w: 12, h: 8 } },
-      crioMemory { gridPos: { x: 12, y: 11, w: 12, h: 8 } },
-    ]
-  ), { gridPos: { x: 0, y: 2, w: 24, h: 1 } }
-)
-
 .addPanel(grafana.row.new(title='Cluster Details', collapse=true).addPanels(
   [
     current_node_count { gridPos: { x: 0, y: 4, w: 8, h: 3 } },
@@ -532,40 +476,14 @@ grafana.dashboard.new(
     secretCmCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
     deployCount { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
     servicesCount { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
-    routesCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
-    alerts { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
-    podDistribution { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
     top10ContMem { gridPos: { x: 0, y: 28, w: 24, h: 8 } },
     top10ContCPU { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
     goroutines_count { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
+    podDistribution { gridPos: { x: 0, y: 44, w: 24, h: 8 } },
   ]
 ), { gridPos: { x: 0, y: 3, w: 24, h: 1 } })
 
-.addPanel(grafana.row.new(title='Cluster Operators Details', collapse=true).addPanels(
-  [
-    clusterOperatorsOverview { gridPos: { x: 0, y: 4, w: 24, h: 3 } },
-    clusterOperatorsInformation { gridPos: { x: 0, y: 4, w: 8, h: 8 } },
-    clusterOperatorsDegraded { gridPos: { x: 8, y: 4, w: 8, h: 8 } },
-  ],
-), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
-
-.addPanel(grafana.row.new(title='Master: $_master_node', collapse=true, repeat='_master_node').addPanels(
-  [
-    nodeCPU('$_master_node') { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
-    nodeMemory('$_master_node') { gridPos: { x: 12, y: 0, w: 12, h: 8 } },
-    diskThroughput('$_master_node') { gridPos: { x: 0, y: 8, w: 12, h: 8 } },
-    diskIOPS('$_master_node') { gridPos: { x: 12, y: 8, w: 12, h: 8 } },
-    networkUtilization('$_master_node') { gridPos: { x: 0, y: 16, w: 12, h: 8 } },
-    networkPackets('$_master_node') { gridPos: { x: 12, y: 16, w: 12, h: 8 } },
-    networkDrop('$_master_node') { gridPos: { x: 0, y: 24, w: 12, h: 8 } },
-    conntrackStats('$_master_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
-    top10ContainerCPU('$_master_node') { gridPos: { x: 0, y: 24, w: 12, h: 8 } },
-    top10ContainerRSS('$_master_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
-    containerWriteBytes('$_master_node') { gridPos: { x: 0, y: 32, w: 12, h: 8 } },
-  ],
-), { gridPos: { x: 0, y: 1, w: 0, h: 8 } })
-
-.addPanel(grafana.row.new(title='Worker: $_worker_node', collapse=true, repeat='_worker_node').addPanels(
+.addPanel(grafana.row.new(title='Node: $_worker_node', collapse=true, repeat='_worker_node').addPanels(
   [
     nodeCPU('$_worker_node') { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
     nodeMemory('$_worker_node') { gridPos: { x: 12, y: 0, w: 12, h: 8 } },
@@ -577,20 +495,5 @@ grafana.dashboard.new(
     conntrackStats('$_worker_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
     top10ContainerCPU('$_worker_node') { gridPos: { x: 0, y: 32, w: 12, h: 8 } },
     top10ContainerRSS('$_worker_node') { gridPos: { x: 12, y: 32, w: 12, h: 8 } },
-  ],
-), { gridPos: { x: 0, y: 1, w: 0, h: 8 } })
-
-.addPanel(grafana.row.new(title='Infra: $_infra_node', collapse=true, repeat='_infra_node').addPanels(
-  [
-    nodeCPU('$_infra_node') { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
-    nodeMemory('$_infra_node') { gridPos: { x: 12, y: 0, w: 12, h: 8 } },
-    diskThroughput('$_infra_node') { gridPos: { x: 0, y: 8, w: 12, h: 8 } },
-    diskIOPS('$_infra_node') { gridPos: { x: 12, y: 8, w: 12, h: 8 } },
-    networkUtilization('$_infra_node') { gridPos: { x: 0, y: 16, w: 12, h: 8 } },
-    networkPackets('$_infra_node') { gridPos: { x: 12, y: 16, w: 12, h: 8 } },
-    networkDrop('$_infra_node') { gridPos: { x: 0, y: 24, w: 12, h: 8 } },
-    conntrackStats('$_infra_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
-    top10ContainerCPU('$_infra_node') { gridPos: { x: 0, y: 24, w: 12, h: 8 } },
-    top10ContainerRSS('$_infra_node') { gridPos: { x: 12, y: 24, w: 12, h: 8 } },
   ],
 ), { gridPos: { x: 0, y: 1, w: 0, h: 8 } })
