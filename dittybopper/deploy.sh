@@ -38,7 +38,7 @@ END
 
 export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
-export DASHBOARDS="ocp-performance.json api-performance-overview.json etcd-on-cluster-dashboard.json"
+export DASHBOARDS="ocp-performance.json api-performance-overview.json etcd-on-cluster-dashboard.json hypershift-performance.json"
 
 # Set defaults for command options
 k8s_cmd='oc'
