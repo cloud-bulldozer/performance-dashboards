@@ -76,7 +76,7 @@ local num_hosted_cluster = stat.new(
     'count(hypershift_cluster_initial_rollout_duration_seconds)',
   )
 ).addThresholds([
-      { color: 'green', value: null },
+  { color: 'green', value: null },
 ]);
 
 local ocp_version = stat.new(
@@ -90,7 +90,7 @@ local ocp_version = stat.new(
     legendFormat='{{version}}',
   )
 ).addThresholds([
-      { color: 'green', value: null },
+  { color: 'green', value: null },
 ]);
 
 local infrastructure = stat.new(
@@ -104,7 +104,7 @@ local infrastructure = stat.new(
     legendFormat='{{type}}',
   )
 ).addThresholds([
-      { color: 'green', value: null },
+  { color: 'green', value: null },
 ]);
 
 local region = stat.new(
@@ -118,7 +118,7 @@ local region = stat.new(
     legendFormat='{{region}}',
   )
 ).addThresholds([
-      { color: 'green', value: null },
+  { color: 'green', value: null },
 ]);
 
 local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').addTarget(
@@ -643,7 +643,7 @@ grafana.dashboard.new(
     region { gridPos: { x: 18, y: 0, w: 6, h: 4 } },
     top10ContCPU { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
     top10ContMem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
-  ], 
+  ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
 .addPanel(grafana.row.new(title='HostedControlPlane stats - $namespace', collapse=true, repeat='namespace').addPanels(
