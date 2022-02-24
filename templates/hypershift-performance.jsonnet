@@ -1,5 +1,6 @@
 local grafana = import 'grafonnet-lib/grafonnet/grafana.libsonnet';
 local prometheus = grafana.prometheus;
+local stat = grafana.statPanel;
 
 // Panel definitions
 
@@ -27,7 +28,7 @@ local hostedControlPlaneCPU = genericGraphLegendPanel('Hosted Control Plane CPU'
   )
 ).addTarget(
   prometheus.target(
-    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~"kube.*"})',
+    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~".*kube.*"})',
     legendFormat='hyper - {{namespace}} - {{app}}',
   )
 ).addTarget(
@@ -49,7 +50,7 @@ local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane M
   )
 ).addTarget(
   prometheus.target(
-    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~"kube.*"})',
+    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~".*kube.*"})',
     legendFormat='hyper - {{namespace}} - {{app}}',
   )
 ).addTarget(
@@ -61,6 +62,76 @@ local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane M
   prometheus.target(
     'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~"openshift.*"})',
     legendFormat='hyper - {{namespace}} - {{app}}',
+  )
+);
+
+// Overall Status
+
+local num_hosted_cluster = stat.new(
+  title='Number of HostedCluster',
+  datasource='$datasource',
+  graphMode='none',
+).addTarget(
+  prometheus.target(
+    'count(hypershift_cluster_initial_rollout_duration_seconds)',
+  )
+).addThresholds([
+      { color: 'green', value: null },
+]);
+
+local ocp_version = stat.new(
+  title='OCP Version',
+  datasource='$datasource',
+  textMode='name',
+  graphMode='none',
+).addTarget(
+  prometheus.target(
+    'cluster_version{type="completed",version!=""}',
+    legendFormat='{{version}}',
+  )
+).addThresholds([
+      { color: 'green', value: null },
+]);
+
+local infrastructure = stat.new(
+  title='Cloud Infrastructure',
+  datasource='$datasource',
+  textMode='name',
+  graphMode='none',
+).addTarget(
+  prometheus.target(
+    'cluster_infrastructure_provider',
+    legendFormat='{{type}}',
+  )
+).addThresholds([
+      { color: 'green', value: null },
+]);
+
+local region = stat.new(
+  title='Cloud Region',
+  datasource='$datasource',
+  textMode='name',
+  graphMode='none',
+).addTarget(
+  prometheus.target(
+    'cluster_infrastructure_provider',
+    legendFormat='{{region}}',
+  )
+).addThresholds([
+      { color: 'green', value: null },
+]);
+
+local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').addTarget(
+  prometheus.target(
+    'topk(10, container_memory_rss{namespace=~"clusters-.*",container!="POD",name!=""})',
+    legendFormat='{{ namespace }} - {{ name }}',
+  )
+);
+
+local top10ContCPU = genericGraphLegendPanel('Top 10 container CPU', 'percent').addTarget(
+  prometheus.target(
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"clusters-.*",container!="POD",name!=""}[1m])*100)',
+    legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
@@ -563,6 +634,18 @@ grafana.dashboard.new(
     includeAll: false,
   }
 )
+
+.addPanel(grafana.row.new(title='Overall stats', collapse=true).addPanels(
+  [
+    ocp_version { gridPos: { x: 0, y: 0, w: 6, h: 4 } },
+    num_hosted_cluster { gridPos: { x: 6, y: 0, w: 6, h: 4 } },
+    infrastructure { gridPos: { x: 12, y: 0, w: 6, h: 4 } },
+    region { gridPos: { x: 18, y: 0, w: 6, h: 4 } },
+    top10ContCPU { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
+    top10ContMem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
+  ], 
+), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
+
 .addPanel(grafana.row.new(title='HostedControlPlane stats - $namespace', collapse=true, repeat='namespace').addPanels(
   [
     hostedControlPlaneCPU { gridPos: { x: 0, y: 11, w: 12, h: 8 } },

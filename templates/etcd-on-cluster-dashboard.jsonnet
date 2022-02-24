@@ -145,7 +145,7 @@ local mem_usage = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace="openshift-etcd"}[2m])) BY (pod, namespace)',
+    'sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*"}[2m])) BY (pod, namespace)',
     legendFormat='{{ pod }}',
   )
 );
@@ -165,12 +165,12 @@ local network_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'sum(rate(container_network_receive_bytes_total{ container="etcd", namespace="openshift-etcd"}[2m])) BY (namespace, pod)',
+    'sum(rate(container_network_receive_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)',
     legendFormat='rx {{ pod }}'
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(container_network_transmit_bytes_total{ container="etcd", namespace="openshift-etcd"}[2m])) BY (namespace, pod)',
+    'sum(rate(container_network_transmit_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)',
     legendFormat='tx {{ pod }}',
   )
 );
