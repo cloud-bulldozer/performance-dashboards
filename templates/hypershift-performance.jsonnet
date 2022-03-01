@@ -647,7 +647,7 @@ grafana.dashboard.new(
 .addPanel(grafana.row.new(title='HostedControlPlane stats - $namespace', collapse=true, repeat='namespace').addPanels(
   [
     infrastructure { gridPos: { x: 0, y: 0, w: 12, h: 4 } },
-    region { gridPos: { x: 12, y: 0, w: 12, h: 4 } },   
+    region { gridPos: { x: 12, y: 0, w: 12, h: 4 } },
     hostedControlPlaneCPU { gridPos: { x: 0, y: 11, w: 12, h: 8 } },
     hostedControlPlaneMemory { gridPos: { x: 12, y: 11, w: 12, h: 8 } },
   ],
