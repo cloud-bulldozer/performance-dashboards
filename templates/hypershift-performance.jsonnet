@@ -71,9 +71,10 @@ local num_hosted_cluster = stat.new(
   title='Number of HostedCluster',
   datasource='$datasource',
   graphMode='none',
+  reducerFunction='last',
 ).addTarget(
   prometheus.target(
-    'count(hypershift_cluster_initial_rollout_duration_seconds)',
+    'count(kube_namespace_labels{namespace=~"clusters-.*"})',
   )
 ).addThresholds([
   { color: 'green', value: null },
@@ -637,10 +638,9 @@ grafana.dashboard.new(
 
 .addPanel(grafana.row.new(title='Overall stats', collapse=true).addPanels(
   [
-    ocp_version { gridPos: { x: 0, y: 0, w: 6, h: 4 } },
-    num_hosted_cluster { gridPos: { x: 6, y: 0, w: 6, h: 4 } },
-    infrastructure { gridPos: { x: 12, y: 0, w: 6, h: 4 } },
-    region { gridPos: { x: 18, y: 0, w: 6, h: 4 } },
+    num_hosted_cluster { gridPos: { x: 0, y: 0, w: 8, h: 4 } },
+    infrastructure { gridPos: { x: 8, y: 0, w: 8, h: 4 } },
+    region { gridPos: { x: 16, y: 0, w: 8, h: 4 } },
     top10ContCPU { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
     top10ContMem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
   ],
