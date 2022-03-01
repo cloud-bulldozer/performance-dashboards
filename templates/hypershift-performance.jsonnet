@@ -101,7 +101,7 @@ local infrastructure = stat.new(
   graphMode='none',
 ).addTarget(
   prometheus.target(
-    'cluster_infrastructure_provider',
+    'cluster_infrastructure_provider{namespace=~"$namespace"}',
     legendFormat='{{type}}',
   )
 ).addThresholds([
@@ -115,7 +115,7 @@ local region = stat.new(
   graphMode='none',
 ).addTarget(
   prometheus.target(
-    'cluster_infrastructure_provider',
+    'cluster_infrastructure_provider{namespace=~"$namespace"}',
     legendFormat='{{region}}',
   )
 ).addThresholds([
@@ -638,9 +638,7 @@ grafana.dashboard.new(
 
 .addPanel(grafana.row.new(title='Overall stats', collapse=true).addPanels(
   [
-    num_hosted_cluster { gridPos: { x: 0, y: 0, w: 8, h: 4 } },
-    infrastructure { gridPos: { x: 8, y: 0, w: 8, h: 4 } },
-    region { gridPos: { x: 16, y: 0, w: 8, h: 4 } },
+    num_hosted_cluster { gridPos: { x: 0, y: 0, w: 24, h: 4 } },
     top10ContCPU { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
     top10ContMem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
   ],
@@ -648,6 +646,8 @@ grafana.dashboard.new(
 
 .addPanel(grafana.row.new(title='HostedControlPlane stats - $namespace', collapse=true, repeat='namespace').addPanels(
   [
+    infrastructure { gridPos: { x: 0, y: 0, w: 12, h: 4 } },
+    region { gridPos: { x: 12, y: 0, w: 12, h: 4 } },   
     hostedControlPlaneCPU { gridPos: { x: 0, y: 11, w: 12, h: 8 } },
     hostedControlPlaneMemory { gridPos: { x: 12, y: 11, w: 12, h: 8 } },
   ],
