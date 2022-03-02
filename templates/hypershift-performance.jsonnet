@@ -71,7 +71,7 @@ local num_hosted_cluster = stat.new(
   title='Number of HostedCluster',
   datasource='$datasource',
   graphMode='none',
-  reducerFunction='last',
+  reducerFunction='max',
 ).addTarget(
   prometheus.target(
     'count(kube_namespace_labels{namespace=~"clusters-.*"})',
