@@ -19,7 +19,7 @@ local fs_writes = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(container_fs_writes_bytes_total{container="etcd",device!~".+dm.+"}[2m])',
+    'rate(container_fs_writes_bytes_total{namespace="openshift-etcd",container="etcd",device!~".+dm.+"}[2m])',
     legendFormat='{{ pod }}: {{ device }}',
   )
 );
@@ -39,7 +39,7 @@ local ptp = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket[2m]))',
+    'histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket{namespace="openshift-etcd"}[2m]))',
     legendFormat='{{pod}}',
   )
 );
@@ -59,7 +59,7 @@ local disk_wal_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(irate(etcd_disk_wal_fsync_duration_seconds_bucket[2m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(irate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))',
     legendFormat='{{pod}} WAL fsync',
   )
 );
@@ -79,7 +79,7 @@ local disk_backend_sync_duration = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(irate(etcd_disk_backend_commit_duration_seconds_bucket[2m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(irate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))',
     legendFormat='{{pod}} DB fsync',
   )
 );
@@ -99,12 +99,12 @@ local db_size = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'etcd_mvcc_db_total_size_in_bytes',
+    'etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}',
     legendFormat='{{pod}} DB physical size'
   )
 ).addTarget(
   prometheus.target(
-    'etcd_mvcc_db_total_size_in_use_in_bytes',
+    'etcd_mvcc_db_total_size_in_use_in_bytes{namespace="openshift-etcd"}',
     legendFormat='{{pod}} DB logical size',
   )
 );
@@ -191,12 +191,12 @@ local grpc_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_client_grpc_received_bytes_total[2m])',
+    'rate(etcd_network_client_grpc_received_bytes_total{namespace="openshift-etcd"}[2m])',
     legendFormat='rx {{pod}}'
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_client_grpc_sent_bytes_total[2m])',
+    'rate(etcd_network_client_grpc_sent_bytes_total{namespace="openshift-etcd"}[2m])',
     legendFormat='tx {{pod}}',
   )
 );
@@ -216,12 +216,12 @@ local peer_traffic = grafana.graphPanel.new(
   nullPointMode='null as zero',
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_peer_received_bytes_total[2m])',
+    'rate(etcd_network_peer_received_bytes_total{namespace="openshift-etcd"}[2m])',
     legendFormat='rx {{pod}} Peer Traffic'
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_network_peer_sent_bytes_total[2m])',
+    'rate(etcd_network_peer_sent_bytes_total{namespace="openshift-etcd"}[2m])',
     legendFormat='tx {{pod}} Peer Traffic',
   )
 );
@@ -232,12 +232,12 @@ local active_streams = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(grpc_server_started_total{grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})',
+    'sum(grpc_server_started_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})',
     legendFormat='Watch Streams',
   )
 ).addTarget(
   prometheus.target(
-    'sum(grpc_server_started_total{grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})',
+    'sum(grpc_server_started_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})',
     legendFormat='Lease Streams',
   )
 );
@@ -248,7 +248,7 @@ local snapshot_duration = grafana.graphPanel.new(
   format='s',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_debugging_snap_save_total_duration_seconds_sum[2m]))',
+    'sum(rate(etcd_debugging_snap_save_total_duration_seconds_sum{namespace="openshift-etcd"}[2m]))',
     legendFormat='the total latency distributions of save called by snapshot',
   )
 );
@@ -261,7 +261,7 @@ local percent_db_used = grafana.graphPanel.new(
   format='percent',
 ).addTarget(
   prometheus.target(
-    '(etcd_mvcc_db_total_size_in_bytes{} / etcd_server_quota_backend_bytes{})*100',
+    '(etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"} / etcd_server_quota_backend_bytes{namespace="openshift-etcd"})*100',
     legendFormat='{{pod}}',
   )
 );
@@ -272,7 +272,7 @@ local db_capacity_left = grafana.graphPanel.new(
   format='bytes',
 ).addTarget(
   prometheus.target(
-    'etcd_server_quota_backend_bytes{} - etcd_mvcc_db_total_size_in_bytes{}',
+    'etcd_server_quota_backend_bytes{namespace="openshift-etcd"} - etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}',
     legendFormat='{{pod}}',
   )
 );
@@ -283,7 +283,7 @@ local db_size_limit = grafana.graphPanel.new(
   format='bytes'
 ).addTarget(
   prometheus.target(
-    'etcd_server_quota_backend_bytes{}',
+    'etcd_server_quota_backend_bytes{namespace="openshift-etcd"}',
     legendFormat='{{ pod }} Quota Bytes',
   )
 );
@@ -295,7 +295,7 @@ local keys = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_keys_total{pod=~"$pod"}',
+    'etcd_debugging_mvcc_keys_total{namespace="openshift-etcd",pod=~"$pod"}',
     legendFormat='{{ pod }} Num keys',
   )
 );
@@ -305,7 +305,7 @@ local compacted_keys = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_db_compaction_keys_total{pod=~"$pod"}',
+    'etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd",pod=~"$pod"}',
     legendFormat='{{ pod  }} keys compacted',
   )
 );
@@ -315,12 +315,12 @@ local heartbeat_failures = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_server_heartbeat_send_failures_total{pod=~"$pod"}',
+    'etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd",pod=~"$pod"}',
     legendFormat='{{ pod }} heartbeat  failures',
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{pod=~"$pod"}',
+    'etcd_server_health_failures{namespace="openshift-etcd",pod=~"$pod"}',
     legendFormat='{{ pod }} health failures',
   )
 );
@@ -343,12 +343,12 @@ local key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_put_total{pod=~"$pod"}[2m])',
+    'rate(etcd_debugging_mvcc_put_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_delete_total{pod=~"$pod"}[2m])',
+    'rate(etcd_debugging_mvcc_delete_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} deletes/s',
   )
 );
@@ -370,12 +370,12 @@ local slow_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_apply_total{pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_apply_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} slow applies',
   )
 ).addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_read_indexes_total{pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
     legendFormat='{{ pod }} slow read indexes',
   )
 );
@@ -385,22 +385,22 @@ local raft_proposals = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_failed_total[2m]))',
+    'sum(rate(etcd_server_proposals_failed_total{namespace="openshift-etcd"}[2m]))',
     legendFormat='Proposal Failure Rate',
   )
 ).addTarget(
   prometheus.target(
-    'sum(etcd_server_proposals_pending)',
+    'sum(etcd_server_proposals_pending{namespace="openshift-etcd"})',
     legendFormat='Proposal Pending Total',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_committed_total[2m]))',
+    'sum(rate(etcd_server_proposals_committed_total{namespace="openshift-etcd"}[2m]))',
     legendFormat='Proposal Commit Rate',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_proposals_applied_total[2m]))',
+    'sum(rate(etcd_server_proposals_applied_total{namespace="openshift-etcd"}[2m]))',
     legendFormat='Proposal Apply Rate',
   )
 );
@@ -410,7 +410,7 @@ local leader_elections_per_day = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'changes(etcd_server_leader_changes_seen_total[1d])',
+    'changes(etcd_server_leader_changes_seen_total{namespace="openshift-etcd"}[1d])',
     legendFormat='{{instance}} Total Leader Elections Per Day',
   )
 );
@@ -432,7 +432,7 @@ local etcd_has_leader = grafana.singlestat.new(
   ]
 ).addTarget(
   prometheus.target(
-    'max(etcd_server_has_leader)',
+    'max(etcd_server_has_leader{namespace="openshift-etcd"})',
   )
 );
 
@@ -441,7 +441,7 @@ local num_leader_changes = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'sum(rate(etcd_server_leader_changes_seen_total[2m]))',
+    'sum(rate(etcd_server_leader_changes_seen_total{namespace="openshift-etcd"}[2m]))',
   )
 );
 
@@ -450,7 +450,7 @@ local num_failed_proposals = grafana.singlestat.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'max(etcd_server_proposals_committed_total)',
+    'max(etcd_server_proposals_committed_total{namespace="openshift-etcd"})',
   )
 );
 
