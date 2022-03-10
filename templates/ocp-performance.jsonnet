@@ -195,14 +195,14 @@ local ovnKubeMasterMem = genericGraphLegendPanel('ovnkube-master Memory Usage', 
 
 local ovnKubeMasterCPU = genericGraphLegendPanel('ovnkube-master CPU Usage', 'percent').addTarget(
   prometheus.target(
-    'rate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100',
+    'irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100',
     legendFormat='{{container}}-{{pod}}-{{node}}',
   )
 );
 
 local topOvnControllerCPU = genericGraphLegendPanel('Top 10 ovn-controller CPU Usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10, rate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)',
+    'topk(10, irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)',
     legendFormat='{{node}}',
   )
 );
