@@ -794,7 +794,7 @@ local long_running_requests = grafana.graphPanel.new(
 );
 
 local request_in_flight = grafana.graphPanel.new(
-  title='request in flight',
+  title='requests in flight',
   datasource='$datasource',
   legend_values=true,
   legend_alignAsTable=true,
