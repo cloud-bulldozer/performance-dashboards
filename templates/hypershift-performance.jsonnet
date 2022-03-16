@@ -977,7 +977,7 @@ grafana.dashboard.new(
   ) {
     label: 'Namespace',
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: true,
   },
 )
@@ -990,7 +990,7 @@ grafana.dashboard.new(
     refresh=1,
   ) {
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: false,
   }
 )
@@ -1004,7 +1004,7 @@ grafana.dashboard.new(
     label='resource'
   ) {
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: true,
   },
 )
@@ -1018,7 +1018,7 @@ grafana.dashboard.new(
     label='code',
   ) {
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: true,
   },
 )
@@ -1033,7 +1033,7 @@ grafana.dashboard.new(
     label='verb',
   ) {
     type: 'query',
-    multi: false,
+    multi: true,
     includeAll: true,
   },
 )
