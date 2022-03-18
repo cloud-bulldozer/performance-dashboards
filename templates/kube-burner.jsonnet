@@ -187,6 +187,27 @@ local metric_count_panel = grafana.statPanel.new(
   { color: 'red', value: 80 },
 ]);
 
+local openshift_version_panel = grafana.statPanel.new(
+  title='OpenShift version',
+  datasource='$datasource1',
+  justifyMode='center',
+  reducerFunction='lastNotNull',
+  fields='/^labels\\.version$/'
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "clusterVersion"',
+    timeField='timestamp',
+    metrics=[{
+      id: '1',
+      settings: {
+        size: '500',
+      },
+      type: 'raw_data',
+    }],
+  )
+);
+
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -313,4 +334,7 @@ grafana.dashboard.new(
 )
 .addPanel(
   metric_count_panel, { x: 4, y: 0, w: 12, h: 4 }
+)
+.addPanel(
+  openshift_version_panel, { x: 16, y: 0, w: 4, h: 4 },
 )
