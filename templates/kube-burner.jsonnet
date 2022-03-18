@@ -48,6 +48,145 @@ local worker_count = grafana.statPanel.new(
 ]);
 
 
+local metric_count_panel = grafana.statPanel.new(
+  datasource='$datasource1',
+  justifyMode='center',
+  title=null
+).addTarget(
+  // Namespaces count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "namespaceCount" AND labels.phase: "Active"',
+    alias='Namespaces',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addTarget(
+  // Services count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "serviceCount"',
+    alias='Services',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addTarget(
+  // Deployments count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "deploymentCount"',
+    alias='Services',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addTarget(
+  // Secrets count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "secretCount"',
+    alias='Services',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addTarget(
+  // ConfigMap count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "configmapCount"',
+    alias='ConfigMaps',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addThresholds([
+  { color: 'green', value: null },
+  { color: 'red', value: 80 },
+]);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -170,5 +309,8 @@ grafana.dashboard.new(
 )
 
 .addPanel(
-  worker_count, { gridPos: { x: 0, y: 0, w: 4, h: 4 } }
+  worker_count, { x: 0, y: 0, w: 4, h: 4 }
+)
+.addPanel(
+  metric_count_panel, { x: 4, y: 0, w: 12, h: 4 }
 )
