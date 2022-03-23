@@ -207,6 +207,127 @@ local openshift_version_panel = grafana.statPanel.new(
   )
 );
 
+local etcd_version_panel = grafana.statPanel.new(
+  title='Etcd version',
+  datasource='$datasource1',
+  justifyMode='center',
+  reducerFunction='lastNotNull',
+  fields='labels.cluster_version'
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "etcdVersion"',
+    timeField='timestamp',
+    metrics=[{
+      id: '1',
+      settings: {
+        size: '500',
+      },
+      type: 'raw_data',
+    }],
+  )
+);
+
+
+// Next line
+
+local job_summary_panel = grafana.tablePanel.new(
+  title='Job Summary',
+  datasource='$datasource1',
+
+
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "jobSummary"',
+    timeField='timestamp',
+    metrics=[{
+      id: '1',
+      settings: {
+        size: '500',
+      },
+      type: 'raw_data',
+    }],
+  )
+).addTransformation(
+  grafana.transformation.new('organize', options={
+    excludeByName: {
+      _id: true,
+      _index: true,
+      _type: true,
+      highlight: true,
+      'jobConfig.cleanup': true,
+      'jobConfig.errorOnVerify': true,
+      'jobConfig.jobIterationDelay': true,
+      'jobConfig.jobIterations': false,
+      'jobConfig.jobPause': true,
+      'jobConfig.maxWaitTimeout': true,
+      'jobConfig.namespace': true,
+      'jobConfig.namespaced': true,
+      'jobConfig.namespacedIterations': false,
+      'jobConfig.objects': true,
+      'jobConfig.preLoadPeriod': true,
+      'jobConfig.verifyObjects': true,
+      'jobConfig.waitFor': true,
+      'jobConfig.waitForDeletion': true,
+      'jobConfig.waitWhenFinished': true,
+      metricName: true,
+      sort: true,
+      timestamp: true,
+      uuid: false,
+    },
+    indexByName: {
+      _id: 1,
+      _index: 2,
+      _type: 3,
+      elapsedTime: 8,
+      'jobConfig.burst': 7,
+      'jobConfig.cleanup': 12,
+      'jobConfig.errorOnVerify': 13,
+      'jobConfig.jobIterationDelay': 14,
+      'jobConfig.jobIterations': 9,
+      'jobConfig.jobPause': 15,
+      'jobConfig.jobType': 10,
+      'jobConfig.maxWaitTimeout': 16,
+      'jobConfig.name': 5,
+      'jobConfig.namespace': 17,
+      'jobConfig.namespacedIterations': 18,
+      'jobConfig.objects': 19,
+      'jobConfig.podWait': 11,
+      'jobConfig.qps': 6,
+      'jobConfig.verifyObjects': 20,
+      'jobConfig.waitFor': 21,
+      'jobConfig.waitForDeletion': 22,
+      'jobConfig.waitWhenFinished': 23,
+      metricName: 24,
+      timestamp: 0,
+      uuid: 4,
+    },
+    renameByName: {
+      _type: '',
+      elapsedTime: 'Elapsed time',
+      'jobConfig.burst': 'Burst',
+      'jobConfig.cleanup': '',
+      'jobConfig.errorOnVerify': 'errorOnVerify',
+      'jobConfig.jobIterationDelay': 'jobIterationDelay',
+      'jobConfig.jobIterations': 'Iterations',
+      'jobConfig.jobPause': 'jobPause',
+      'jobConfig.jobType': 'Job Type',
+      'jobConfig.maxWaitTimeout': 'maxWaitTImeout',
+      'jobConfig.name': 'Name',
+      'jobConfig.namespace': 'namespacePrefix',
+      'jobConfig.namespaced': '',
+      'jobConfig.namespacedIterations': 'Namespaced iterations',
+      'jobConfig.objects': '',
+      'jobConfig.podWait': 'podWait',
+      'jobConfig.preLoadImages': 'Preload Images',
+      'jobConfig.preLoadPeriod': '',
+      'jobConfig.qps': 'QPS',
+      'jobConfig.verifyObjects': '',
+      metricName: '',
+      timestamp: '',
+      uuid: 'UUID',
+    },
+  })
+);
 
 //Dashboard & Templates
 
@@ -337,4 +458,10 @@ grafana.dashboard.new(
 )
 .addPanel(
   openshift_version_panel, { x: 16, y: 0, w: 4, h: 4 },
+)
+.addPanel(
+  etcd_version_panel, { x: 20, y: 0, w: 2, h: 4 }
+)
+.addPanel(
+  job_summary_panel, { x: 0, y: 4, h: 3, w: 24 },
 )
