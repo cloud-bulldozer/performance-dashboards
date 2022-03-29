@@ -109,11 +109,10 @@ fi
 #FIXME: This is OCP-Specific; needs updating to support k8s
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
-GRAFANA_SECRET=$($k8s_cmd get secrets -n openshift-monitoring -l app.kubernetes.io/component=grafana | grep datasource | awk '{print $1}')
-export PROMETHEUS_URL=$($k8s_cmd get secrets -n openshift-monitoring $GRAFANA_SECRET -o go-template='{{index .data "prometheus.yaml" | base64decode }}' | jq '.datasources[0].url')
-export PROMETHEUS_PASSWORD=$($k8s_cmd get secrets -n openshift-monitoring $GRAFANA_SECRET -o go-template='{{index .data "prometheus.yaml"| base64decode }}' | jq 'if .datasources[0].basicAuthPassword != null then .datasources[0].basicAuthPassword else .datasources[0].secureJsonData.basicAuthPassword end')
+export PROMETHEUS_URL="https://$($k8s_cmd get routes -n openshift-monitoring prometheus-k8s -o json | jq -r '.spec.host')"
+export PROMETHEUS_BEARER=$($k8s_cmd sa get-token prometheus-k8s -n openshift-monitoring)
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
-echo "Prometheus password collected."
+echo "Prometheus bearer token collected."
 
 function namespace() {
   # Create namespace
