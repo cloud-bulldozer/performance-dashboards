@@ -89,13 +89,14 @@ data:
       access: proxy
       orgId: 1
       url: ${PROMETHEUS_URL}
-      basicAuth: true
-      basicAuthUser: ${PROMETHEUS_USER}
-      basicAuthPassword: ${PROMETHEUS_PASSWORD}
-      withCredentials: false
       isDefault: true
       jsonData:
         tlsSkipVerify: true
+        httpHeaderName1: Authorization
+        timeInterval: 5s
+      secureJsonData:
+        httpHeaderValue1: >-
+          Bearer ${PROMETHEUS_BEARER}
       version: 1
       editable: false
 ---
