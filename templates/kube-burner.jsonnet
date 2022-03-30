@@ -329,6 +329,54 @@ local job_summary_panel = grafana.tablePanel.new(
   })
 );
 
+// First row: Cluster status
+local masters_cpu = grafana.graphPanel.new(
+  title='Masters CPU utilization',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_avg=true,
+  legend_max=true,
+  percentage=true,
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Masters" AND NOT labels.mode.keyword: idle AND NOT labels.mode.keyword: steal',
+    timeField='timestamp',
+    alias='{{labels.instance.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {
+        script: '_value * 100',
+      },
+      type: 'sum',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.instance.keyword',
+        fake: true,
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -464,4 +512,13 @@ grafana.dashboard.new(
 )
 .addPanel(
   job_summary_panel, { x: 0, y: 4, h: 3, w: 24 },
+)
+.addPanel(
+  grafana.row.new(title='Cluster status', collapse=true).addPanels(
+    [
+      masters_cpu { gridPos: { x: 0, y: 8, w: 12, h: 9 } },
+      // { gridPos: { x: , y: 8, w: , h: 9 } },
+      // { gridPos: { x: , y: 8, w: , h: 9 } },
+    ]
+  ), { x: 0, y: 8, w: 24, h: 1 }
 )
