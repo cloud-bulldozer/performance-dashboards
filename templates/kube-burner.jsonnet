@@ -337,6 +337,7 @@ local masters_cpu = grafana.graphPanel.new(
   legend_avg=true,
   legend_max=true,
   percentage=true,
+  legend_values=true,
 ).addTarget(
   es.target(
     query='uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Masters" AND NOT labels.mode.keyword: idle AND NOT labels.mode.keyword: steal',
@@ -348,6 +349,52 @@ local masters_cpu = grafana.graphPanel.new(
       settings: {
         script: '_value * 100',
       },
+      type: 'sum',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.instance.keyword',
+        fake: true,
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local masters_memory = grafana.graphPanel.new(
+  title='Masters Memory utilization',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_avg=true,
+  legend_max=true,
+  legend_values=true,
+  // TODO: Add unit: "bytes" if possible.
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryAvailable-Masters"',
+    timeField='timestamp',
+    alias='Available {{labels.instance.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
       type: 'sum',
     }],
     bucketAggs=[
@@ -517,7 +564,7 @@ grafana.dashboard.new(
   grafana.row.new(title='Cluster status', collapse=true).addPanels(
     [
       masters_cpu { gridPos: { x: 0, y: 8, w: 12, h: 9 } },
-      // { gridPos: { x: , y: 8, w: , h: 9 } },
+      masters_memory { gridPos: { x: 12, y: 8, w: 12, h: 9 } },
       // { gridPos: { x: , y: 8, w: , h: 9 } },
     ]
   ), { x: 0, y: 8, w: 24, h: 1 }
