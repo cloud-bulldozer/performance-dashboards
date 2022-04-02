@@ -424,6 +424,54 @@ local masters_memory = grafana.graphPanel.new(
   )
 );
 
+local node_status_summary = grafana.graphPanel.new(
+  title='Node Status Summary',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_current=true,
+  legend_values=true,
+  legend_rightSide=true,
+  // TODO: Add unit: "bytes" if possible.
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeStatus"',
+    timeField='timestamp',
+    alias='{{labels.condition.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.condition.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -565,7 +613,7 @@ grafana.dashboard.new(
     [
       masters_cpu { gridPos: { x: 0, y: 8, w: 12, h: 9 } },
       masters_memory { gridPos: { x: 12, y: 8, w: 12, h: 9 } },
-      // { gridPos: { x: , y: 8, w: , h: 9 } },
+      node_status_summary { gridPos: { x: 0, y: 17, w: 12, h: 9 } },
     ]
   ), { x: 0, y: 8, w: 24, h: 1 }
 )
