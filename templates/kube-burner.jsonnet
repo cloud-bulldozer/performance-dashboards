@@ -574,7 +574,45 @@ local kube_api_cpu = grafana.graphPanel.new(
       },
     ],
   )
+)
+                     .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    timeField='timestamp',
+    alias='Avg CPU {{labels.container.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
 );
+// TODO: When the feature is added to grafannet, style the average differently.
 
 
 local kube_api_memory = grafana.graphPanel.new(
@@ -634,7 +672,46 @@ local kube_api_memory = grafana.graphPanel.new(
       },
     ],
   )
+)
+                        .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    timeField='timestamp',
+    alias='Avg Rss {{labels.container.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
 );
+// TODO: When the feature is added to grafannet, style the average differently.
+
 
 //Dashboard & Templates
 
