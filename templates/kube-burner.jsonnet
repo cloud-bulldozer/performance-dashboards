@@ -229,7 +229,8 @@ local etcd_version_panel = grafana.statPanel.new(
 
 
 // Next line
-
+// TODO: Convert to new table format once jsonnet supports it.
+// That would fix the text wrapping problem.
 local job_summary_panel = grafana.tablePanel.new(
   title='Job Summary',
   datasource='$datasource1',
@@ -713,20 +714,20 @@ local kube_api_memory = grafana.graphPanel.new(
 // TODO: When the feature is added to grafannet, style the average differently.
 
 
-local kube_api_memory = grafana.graphPanel.new(
-  title='Active Kube-controller-manager usage',
+local active_controller_manager_cpu = grafana.graphPanel.new(
+  title='Active Kube-controller-manager CPU',
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
   legend_avg=true,
   legend_values=true,
-  format='bytes',
+  format='percent',
 )
-                        .addTarget(
+                                      .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.container.keyword: kube-controller-manager',
     timeField='timestamp',
-    alias='Rss {{labels.pod.keyword}}',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
     metrics=[{
       field: 'value',
       id: '1',
@@ -742,7 +743,7 @@ local kube_api_memory = grafana.graphPanel.new(
           min_doc_count: '1',
           order: 'desc',
           orderBy: '1',
-          size: '0',
+          size: '1',
         },
         type: 'terms',
       },
@@ -753,8 +754,20 @@ local kube_api_memory = grafana.graphPanel.new(
         settings: {
           min_doc_count: '1',
           order: 'desc',
-          orderBy: '_term',
-          size: '10',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
         },
         type: 'terms',
       },
@@ -771,9 +784,9 @@ local kube_api_memory = grafana.graphPanel.new(
     ],
   )
 )
-                        .addTarget(
+                                      .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerCPU-Masters" AND labels.container.keyword: kube-controller-manager',
     timeField='timestamp',
     alias='Avg Rss {{labels.container.keyword}}',
     metrics=[{
@@ -784,14 +797,38 @@ local kube_api_memory = grafana.graphPanel.new(
     }],
     bucketAggs=[
       {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '1',
+        },
+        type: 'terms',
+      },
+      {
         field: 'labels.container.keyword',
         fake: true,
         id: '3',
         settings: {
           min_doc_count: '1',
           order: 'desc',
-          orderBy: '_term',
-          size: '10',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
         },
         type: 'terms',
       },
@@ -809,6 +846,138 @@ local kube_api_memory = grafana.graphPanel.new(
   )
 );
 
+
+local active_controller_manager_memory = grafana.graphPanel.new(
+  title='Active Kube-controller-manager memory',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                                         .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.container.keyword: kube-controller-manager',
+    timeField='timestamp',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '1',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                                         .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory-Masters" AND labels.container.keyword: kube-controller-manager',
+    timeField='timestamp',
+    alias='Avg Rss {{labels.container.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '1',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
 
 //Dashboard & Templates
 
@@ -955,6 +1124,8 @@ grafana.dashboard.new(
       pod_status_summary { gridPos: { x: 12, y: 17, w: 12, h: 8 } },
       kube_api_cpu { gridPos: { x: 0, y: 25, w: 12, h: 9 } },
       kube_api_memory { gridPos: { x: 12, y: 25, w: 12, h: 9 } },
+      active_controller_manager_cpu { gridPos: { x: 0, y: 34, w: 12, h: 9 } },
+      active_controller_manager_memory { gridPos: { x: 12, y: 34, w: 12, h: 9 } },
     ]
   ), { x: 0, y: 8, w: 24, h: 1 }
 )
