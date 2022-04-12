@@ -854,7 +854,7 @@ local active_controller_manager_memory = grafana.graphPanel.new(
   legend_max=true,
   legend_avg=true,
   legend_values=true,
-  format='percent',
+  format='bytes',
 )
                                          .addTarget(
   es.target(
