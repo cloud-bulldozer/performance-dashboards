@@ -979,6 +979,122 @@ local active_controller_manager_memory = grafana.graphPanel.new(
   )
 );
 
+
+local hypershift_controlplane_cpu = grafana.graphPanel.new(
+  title='Hypershift Controlplane CPU Usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                                    .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU-Controlplane"',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '20',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '20',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '4',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local hypershift_controlplane_memory = grafana.graphPanel.new(
+  title='Hypershift Controlplane RSS memory Usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='bytes',
+)
+                                       .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory-Controlplane"',
+    timeField='timestamp',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '20',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '20',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '4',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -1126,6 +1242,8 @@ grafana.dashboard.new(
       kube_api_memory { gridPos: { x: 12, y: 25, w: 12, h: 9 } },
       active_controller_manager_cpu { gridPos: { x: 0, y: 34, w: 12, h: 9 } },
       active_controller_manager_memory { gridPos: { x: 12, y: 34, w: 12, h: 9 } },
+      hypershift_controlplane_cpu { gridPos: { x: 0, y: 43, w: 12, h: 9 } },
+      hypershift_controlplane_memory { gridPos: { x: 12, y: 43, w: 12, h: 9 } },
     ]
   ), { x: 0, y: 8, w: 24, h: 1 }
 )
