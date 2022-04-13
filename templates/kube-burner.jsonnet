@@ -529,9 +529,9 @@ local kube_api_cpu = grafana.graphPanel.new(
 )
                      .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.container.keyword: kube-apiserver',
     timeField='timestamp',
-    alias='{{labels.pod.keyword}}',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
     metrics=[{
       field: 'value',
       id: '1',
@@ -564,6 +564,18 @@ local kube_api_cpu = grafana.graphPanel.new(
         type: 'terms',
       },
       {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
         field: 'timestamp',
         id: '2',
         settings: {
@@ -578,7 +590,68 @@ local kube_api_cpu = grafana.graphPanel.new(
 )
                      .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerCPU-Masters" AND labels.container.keyword: kube-apiserver',
+    timeField='timestamp',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                     .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.container.keyword: kube-apiserver',
     timeField='timestamp',
     alias='Avg CPU {{labels.container.keyword}}',
     metrics=[{
@@ -595,8 +668,19 @@ local kube_api_cpu = grafana.graphPanel.new(
         settings: {
           min_doc_count: '1',
           order: 'desc',
-          orderBy: '_term',
-          size: '10',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
         },
         type: 'terms',
       },
@@ -627,9 +711,9 @@ local kube_api_memory = grafana.graphPanel.new(
 )
                         .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.container.keyword: kube-apiserver',
     timeField='timestamp',
-    alias='Rss {{labels.pod.keyword}}',
+    alias='Rss {{labels.namespace.keyword}}-{{labels.pod.keyword}}',
     metrics=[{
       field: 'value',
       id: '1',
@@ -662,6 +746,78 @@ local kube_api_memory = grafana.graphPanel.new(
         type: 'terms',
       },
       {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory-Masters" AND labels.container.keyword: kube-apiserver',
+    timeField='timestamp',
+    alias='Rss {{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
         field: 'timestamp',
         id: '2',
         settings: {
@@ -676,7 +832,7 @@ local kube_api_memory = grafana.graphPanel.new(
 )
                         .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: openshift-kube-apiserver AND labels.container.keyword: kube-apiserver',
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.container.keyword: kube-apiserver',
     timeField='timestamp',
     alias='Avg Rss {{labels.container.keyword}}',
     metrics=[{
@@ -693,8 +849,19 @@ local kube_api_memory = grafana.graphPanel.new(
         settings: {
           min_doc_count: '1',
           order: 'desc',
-          orderBy: '_term',
-          size: '10',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
         },
         type: 'terms',
       },
