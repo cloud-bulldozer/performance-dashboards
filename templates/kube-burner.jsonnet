@@ -788,7 +788,7 @@ local active_controller_manager_cpu = grafana.graphPanel.new(
   es.target(
     query='uuid.keyword: $uuid AND metricName: "containerCPU-Masters" AND labels.container.keyword: kube-controller-manager',
     timeField='timestamp',
-    alias='Avg Rss {{labels.container.keyword}}',
+    alias='{{labels.container.keyword}}',
     metrics=[{
       field: 'value',
       id: '1',
@@ -921,7 +921,7 @@ local active_controller_manager_memory = grafana.graphPanel.new(
   es.target(
     query='uuid.keyword: $uuid AND metricName: "containerMemory-Masters" AND labels.container.keyword: kube-controller-manager',
     timeField='timestamp',
-    alias='Avg Rss {{labels.container.keyword}}',
+    alias='{{labels.container.keyword}}',
     metrics=[{
       field: 'value',
       id: '1',
@@ -956,6 +956,268 @@ local active_controller_manager_memory = grafana.graphPanel.new(
       {
         field: 'labels.namespace.keyword',
         fake: true,
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local kube_scheduler_cpu = grafana.graphPanel.new(
+  title='Kube-scheduler CPU',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                           .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.container.keyword: kube-scheduler',
+    timeField='timestamp',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                           .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU-Masters" AND labels.container.keyword: kube-scheduler',
+    timeField='timestamp',
+    alias='{{labels.container.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local kube_scheduler_memory = grafana.graphPanel.new(
+  title='Kube-scheduler memory',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='bytes',
+)
+                              .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.container.keyword: kube-scheduler',
+    timeField='timestamp',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                              .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory-Masters" AND labels.container.keyword: kube-scheduler',
+    timeField='timestamp',
+    alias='Rss {{labels.container.keyword}}',
+    metrics=[{
+      field: 'value',
+      id: '1',
+      settings: {},
+      type: 'avg',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
         id: '5',
         settings: {
           min_doc_count: '1',
@@ -1242,8 +1504,10 @@ grafana.dashboard.new(
       kube_api_memory { gridPos: { x: 12, y: 25, w: 12, h: 9 } },
       active_controller_manager_cpu { gridPos: { x: 0, y: 34, w: 12, h: 9 } },
       active_controller_manager_memory { gridPos: { x: 12, y: 34, w: 12, h: 9 } },
-      hypershift_controlplane_cpu { gridPos: { x: 0, y: 43, w: 12, h: 9 } },
-      hypershift_controlplane_memory { gridPos: { x: 12, y: 43, w: 12, h: 9 } },
+      kube_scheduler_cpu { gridPos: { x: 0, y: 43, w: 12, h: 9 } },
+      kube_scheduler_memory { gridPos: { x: 12, y: 43, w: 12, h: 9 } },
+      hypershift_controlplane_cpu { gridPos: { x: 0, y: 52, w: 12, h: 9 } },
+      hypershift_controlplane_memory { gridPos: { x: 12, y: 52, w: 12, h: 9 } },
     ]
   ), { x: 0, y: 8, w: 24, h: 1 }
 )
