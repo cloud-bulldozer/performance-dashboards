@@ -1524,6 +1524,106 @@ local hypershift_controlplane_memory = grafana.graphPanel.new(
   )
 );
 
+// Pod latencies section
+local average_pod_latency = grafana.graphPanel.new(
+  title='Average pod latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_min=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='ms',
+)
+                            .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: podLatencyMeasurement',
+    timeField='timestamp',
+    alias='{{field}}',
+    metrics=[
+      {
+        field: 'podReadyLatency',
+        id: '1',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+      {
+        field: 'schedulingLatency',
+        id: '3',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+      {
+        field: 'initializedLatency',
+        id: '4',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local pod_latencies_summary = grafana.statPanel.new(
+  datasource='$datasource1',
+  justifyMode='center',
+  title='Pod latencies summary $latencyPercentile',
+  unit='ms',
+  colorMode='palette-classic',
+).addTarget(
+  // Namespaces count
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: podLatencyQuantilesMeasurement',
+    alias='$latencyPercentile {{term quantileName.keyword}}',
+    timeField='timestamp',
+    metrics=[{
+      field: '$latencyPercentile',
+      id: '1',
+      meta: {},
+      settings: {},
+      type: 'max',
+    }],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'quantileName.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '0',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -1676,5 +1776,15 @@ grafana.dashboard.new(
       hypershift_controlplane_cpu { gridPos: { x: 0, y: 52, w: 12, h: 9 } },
       hypershift_controlplane_memory { gridPos: { x: 12, y: 52, w: 12, h: 9 } },
     ]
-  ), { x: 0, y: 8, w: 24, h: 1 }
+  ), { x: 0, y: 7, w: 24, h: 1 }
+)
+.addPanel(
+  // Panels below for uncollapsed row.
+  grafana.row.new(title='Pod latency stats', collapse=false), { x: 0, y: 8, w: 24, h: 1 }
+)
+.addPanels(
+  [
+    average_pod_latency { gridPos: { x: 0, y: 9, w: 12, h: 8 } },
+    pod_latencies_summary { gridPos: { x: 12, y: 9, w: 12, h: 8 } },
+  ]
 )
