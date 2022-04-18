@@ -1583,7 +1583,7 @@ local pod_latencies_summary = grafana.statPanel.new(
   justifyMode='center',
   title='Pod latencies summary $latencyPercentile',
   unit='ms',
-  colorMode='palette-classic',
+  colorMode='value', // Note: There isn't currently a way to set the color palette.
 ).addTarget(
   // Namespaces count
   es.target(
