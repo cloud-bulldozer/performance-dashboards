@@ -1583,7 +1583,7 @@ local pod_latencies_summary = grafana.statPanel.new(
   justifyMode='center',
   title='Pod latencies summary $latencyPercentile',
   unit='ms',
-  colorMode='value', // Note: There isn't currently a way to set the color palette.
+  colorMode='value',  // Note: There isn't currently a way to set the color palette.
 ).addTarget(
   // Namespaces count
   es.target(
@@ -1623,6 +1623,126 @@ local pod_latencies_summary = grafana.statPanel.new(
     ],
   )
 );
+
+local pod_conditions_latency = grafana.tablePanel.new(
+  title='Pod conditions latency',
+  datasource='$datasource1',
+  transform='table',
+  styles=[
+    {
+      pattern: 'Average containersReadyLatency',
+      alias: 'ContainersReady',
+      type: 'number',
+      unit: 'ms',
+    },
+    {
+      pattern: 'Average initializedLatency',
+      alias: 'Initialized',
+      type: 'number',
+      unit: 'ms',
+    },
+    {
+      pattern: 'Average podReadyLatency',
+      alias: 'Ready',
+      type: 'number',
+      unit: 'ms',
+    },
+    {
+      pattern: 'Average schedulingLatency',
+      alias: 'Scheduling',
+      type: 'number',
+      unit: 'ms',
+    },
+    {
+      pattern: 'namespace.keyword',
+      alias: 'Namespace',
+      type: 'string',
+    },
+    {
+      pattern: 'podName.keyword',
+      alias: 'Pod',
+      type: 'string',
+    },
+    {
+      pattern: 'nodeName.keyword',
+      alias: 'Node',
+      type: 'string',
+    },
+  ],
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: podLatencyMeasurement',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'schedulingLatency',
+        id: '1',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+      {
+        field: 'initializedLatency',
+        id: '3',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+      {
+        field: 'containersReadyLatency',
+        id: '4',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+      {
+        field: 'podReadyLatency',
+        id: '5',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'namespace.keyword',
+        id: '6',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '5',
+          size: '100',
+        },
+        type: 'terms',
+      },
+      {
+        fake: true,
+        field: 'nodeName.keyword',
+        id: '7',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '100',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'podName.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '5',
+          size: '100',
+        },
+        type: 'terms',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -1786,5 +1906,6 @@ grafana.dashboard.new(
   [
     average_pod_latency { gridPos: { x: 0, y: 9, w: 12, h: 8 } },
     pod_latencies_summary { gridPos: { x: 12, y: 9, w: 12, h: 8 } },
+    pod_conditions_latency { gridPos: { x: 0, y: 17, w: 24, h: 10 } },
   ]
 )
