@@ -1743,6 +1743,92 @@ local pod_conditions_latency = grafana.tablePanel.new(
   )
 );
 
+local setup_latency = grafana.graphPanel.new(
+  title='Top 10 Container runtime network setup latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='µs',
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: containerNetworkSetupLatency',
+    timeField='timestamp',
+    alias='{{labels.node.keyword}}',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.node.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local scheduling_throughput = grafana.graphPanel.new(
+  title='Scheduling throughput',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='reqps',
+)
+                              .addTarget(
+  es.target(
+    query='uuid: $uuid AND metricName.keyword: schedulingThroughput',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        meta: {},
+        settings: {},
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
 
 //Dashboard & Templates
 
@@ -1907,5 +1993,7 @@ grafana.dashboard.new(
     average_pod_latency { gridPos: { x: 0, y: 9, w: 12, h: 8 } },
     pod_latencies_summary { gridPos: { x: 12, y: 9, w: 12, h: 8 } },
     pod_conditions_latency { gridPos: { x: 0, y: 17, w: 24, h: 10 } },
+    setup_latency { gridPos: { x: 0, y: 27, w: 12, h: 9 } },
+    scheduling_throughput { gridPos: { x: 12, y: 27, w: 12, h: 9 } },
   ]
 )
