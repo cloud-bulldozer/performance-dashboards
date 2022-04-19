@@ -2034,6 +2034,56 @@ local ovnkube_controller_memory = grafana.graphPanel.new(
   )
 );
 
+
+// ETCD section
+local etcd_fsync_latency = grafana.graphPanel.new(
+  title='etcd 99th disk WAL fsync latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                           .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "99thEtcdDiskWalFsyncDurationSeconds"',
+    timeField='timestamp',
+    alias='{{labels.pod.keyword}}',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -2210,4 +2260,12 @@ grafana.dashboard.new(
       ovnkube_controller_memory { gridPos: { x: 12, y: 88, w: 12, h: 8 } },
     ]
   ), { x: 0, y: 36, w: 24, h: 1 }
+)
+.addPanel(
+  grafana.row.new(title='etcd', collapse=false), { x: 0, y: 37, w: 24, h: 1 }
+)
+.addPanels(
+  [
+    etcd_fsync_latency { gridPos: { x: 0, y: 38, w: 12, h: 9 } },
+  ],
 )
