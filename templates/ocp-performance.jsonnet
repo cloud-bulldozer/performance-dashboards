@@ -167,22 +167,22 @@ local containerWriteBytes(nodeName) = genericGraphLegendPanel('Container fs writ
 
 local ovnAnnotationLatency = genericGraphPanel('99% Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[$interval])) by (le)) > 0',
-    legendFormat='{{instance}}',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[$interval])) by (pod,le)) > 0',
+    legendFormat='{{pod}}',
   )
 );
 
 local ovnCNIAdd = genericGraphPanel('99% CNI Request ADD Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[$interval])) by (le)) > 0',
-    legendFormat='{{instance}}',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[$interval])) by (pod,le)) > 0',
+    legendFormat='{{pod}}',
   )
 );
 
 local ovnCNIDel = genericGraphPanel('99% CNI Request DEL Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[$interval])) by (le)) > 0',
-    legendFormat='{{instance}}',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[$interval])) by (pod,le)) > 0',
+    legendFormat='{{pod}}',
   )
 );
 
