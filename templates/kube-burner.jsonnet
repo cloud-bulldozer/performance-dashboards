@@ -2084,6 +2084,152 @@ local etcd_fsync_latency = grafana.graphPanel.new(
   )
 );
 
+local etcd_commit_latency = grafana.graphPanel.new(
+  title='etcd 99th disk backend commit latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                            .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "99thEtcdDiskBackendCommitDurationSeconds"',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local etcd_leader_changes = grafana.graphPanel.new(
+  title='Etcd leader changes',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  min=0,
+  format='s',
+)
+                            .addTarget(
+  es.target(
+    query='uuid: $uuid AND metricName.keyword: etcdLeaderChangesRate',
+    alias='Etcd leader changes',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '1',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local etcd_peer_roundtrip_time = grafana.graphPanel.new(
+  title='Etcd 99th network peer roundtrip time',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                                 .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: 99thEtcdRoundTripTimeSeconds',
+    alias='{{labels.pod.keyword}} to {{labels.To.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        fake: true,
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        fake: true,
+        field: 'labels.To.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -2252,7 +2398,7 @@ grafana.dashboard.new(
   ]
 )
 .addPanel(
-  grafana.row.new(title='Cluster status', collapse=true).addPanels(
+  grafana.row.new(title='OVNKubernetes', collapse=true).addPanels(
     [
       ovnkube_master_cpu { gridPos: { x: 0, y: 80, w: 12, h: 8 } },
       ovnkube_master_memory { gridPos: { x: 12, y: 80, w: 12, h: 8 } },
@@ -2267,5 +2413,8 @@ grafana.dashboard.new(
 .addPanels(
   [
     etcd_fsync_latency { gridPos: { x: 0, y: 38, w: 12, h: 9 } },
+    etcd_commit_latency { gridPos: { x: 12, y: 38, w: 12, h: 9 } },
+    etcd_leader_changes { gridPos: { x: 0, y: 47, w: 12, h: 9 } },
+    etcd_peer_roundtrip_time { gridPos: { x: 12, y: 47, w: 12, h: 9 } },
   ],
 )
