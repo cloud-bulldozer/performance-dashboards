@@ -1830,6 +1830,210 @@ local scheduling_throughput = grafana.graphPanel.new(
   )
 );
 
+// OVN section
+local ovnkube_master_cpu = grafana.graphPanel.new(
+  title='ovnkube-master CPU usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                           .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-master.*/',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '3',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local ovnkube_master_memory = grafana.graphPanel.new(
+  title='ovnkube-master Memory usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='bytes',
+)
+                              .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-master.*/',
+    timeField='timestamp',
+    alias='{{labels.pod.keyword}}',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'sum',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '3',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local ovnkube_controller_cpu = grafana.graphPanel.new(
+  title='ovn-controller CPU usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                               .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-node.*/ AND labels.container.keyword: "ovn-controller"',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '3',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local ovnkube_controller_memory = grafana.graphPanel.new(
+  title='ovn-controller Memory usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='bytes',
+)
+                                  .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-node.*/ AND labels.container.keyword: "ovn-controller"',
+    timeField='timestamp',
+    alias='{{labels.pod.keyword}}',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'sum',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.pod.keyword',
+        id: '2',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '3',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          timeZone: 'utc',
+          trimEdges: '0',
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 //Dashboard & Templates
 
 grafana.dashboard.new(
@@ -1996,4 +2200,14 @@ grafana.dashboard.new(
     setup_latency { gridPos: { x: 0, y: 27, w: 12, h: 9 } },
     scheduling_throughput { gridPos: { x: 12, y: 27, w: 12, h: 9 } },
   ]
+)
+.addPanel(
+  grafana.row.new(title='Cluster status', collapse=true).addPanels(
+    [
+      ovnkube_master_cpu { gridPos: { x: 0, y: 80, w: 12, h: 8 } },
+      ovnkube_master_memory { gridPos: { x: 12, y: 80, w: 12, h: 8 } },
+      ovnkube_controller_cpu { gridPos: { x: 0, y: 88, w: 12, h: 8 } },
+      ovnkube_controller_memory { gridPos: { x: 12, y: 88, w: 12, h: 8 } },
+    ]
+  ), { x: 0, y: 36, w: 24, h: 1 }
 )
