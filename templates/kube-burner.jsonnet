@@ -2229,6 +2229,149 @@ local etcd_peer_roundtrip_time = grafana.graphPanel.new(
   )
 );
 
+local etcd_cpu = grafana.graphPanel.new(
+  title='Etcd CPU utilization',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                 .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.container.keyword: etcd',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        fake: true,
+        field: 'labels.container.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local etcd_memory = grafana.graphPanel.new(
+  title='Etcd memory utilization',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='bytes',
+)
+                    .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.container.keyword: etcd',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        fake: true,
+        field: 'labels.container.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.namespace.keyword',
+        id: '5',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -2416,5 +2559,7 @@ grafana.dashboard.new(
     etcd_commit_latency { gridPos: { x: 12, y: 38, w: 12, h: 9 } },
     etcd_leader_changes { gridPos: { x: 0, y: 47, w: 12, h: 9 } },
     etcd_peer_roundtrip_time { gridPos: { x: 12, y: 47, w: 12, h: 9 } },
+    etcd_cpu { gridPos: { x: 0, y: 56, w: 12, h: 9 } },
+    etcd_memory { gridPos: { x: 12, y: 56, w: 12, h: 9 } },
   ],
 )
