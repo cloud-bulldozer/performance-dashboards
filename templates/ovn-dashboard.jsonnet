@@ -105,22 +105,22 @@ local topOvnControllerMem = genericGraphLegendPanel('Top 10  ovn-controller Memo
 
 local pod_latency = genericGraphLegendPanel('Pod creation Latency', 's').addTarget(
   prometheus.target(
-    'sum(rate(ovnkube_master_pod_lsp_created_port_binding_duration_seconds_sum[1m])) by (pod)',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_lsp_created_port_binding_duration_seconds_bucket[1m])) by (pod,le))',
     legendFormat='{{pod}} - LSP created',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(ovnkube_master_pod_port_binding_port_binding_chassis_duration_seconds_sum[1m])) by (pod)',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_port_binding_chassis_duration_seconds_bucket[1m])) by (pod,le))',
     legendFormat='{{pod}} - Port Binding',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(ovnkube_master_pod_port_binding_chassis_port_binding_up_duration_seconds_sum[1m])) by (pod)',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_chassis_port_binding_up_duration_seconds_bucket[1m])) by (pod,le))',
     legendFormat='{{pod}} - Port Binding Up',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(ovnkube_master_pod_first_seen_lsp_created_duration_seconds_sum[1m])) by (pod)',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_first_seen_lsp_created_duration_seconds_bucket[1m])) by (pod,le))',
     legendFormat='{{pod}} - Pod First seen',
   )
 );
@@ -161,21 +161,21 @@ local work_queue_unfinished_latency = genericGraphLegendPanel('OVNKube Master wo
 
 local ovnAnnotationLatency = genericGraphLegendPanel('Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'sum by (pod) (rate(ovnkube_master_pod_creation_latency_seconds_sum[1m]))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[1m])) by (pod,le)) > 0',
     legendFormat='{{pod}} - Pod Annotation latency',
   )
 );
 
 local ovnCNIAdd = genericGraphLegendPanel('CNI Request ADD Latency', 's').addTarget(
   prometheus.target(
-    'sum by (pod) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="ADD"}[1m]))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[1m])) by (pod,le)) > 0',
     legendFormat='{{pod}}',
   )
 );
 
 local ovnCNIDel = genericGraphLegendPanel('CNI Request DEL Latency', 's').addTarget(
   prometheus.target(
-    'sum by (pod) (rate(ovnkube_node_cni_request_duration_seconds_sum{command="DEL"}[1m]))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[1m])) by (pod,le)) > 0',
     legendFormat='{{pod}}',
   )
 );
@@ -266,10 +266,10 @@ grafana.dashboard.new(
       ovn_nbdb_leader { gridPos: { x: 8, y: 0, w: 4, h: 4 } },
       ovn_sbdb_leader { gridPos: { x: 12, y: 0, w: 4, h: 4 } },
       num_onv_controller { gridPos: { x: 16, y: 0, w: 4, h: 4 } },
-      ovnKubeMasterCPU { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
-      ovnKubeMasterMem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
-      topOvnControllerCPU { gridPos: { x: 0, y: 12, w: 12, h: 8 } },
-      topOvnControllerMem { gridPos: { x: 12, y: 12, w: 12, h: 8 } },
+      ovnKubeMasterCPU { gridPos: { x: 0, y: 4, w: 12, h: 10 } },
+      ovnKubeMasterMem { gridPos: { x: 12, y: 4, w: 12, h: 10 } },
+      topOvnControllerCPU { gridPos: { x: 0, y: 12, w: 12, h: 10 } },
+      topOvnControllerMem { gridPos: { x: 12, y: 12, w: 12, h: 10 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
@@ -278,10 +278,10 @@ grafana.dashboard.new(
 .addPanel(
   grafana.row.new(title='Latency Monitoring', collapse=true).addPanels(
     [
-      ovnAnnotationLatency { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
-      ovnCNIAdd { gridPos: { x: 12, y: 0, w: 12, h: 8 } },
-      pod_latency { gridPos: { x: 0, y: 8, w: 24, h: 12 } },
-      sync_latency { gridPos: { x: 0, y: 16, w: 24, h: 12 } },
+      ovnAnnotationLatency { gridPos: { x: 0, y: 0, w: 12, h: 10 } },
+      ovnCNIAdd { gridPos: { x: 12, y: 0, w: 12, h: 10 } },
+      pod_latency { gridPos: { x: 0, y: 8, w: 24, h: 10 } },
+      sync_latency { gridPos: { x: 0, y: 16, w: 24, h: 10 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
@@ -289,10 +289,10 @@ grafana.dashboard.new(
 .addPanel(
   grafana.row.new(title='WorkQueue Monitoring', collapse=true).addPanels(
     [
-      work_queue { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
-      work_queue_depth { gridPos: { x: 12, y: 0, w: 12, h: 8 } },
-      work_queue_latency { gridPos: { x: 0, y: 8, w: 12, h: 8 } },
-      work_queue_unfinished_latency { gridPos: { x: 12, y: 8, w: 12, h: 8 } },
+      work_queue { gridPos: { x: 0, y: 0, w: 12, h: 10 } },
+      work_queue_depth { gridPos: { x: 12, y: 0, w: 12, h: 10 } },
+      work_queue_latency { gridPos: { x: 0, y: 8, w: 12, h: 10 } },
+      work_queue_unfinished_latency { gridPos: { x: 12, y: 8, w: 12, h: 10 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
