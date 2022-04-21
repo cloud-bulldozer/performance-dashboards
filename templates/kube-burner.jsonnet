@@ -2372,6 +2372,337 @@ local etcd_memory = grafana.graphPanel.new(
   )
 );
 
+// API an Kubeproxy section
+
+local api_latency_read_only_resource = grafana.graphPanel.new(
+  title='Read Only API request P99 latency - resource scoped',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  format='s',
+)
+                                       .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: resource',
+    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.verb.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: 0,
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.resource.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local api_latency_read_only_namespace = grafana.graphPanel.new(
+  title='Read Only API request P99 latency - namespace scoped',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  format='s',
+)
+                                        .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: namespace',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.verb.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: 0,
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local api_latency_read_only_cluster = grafana.graphPanel.new(
+  title='Read Only API request P99 latency - cluster scoped',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: cluster',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.verb.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: 0,
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local api_latency_mutating = grafana.graphPanel.new(
+  title='Mutating API request P99 latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                             .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: mutatingAPICallsLatency',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.verb.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: 0,
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local api_request_rate = grafana.graphPanel.new(
+  title='API request rate',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                         .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: APIRequestRate',
+    alias='{{labels.verb.keyword}} {{labels.resource.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.resource.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        fake: true,
+        field: 'labels.verb.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: 0,
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local service_sync_latency = grafana.graphPanel.new(
+  title='Service sync latency',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='s',
+)
+                             .addTarget(
+  es.target(
+    query='uuid: $uuid AND metricName.keyword: kubeproxyP99ProgrammingLatency',
+    alias='Latency',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.instance.keyword',
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '_term',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                             .addTarget(
+  es.target(
+    query='uuid: $uuid AND metricName.keyword: serviceSyncLatency',
+    alias='Latency',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -2561,5 +2892,18 @@ grafana.dashboard.new(
     etcd_peer_roundtrip_time { gridPos: { x: 12, y: 47, w: 12, h: 9 } },
     etcd_cpu { gridPos: { x: 0, y: 56, w: 12, h: 9 } },
     etcd_memory { gridPos: { x: 12, y: 56, w: 12, h: 9 } },
+  ],
+)
+.addPanel(
+  grafana.row.new(title='API and Kubeproxy', collapse=false), { x: 0, y: 65, w: 24, h: 1 }
+)
+.addPanels(
+  [
+    api_latency_read_only_resource { gridPos: { x: 0, y: 66, w: 12, h: 9 } },
+    api_latency_read_only_namespace { gridPos: { x: 12, y: 66, w: 12, h: 9 } },
+    api_latency_read_only_cluster { gridPos: { x: 0, y: 75, w: 12, h: 9 } },
+    api_latency_mutating { gridPos: { x: 12, y: 75, w: 12, h: 9 } },
+    api_request_rate { gridPos: { x: 0, y: 84, w: 12, h: 9 } },
+    service_sync_latency { gridPos: { x: 12, y: 84, w: 12, h: 9 } },
   ],
 )
