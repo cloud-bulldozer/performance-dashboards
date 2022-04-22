@@ -2894,6 +2894,269 @@ local cri_o_process_memory = grafana.graphPanel.new(
   )
 );
 
+// Master Node section
+
+local container_cpu_master = grafana.graphPanel.new(
+  title='Container CPU usage $master',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='percent',
+)
+                             .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.node.keyword: $master AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local container_memory_master = grafana.graphPanel.new(
+  title='Container RSS memory $master',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                                .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.node.keyword: $master AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local cpu_master = grafana.graphPanel.new(
+  title='CPU $master',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_min=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                   .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Masters" AND labels.instance.keyword: $master',
+    alias='{{labels.mode.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+        settings: {
+          script: {
+            inline: '_value*100',
+          },
+        },
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.mode.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local memory_master = grafana.graphPanel.new(
+  title='Memory $master',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryAvailable-Masters" AND labels.instance.keyword: $master',
+    alias='Available',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryTotal-Masters" AND labels.instance.keyword: $master',
+    alias='Total',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryUtilization-Masters" AND labels.instance.keyword: $master',
+    alias='Utilization',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -3106,7 +3369,18 @@ grafana.dashboard.new(
   [
     kubelet_process_cpu { gridPos: { x: 0, y: 94, w: 12, h: 8 } },
     kubelet_process_memory { gridPos: { x: 12, y: 94, w: 12, h: 8 } },
-    cri_o_process_cpu { gridPos: { x: 0, y: 94, w: 12, h: 8 } },
-    cri_o_process_memory { gridPos: { x: 12, y: 94, w: 12, h: 8 } },
+    cri_o_process_cpu { gridPos: { x: 0, y: 103, w: 12, h: 8 } },
+    cri_o_process_memory { gridPos: { x: 12, y: 103, w: 12, h: 8 } },
   ],
+)
+
+.addPanel(
+  grafana.row.new(title='Master: $master', collapse=true, repeat='$master').addPanels(
+    [
+      container_cpu_master { gridPos: { x: 0, y: 112, w: 12, h: 9 } },
+      container_memory_master { gridPos: { x: 12, y: 112, w: 12, h: 9 } },
+      cpu_master { gridPos: { x: 0, y: 121, w: 12, h: 9 } },
+      memory_master { gridPos: { x: 12, y: 121, w: 12, h: 9 } },
+    ]
+  ), { x: 0, y: 111, w: 24, h: 1 }
 )
