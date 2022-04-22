@@ -2702,6 +2702,198 @@ local service_sync_latency = grafana.graphPanel.new(
   )
 );
 
+// Cluster Kubelet & CRI-O section
+local kubelet_process_cpu = grafana.graphPanel.new(
+  title='Kubelet process CPU usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                            .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: kubeletCPU',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.node.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local kubelet_process_memory = grafana.graphPanel.new(
+  title='Kubelet process RSS memory usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                               .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: kubeletMemory',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.node.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local cri_o_process_cpu = grafana.graphPanel.new(
+  title='CRI-O process CPU usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                          .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: crioCPU',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.node.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+local cri_o_process_memory = grafana.graphPanel.new(
+  title='CRI-O RSS memory usage',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_values=true,
+  format='percent',
+)
+                             .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: crioMemory',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'labels.node.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -2904,5 +3096,17 @@ grafana.dashboard.new(
     api_latency_mutating { gridPos: { x: 12, y: 75, w: 12, h: 9 } },
     api_request_rate { gridPos: { x: 0, y: 84, w: 12, h: 9 } },
     service_sync_latency { gridPos: { x: 12, y: 84, w: 12, h: 9 } },
+  ],
+)
+
+.addPanel(
+  grafana.row.new(title='API and Kubeproxy', collapse=false), { x: 0, y: 93, w: 24, h: 1 }
+)
+.addPanels(
+  [
+    kubelet_process_cpu { gridPos: { x: 0, y: 94, w: 12, h: 8 } },
+    kubelet_process_memory { gridPos: { x: 12, y: 94, w: 12, h: 8 } },
+    cri_o_process_cpu { gridPos: { x: 0, y: 94, w: 12, h: 8 } },
+    cri_o_process_memory { gridPos: { x: 12, y: 94, w: 12, h: 8 } },
   ],
 )
