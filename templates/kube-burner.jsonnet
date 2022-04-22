@@ -2383,7 +2383,6 @@ local api_latency_read_only_resource = grafana.graphPanel.new(
                                        .addTarget(
   es.target(
     query='uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: resource',
-    alias='{{labels.namespace.keyword}}-{{labels.pod.keyword}}',
     timeField='timestamp',
     metrics=[
       {
