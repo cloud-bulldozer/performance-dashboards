@@ -234,8 +234,166 @@ local etcd_version_panel = grafana.statPanel.new(
 local job_summary_panel = grafana.tablePanel.new(
   title='Job Summary',
   datasource='$datasource1',
-
-
+  styles=[
+    {
+      pattern: 'uuid',
+      alias: 'UUID',
+      type: 'string',
+    },
+    {
+      pattern: 'jobConfig.name',
+      alias: 'Name',
+      type: 'string',
+    },
+    {
+      pattern: 'jobConfig.qps',
+      alias: 'QPS',
+      type: 'number',
+    },
+    {
+      pattern: 'jobConfig.burst',
+      alias: 'Burst',
+      type: 'number',
+    },
+    {
+      pattern: 'elapsedTime',
+      alias: 'Elapsed time',
+      type: 'number',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.jobIterations',
+      alias: 'Iterations',
+      type: 'number',
+    },
+    {
+      pattern: 'jobConfig.jobType',
+      alias: 'Job Type',
+      type: 'string',
+    },
+    {
+      pattern: 'jobConfig.podWait',
+      alias: 'podWait',
+      type: 'boolean',
+    },
+    {
+      pattern: 'jobConfig.namespacedIterations',
+      alias: 'Namespaced iterations',
+      type: 'boolean',
+    },
+    {
+      pattern: 'jobConfig.preLoadImages',
+      alias: 'Preload Images',
+      type: 'boolean',
+    },
+    {
+      pattern: '_id',
+      alias: '_id',
+      type: 'hidden',
+    },
+    {
+      pattern: '_index',
+      alias: '_index',
+      type: 'hidden',
+    },
+    {
+      pattern: '_type',
+      alias: '_type',
+      type: 'hidden',
+    },
+    {
+      pattern: 'highlight',
+      alias: 'highlight',
+      type: 'hidden',
+    },
+    {
+      pattern: '_type',
+      alias: '_type',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.cleanup',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.errorOnVerify',
+      alias: 'errorOnVerify',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.jobIterationDelay',
+      alias: 'jobIterationDelay',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.jobPause',
+      alias: 'jobPause',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.maxWaitTimeout',
+      alias: 'maxWaitTimeout',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.namespace',
+      alias: 'namespacePrefix',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.namespaced',
+      alias: 'jobConfig.namespaced',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.objects',
+      alias: 'jobConfig.objects',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.preLoadPeriod',
+      alias: 'jobConfig.preLoadPeriod',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.verifyObjects',
+      alias: 'jobConfig.verifyObjects',
+      type: 'hidden',
+    },
+    {
+      pattern: 'metricName',
+      alias: 'metricName',
+      type: 'hidden',
+    },
+    {
+      pattern: 'timestamp',
+      alias: 'timestamp',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitFor',
+      alias: 'jobConfig.waitFor',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitForDeletion',
+      alias: 'jobConfig.waitForDeletion',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitWhenFinished',
+      alias: 'jobConfig.waitWhenFinished',
+      type: 'hidden',
+    },
+    {
+      pattern: 'sort',
+      alias: 'sort',
+      type: 'hidden',
+    },
+  ]
 ).addTarget(
   es.target(
     query='uuid.keyword: $uuid AND metricName: "jobSummary"',
@@ -250,31 +408,6 @@ local job_summary_panel = grafana.tablePanel.new(
   )
 ).addTransformation(
   grafana.transformation.new('organize', options={
-    excludeByName: {
-      _id: true,
-      _index: true,
-      _type: true,
-      highlight: true,
-      'jobConfig.cleanup': true,
-      'jobConfig.errorOnVerify': true,
-      'jobConfig.jobIterationDelay': true,
-      'jobConfig.jobIterations': false,
-      'jobConfig.jobPause': true,
-      'jobConfig.maxWaitTimeout': true,
-      'jobConfig.namespace': true,
-      'jobConfig.namespaced': true,
-      'jobConfig.namespacedIterations': false,
-      'jobConfig.objects': true,
-      'jobConfig.preLoadPeriod': true,
-      'jobConfig.verifyObjects': true,
-      'jobConfig.waitFor': true,
-      'jobConfig.waitForDeletion': true,
-      'jobConfig.waitWhenFinished': true,
-      metricName: true,
-      sort: true,
-      timestamp: true,
-      uuid: false,
-    },
     indexByName: {
       _id: 1,
       _index: 2,
@@ -301,31 +434,6 @@ local job_summary_panel = grafana.tablePanel.new(
       metricName: 24,
       timestamp: 0,
       uuid: 4,
-    },
-    renameByName: {
-      _type: '',
-      elapsedTime: 'Elapsed time',
-      'jobConfig.burst': 'Burst',
-      'jobConfig.cleanup': '',
-      'jobConfig.errorOnVerify': 'errorOnVerify',
-      'jobConfig.jobIterationDelay': 'jobIterationDelay',
-      'jobConfig.jobIterations': 'Iterations',
-      'jobConfig.jobPause': 'jobPause',
-      'jobConfig.jobType': 'Job Type',
-      'jobConfig.maxWaitTimeout': 'maxWaitTImeout',
-      'jobConfig.name': 'Name',
-      'jobConfig.namespace': 'namespacePrefix',
-      'jobConfig.namespaced': '',
-      'jobConfig.namespacedIterations': 'Namespaced iterations',
-      'jobConfig.objects': '',
-      'jobConfig.podWait': 'podWait',
-      'jobConfig.preLoadImages': 'Preload Images',
-      'jobConfig.preLoadPeriod': '',
-      'jobConfig.qps': 'QPS',
-      'jobConfig.verifyObjects': '',
-      metricName: '',
-      timestamp: '',
-      uuid: 'UUID',
     },
   })
 );
@@ -4049,10 +4157,10 @@ grafana.dashboard.new(
   metric_count_panel, { x: 4, y: 0, w: 12, h: 4 }
 )
 .addPanel(
-  openshift_version_panel, { x: 16, y: 0, w: 4, h: 4 },
+  openshift_version_panel, { x: 16, y: 0, w: 6, h: 4 },
 )
 .addPanel(
-  etcd_version_panel, { x: 20, y: 0, w: 2, h: 4 }
+  etcd_version_panel, { x: 22, y: 0, w: 2, h: 4 }
 )
 .addPanel(
   job_summary_panel, { x: 0, y: 4, h: 3, w: 24 },
