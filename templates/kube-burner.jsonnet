@@ -3157,6 +3157,533 @@ local memory_master = grafana.graphPanel.new(
   )
 );
 
+// Worker Node section
+
+local container_cpu_worker = grafana.graphPanel.new(
+  title='Container CPU usage $worker',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='percent',
+)
+                             .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.node.keyword: $worker AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local container_memory_worker = grafana.graphPanel.new(
+  title='Container RSS memory $worker',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                                .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.node.keyword: $worker AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local cpu_worker = grafana.graphPanel.new(
+  title='CPU $worker',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_min=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                   .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Workers" AND labels.instance.keyword: $worker',
+    alias='{{labels.mode.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+        settings: {
+          script: {
+            inline: '_value*100',
+          },
+        },
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.mode.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local memory_worker = grafana.graphPanel.new(
+  title='Memory $worker',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryAvailable-Workers" AND labels.instance.keyword: $worker',
+    alias='Available',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryTotal-Workers" AND labels.instance.keyword: $worker',
+    alias='Total',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                      .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryUtilization-Workers" AND labels.instance.keyword: $worker',
+    alias='Utilization',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+
+// Infra Node section
+
+local container_cpu_infra = grafana.graphPanel.new(
+  title='Container CPU usage $infra',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='percent',
+)
+                            .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.node.keyword: $infra AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local container_memory_infra = grafana.graphPanel.new(
+  title='Container RSS memory $infra',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                               .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.node.keyword: $infra AND labels.namespace.keyword: $namespace',
+    alias='{{labels.pod.keyword}} {{labels.container.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.pod.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'labels.container.keyword',
+        fake: true,
+        id: '3',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '0',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local cpu_infra = grafana.graphPanel.new(
+  title='CPU $infra',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_min=true,
+  legend_avg=true,
+  legend_values=true,
+  format='percent',
+)
+                  .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Infra" AND labels.instance.keyword: $infra',
+    alias='{{labels.mode.keyword}}',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+        settings: {
+          script: {
+            inline: '_value*100',
+          },
+        },
+      },
+    ],
+    bucketAggs=[
+      {
+        fake: true,
+        field: 'labels.mode.keyword',
+        id: '4',
+        settings: {
+          min_doc_count: '1',
+          order: 'desc',
+          orderBy: '1',
+          size: '10',
+        },
+        type: 'terms',
+      },
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: 'auto',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
+local memory_infra = grafana.graphPanel.new(
+  title='Memory $infra',
+  datasource='$datasource1',
+  legend_alignAsTable=true,
+  legend_rightSide=true,
+  legend_max=true,
+  legend_values=true,
+  format='bytes',
+)
+                     .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryAvailable-Infra" AND labels.instance.keyword: $infra',
+    alias='Available',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                     .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryTotal-Infra" AND labels.instance.keyword: $infra',
+    alias='Total',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+)
+                     .addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND metricName.keyword: "nodeMemoryUtilization-Infra" AND labels.instance.keyword: $infra',
+    alias='Utilization',
+    timeField='timestamp',
+    metrics=[
+      {
+        field: 'value',
+        id: '1',
+        type: 'avg',
+      },
+    ],
+    bucketAggs=[
+      {
+        field: 'timestamp',
+        id: '2',
+        settings: {
+          interval: '30s',
+          min_doc_count: '1',
+          trimEdges: 0,
+        },
+        type: 'date_histogram',
+      },
+    ],
+  )
+);
+
 
 //Dashboard & Templates
 
@@ -3383,4 +3910,26 @@ grafana.dashboard.new(
       memory_master { gridPos: { x: 12, y: 121, w: 12, h: 9 } },
     ]
   ), { x: 0, y: 111, w: 24, h: 1 }
+)
+
+.addPanel(
+  grafana.row.new(title='Worker: $worker', collapse=true, repeat='$worker').addPanels(
+    [
+      container_cpu_worker { gridPos: { x: 0, y: 112, w: 12, h: 9 } },
+      container_memory_worker { gridPos: { x: 12, y: 112, w: 12, h: 9 } },
+      cpu_worker { gridPos: { x: 0, y: 121, w: 12, h: 9 } },
+      memory_worker { gridPos: { x: 12, y: 121, w: 12, h: 9 } },
+    ]
+  ), { x: 0, y: 111, w: 24, h: 1 }
+)
+
+.addPanel(
+  grafana.row.new(title='Infra: $infra', collapse=true, repeat='$infra').addPanels(
+    [
+      container_cpu_infra { gridPos: { x: 0, y: 131, w: 12, h: 9 } },
+      container_memory_infra { gridPos: { x: 12, y: 131, w: 12, h: 9 } },
+      cpu_infra { gridPos: { x: 0, y: 140, w: 12, h: 9 } },
+      memory_infra { gridPos: { x: 12, y: 140, w: 12, h: 9 } },
+    ]
+  ), { x: 0, y: 130, w: 24, h: 1 }
 )
