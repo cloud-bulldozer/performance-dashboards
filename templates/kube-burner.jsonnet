@@ -4053,34 +4053,48 @@ grafana.dashboard.new(
   )
 )
 .addTemplate(
-  grafana.template.custom(
-    label='SDN type',
-    name='sdn',
+  grafana.template.new(
+    label='Platform',
+    name='platform',
     current='All',
-    query='openshift-sdn,openshift-ovn-kubernetes',
+    query='{"find": "terms", "field": "platform.keyword"}',
+    refresh=2,
     multi=true,
     includeAll=true,
+    datasource='$datasource1',
   )
 )
 .addTemplate(
   grafana.template.new(
-    label='Job',
-    multi=true,
-    query='{"find": "terms", "field": "jobName.keyword"}',
+    label='SDN type',
+    name='sdn',
+    current='All',
+    query='{"find": "terms", "field": "sdn_type.keyword"}',
     refresh=2,
-    name='job',
+    multi=true,
+    includeAll=true,
+    datasource='$datasource1',
+  )
+)
+.addTemplate(
+  grafana.template.new(
+    label='Workload',
+    multi=true,
+    query='{"find": "terms", "field": "workload.keyword", "query": "platform.keyword: $platform AND sdn_type.keyword: $sdn"}',
+    refresh=1,
+    name='workload',
     includeAll=false,
     datasource='$datasource1'
   )
 )
 .addTemplate(
   grafana.template.new(
-    label='Job',
+    label='Worker count',
     multi=true,
-    query='{"find": "terms", "field": "jobName.keyword"}',
-    refresh=2,
-    name='job',
-    includeAll=false,
+    query='{"find": "terms", "field": "worker_nodes_count", "query": "platform.keyword: $platform AND sdn_type.keyword: $sdn AND workload.keyword: $workload"}',
+    refresh=1,
+    name='worker_count',
+    includeAll=true,
     datasource='$datasource1'
   )
 )
@@ -4088,7 +4102,7 @@ grafana.dashboard.new(
   grafana.template.new(
     label='UUID',
     multi=false,
-    query='{"find": "terms", "field": "uuid.keyword",  "query": "labels.namespace.keyword:  $sdn AND jobName.keyword: $job"}',
+    query='{"find": "terms", "field": "uuid.keyword", "query": "platform.keyword: $platform AND sdn_type.keyword: $sdn AND workload.keyword: $workload AND worker_nodes_count: $worker_count"}',
     refresh=2,
     name='uuid',
     includeAll=false,
