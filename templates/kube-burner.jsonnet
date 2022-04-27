@@ -231,9 +231,9 @@ local etcd_version_panel = grafana.statPanel.new(
 // Next line
 // TODO: Convert to new table format once jsonnet supports it.
 // That would fix the text wrapping problem.
-local job_summary_panel = grafana.tablePanel.new(
-  title='Job Summary',
+local summary_panel_1 = grafana.tablePanel.new(
   datasource='$datasource1',
+  title=null,
   styles=[
     {
       pattern: 'uuid',
@@ -243,7 +243,7 @@ local job_summary_panel = grafana.tablePanel.new(
     {
       pattern: 'jobConfig.name',
       alias: 'Name',
-      type: 'string',
+      type: 'hidden',
     },
     {
       pattern: 'jobConfig.qps',
@@ -274,12 +274,12 @@ local job_summary_panel = grafana.tablePanel.new(
     {
       pattern: 'jobConfig.podWait',
       alias: 'podWait',
-      type: 'boolean',
+      type: 'hidden',
     },
     {
       pattern: 'jobConfig.namespacedIterations',
       alias: 'Namespaced iterations',
-      type: 'boolean',
+      type: 'hidden',
     },
     {
       pattern: 'jobConfig.preLoadImages',
@@ -434,6 +434,261 @@ local job_summary_panel = grafana.tablePanel.new(
       metricName: 24,
       timestamp: 0,
       uuid: 4,
+    },
+  })
+);
+
+
+// TODO: Convert to new table format once jsonnet supports it.
+// That would fix the text wrapping problem.
+local summary_panel_2 = grafana.tablePanel.new(
+  datasource='$datasource1',
+  title=null,
+  styles=[
+    {
+      pattern: 'k8s_version',
+      alias: 'k8s version',
+      type: 'string',
+    },
+    {
+      pattern: 'result',
+      alias: 'Result',
+      type: 'string',
+    },
+    {
+      pattern: 'sdn_type',
+      alias: 'SDN',
+      type: 'string',
+    },
+    {
+      pattern: 'total_nodes',
+      alias: 'Total nodes',
+      type: 'number',
+    },
+    {
+      pattern: 'master_nodes_count',
+      alias: 'Master nodes',
+      type: 'number',
+    },
+    {
+      pattern: 'worker_nodes_count',
+      alias: 'Worker nodes',
+      type: 'number',
+    },
+    {
+      pattern: 'infra_nodes_count',
+      alias: 'Infra nodes',
+      type: 'number',
+    },
+    {
+      pattern: 'master_nodes_type',
+      alias: 'Masters flavor',
+      type: 'string',
+    },
+    {
+      pattern: '_id',
+      alias: '_id',
+      type: 'hidden',
+    },
+    {
+      pattern: '_index',
+      alias: '_index',
+      type: 'hidden',
+    },
+    {
+      pattern: '_type',
+      alias: '_type',
+      type: 'hidden',
+    },
+    {
+      pattern: 'benchmark',
+      alias: 'benchmark',
+      type: 'hidden',
+    },
+    {
+      pattern: 'clustertype',
+      alias: 'clustertype',
+      type: 'hidden',
+    },
+    {
+      pattern: 'end_date',
+      alias: 'end_date',
+      type: 'hidden',
+    },
+    {
+      pattern: 'highlight',
+      alias: 'highlight',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.cleanup',
+      alias: 'jobConfig.cleanup',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.errorOnVerify',
+      alias: 'errorOnVerify',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.jobIterationDelay',
+      alias: 'jobIterationDelay',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.jobPause',
+      alias: 'jobPause',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.maxWaitTimeout',
+      alias: 'maxWaitTimeout',
+      type: 'hidden',
+      unit: 's',
+    },
+    {
+      pattern: 'jobConfig.namespace',
+      alias: 'namespacePrefix',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.namespaced',
+      alias: 'jobConfig.namespaced',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.objects',
+      alias: 'jobConfig.objects',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.preLoadPeriod',
+      alias: 'jobConfig.preLoadPeriod',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.verifyObjects',
+      alias: 'jobConfig.verifyObjects',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitFor',
+      alias: 'jobConfig.waitFor',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitForDeletion',
+      alias: 'jobConfig.waitForDeletion',
+      type: 'hidden',
+    },
+    {
+      pattern: 'jobConfig.waitWhenFinished',
+      alias: 'jobConfig.waitWhenFinished',
+      type: 'hidden',
+    },
+    {
+      pattern: 'metricName',
+      alias: 'metricName',
+      type: 'hidden',
+    },
+    {
+      pattern: 'ocp_version',
+      alias: 'ocp_version',
+      type: 'hidden',
+    },
+    {
+      pattern: 'ocp_version',
+      alias: 'ocp_version',
+      type: 'hidden',
+    },
+    {
+      pattern: 'sort',
+      alias: 'sort',
+      type: 'hidden',
+    },
+    {
+      pattern: 'timestamp',
+      alias: 'timestamp',
+      type: 'hidden',
+    },
+    {
+      pattern: 'uuid',
+      alias: 'uuid',
+      type: 'hidden',
+    },
+    {
+      pattern: 'workload',
+      alias: 'workload',
+      type: 'hidden',
+    },
+    {
+      pattern: 'worker_nodes_type',
+      alias: 'worker_nodes_type',
+      type: 'hidden',
+    },
+    {
+      pattern: 'infra_nodes_type',
+      alias: 'infra_nodes_type',
+      type: 'hidden',
+    },
+    {
+      pattern: 'platform',
+      alias: 'platform',
+      type: 'hidden',
+    },
+    {
+      pattern: 'workload_nodes_count',
+      alias: 'workload_nodes_count',
+      type: 'hidden',
+    },
+    {
+      pattern: 'workload_nodes_type',
+      alias: 'workload_nodes_type',
+      type: 'hidden',
+    },
+  ]
+).addTarget(
+  es.target(
+    query='uuid.keyword: $uuid AND result.keyword: *',
+    timeField='timestamp',
+    metrics=[{
+      id: '1',
+      settings: {
+        size: '500',
+      },
+      type: 'raw_data',
+    }],
+  )
+).addTransformation(
+  grafana.transformation.new('organize', options={
+    indexByName: {
+      _id: 4,
+      _index: 5,
+      _type: 15,
+      benchmark: 17,
+      clustertype: 18,
+      end_date: 19,
+      highlight: 20,
+      infra_nodes_count: 9,
+      infra_nodes_type: 14,
+      k8s_version: 1,
+      master_nodes_count: 7,
+      master_nodes_type: 11,
+      ocp_version: 21,
+      platform: 22,
+      result: 2,
+      sdn_type: 3,
+      sort: 23,
+      timestamp: 0,
+      total_nodes: 6,
+      uuid: 16,
+      worker_nodes_count: 8,
+      worker_nodes_type: 12,
+      workload: 24,
+      workload_nodes_count: 10,
+      workload_nodes_type: 13,
     },
   })
 );
@@ -4039,11 +4294,6 @@ grafana.dashboard.new(
   time_to='now',
   timezone='utc',
 )
-
-
-
-// TODO: Second datasource and confirm that this one is working.
-
 .addTemplate(
   grafana.template.datasource(
     'datasource1',
@@ -4163,21 +4413,15 @@ grafana.dashboard.new(
     includeAll=false,
   )
 )
-
-.addPanel(
-  worker_count, { x: 0, y: 0, w: 4, h: 4 }
-)
-.addPanel(
-  metric_count_panel, { x: 4, y: 0, w: 12, h: 4 }
-)
-.addPanel(
-  openshift_version_panel, { x: 16, y: 0, w: 6, h: 4 },
-)
-.addPanel(
-  etcd_version_panel, { x: 22, y: 0, w: 2, h: 4 }
-)
-.addPanel(
-  job_summary_panel, { x: 0, y: 4, h: 3, w: 24 },
+.addPanels(
+  [
+    worker_count { gridPos: { x: 0, y: 0, w: 4, h: 3 } },
+    metric_count_panel { gridPos: { x: 4, y: 0, w: 12, h: 3 } },
+    openshift_version_panel { gridPos: { x: 16, y: 0, w: 6, h: 3 } },
+    etcd_version_panel { gridPos: { x: 22, y: 0, w: 2, h: 3 } },
+    summary_panel_1 { gridPos: { x: 0, y: 3, h: 2, w: 24 } },
+    summary_panel_2 { gridPos: { x: 0, y: 5, h: 2, w: 24 } },
+  ],
 )
 .addPanel(
   grafana.row.new(title='Cluster status', collapse=true).addPanels(
@@ -4248,7 +4492,7 @@ grafana.dashboard.new(
 )
 
 .addPanel(
-  grafana.row.new(title='API and Kubeproxy', collapse=false), { x: 0, y: 93, w: 24, h: 1 }
+  grafana.row.new(title='Cluster Kubelet & CRI-O', collapse=false), { x: 0, y: 93, w: 24, h: 1 }
 )
 .addPanels(
   [
