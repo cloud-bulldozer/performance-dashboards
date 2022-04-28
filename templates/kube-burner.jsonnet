@@ -4299,7 +4299,8 @@ grafana.dashboard.new(
     'datasource1',
     'elasticsearch',
     'AWS Dev - ripsaw-kube-burner',
-    label='Datasource'
+    label='Datasource',
+    regex='/.*kube-burner.*/'
   )
 )
 .addTemplate(
