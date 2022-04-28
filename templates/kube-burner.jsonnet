@@ -2205,7 +2205,7 @@ local ovnkube_master_cpu = grafana.graphPanel.new(
 )
                            .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-master.*/',
+    query='uuid.keyword: $uuid AND metricName: "containerCPU" AND labels.pod.keyword: /ovnkube-master.*/',
     timeField='timestamp',
     metrics=[
       {
@@ -2264,7 +2264,7 @@ local ovnkube_master_memory = grafana.graphPanel.new(
 )
                               .addTarget(
   es.target(
-    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-master.*/',
+    query='uuid.keyword: $uuid AND metricName: "containerMemory" AND labels.pod.keyword: /ovnkube-master.*/',
     timeField='timestamp',
     alias='{{labels.pod.keyword}}',
     metrics=[
