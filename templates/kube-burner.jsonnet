@@ -2742,6 +2742,9 @@ local api_latency_read_only_resource = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   format='s',
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
 )
                                        .addTarget(
   es.target(
@@ -2797,6 +2800,9 @@ local api_latency_read_only_namespace = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   format='s',
+  legend_max=true,
+  legend_avg=true,
+  legend_values=true,
 )
                                         .addTarget(
   es.target(
@@ -3120,6 +3126,7 @@ local kubelet_process_memory = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3216,6 +3223,7 @@ local cri_o_process_memory = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='percent',
 )
@@ -3264,6 +3272,7 @@ local container_cpu_master = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='percent',
 )
@@ -3323,6 +3332,7 @@ local container_memory_master = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3438,6 +3448,7 @@ local memory_master = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3527,6 +3538,7 @@ local container_cpu_worker = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='percent',
 )
@@ -3586,6 +3598,7 @@ local container_memory_worker = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3701,6 +3714,7 @@ local memory_worker = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3790,6 +3804,7 @@ local container_cpu_infra = grafana.graphPanel.new(
   title='Container CPU usage $infra',
   datasource='$datasource1',
   legend_alignAsTable=true,
+  legend_avg=true,
   legend_max=true,
   legend_values=true,
   format='percent',
@@ -3850,6 +3865,7 @@ local container_memory_infra = grafana.graphPanel.new(
   datasource='$datasource1',
   legend_alignAsTable=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -3965,6 +3981,7 @@ local memory_infra = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
@@ -4054,6 +4071,7 @@ local agg_avg_cpu = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_avg=true,
+  legend_max=true,
   legend_values=true,
   format='percent',
 )
@@ -4107,6 +4125,7 @@ local agg_avg_mem = grafana.graphPanel.new(
   legend_alignAsTable=true,
   legend_rightSide=true,
   legend_max=true,
+  legend_avg=true,
   legend_values=true,
   format='bytes',
 )
