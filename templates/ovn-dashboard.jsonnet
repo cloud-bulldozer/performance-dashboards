@@ -296,4 +296,3 @@ grafana.dashboard.new(
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
-
