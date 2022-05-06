@@ -64,7 +64,7 @@ spec:
           value: ${GRAFANA_ADMIN_PASSWORD}
         - name: DASHBOARDS
           value: ${DASHBOARDS}
-        image: quay.io/jaredoconnell/dittybopper-syncer:disconnected-support
+        image: quay.io/joconnel/dittybopper-syncer:disconnected-support
       volumes:
       - name: sc-grafana-config
         configMap:
