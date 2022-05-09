@@ -39,7 +39,7 @@ END
 export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
 export DASHBOARDS="ocp-performance.json api-performance-overview.json etcd-on-cluster-dashboard.json hypershift-performance.json ovn-dashboard.json"
-export REPOSITORY="https://github.com/cloud-bulldozer/performance-dashboards.git" # Repo to pull dashboards templates
+export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/cloud-bulldozer/dittybopper-syncer:latest"} # Syncer image
 
 # Set defaults for command options
 k8s_cmd='oc'

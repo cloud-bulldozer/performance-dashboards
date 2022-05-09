@@ -19,6 +19,14 @@ templates will need adjustment accordingly.
 
 The `deploy.sh` script also requires `jq` to be installed on the system it is being run from.
 
+## Syncer Image and Deploying Forked Changes
+
+The image is built with the context at the root of the repository, and the image in the dittybopper/syncer directory.
+
+For disconnected support, the syncer image stores all dashboards on it. For deploying dittybopper with changed
+dashboards, you need to build it yourself from the root of the repository and update the SYNCER_IMAGE environment
+variable to match your own image repository.
+
 ## Contribute
 
 Pull requests are encouraged. If you find this tool useful, please help extend it for more use cases.
