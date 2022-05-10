@@ -5,4 +5,5 @@ WORKDIR /dittybopper-syncer
 COPY . /dittybopper-syncer/dashboards
 RUN chmod -R 775 /dittybopper-syncer
 COPY dittybopper/syncer/entrypoint.sh /bin/entrypoint.sh
+RUN make -C dashboards deps
 ENTRYPOINT ["entrypoint.sh"]

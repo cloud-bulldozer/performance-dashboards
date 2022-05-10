@@ -1,6 +1,6 @@
 #!/bin/bash
 
-make -C dashboards build
+make -C dashboards offline-build
 pushd dashboards/rendered
 while [[ $(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/api/health) != "200" ]]; do 
   echo "Grafana still not ready, waiting 5 seconds"

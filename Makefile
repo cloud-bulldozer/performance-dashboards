@@ -20,7 +20,9 @@ $(ALLDIRS):
 format: deps
 	$(BINDIR)/jsonnetfmt -i $(TEMPLATES)
 
-build: deps $(TEMPLATESDIR)/grafonnet-lib $(outputs)
+build: deps $(TEMPLATESDIR)/grafonnet-lib offline-build
+
+offline-build: $(outputs)
 
 clean:
 	@echo "Cleaning up"
