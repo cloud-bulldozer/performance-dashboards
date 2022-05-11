@@ -27,6 +27,10 @@ For disconnected support, the syncer image stores all dashboards on it. For depl
 dashboards, you need to build it yourself from the root of the repository and update the SYNCER_IMAGE environment
 variable to match your own image repository.
 
+If using disconnected, you need to sync the cloud-bulldozer grafana image (shown in the
+dittybopper/templates/dittybopper.yaml.template file) and your chosen syncer image
+(defaults to quay.io/cloud-bulldozer/dittybopper-syncer:latest).
+
 ## Contribute
 
 Pull requests are encouraged. If you find this tool useful, please help extend it for more use cases.
