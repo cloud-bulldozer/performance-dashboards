@@ -1,0 +1,31 @@
+name: Grafana Syncer
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: [ master, auto-dashboard-load ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Compile dashboards
+      run: make build
+
+    - name: Import dashboards to grafana
+      run: >
+	#for t in rendered/*.json; do
+        t="rendered/kube-burner.json"
+        echo "Importing ${t}";
+        dashboard=$(cat ${t});
+        echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
+        curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
+        "http://${{ secrets.GRAFANA_USER }}:${{ secrets.GRAFANA_PASSWORD }}@${{ secrets.AZURE_CREDENTIALS }}/api/dashboards/db" -o /dev/null;
+        #done
+
