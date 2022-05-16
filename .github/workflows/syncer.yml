@@ -24,6 +24,6 @@ jobs:
         echo "Importing ${t}";
         dashboard=$(cat ${t});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
-        curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@- \
+        curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
         "${{ secrets.GRAFANA_URL }}/api/dashboards/db" -o /dev/null;
 
