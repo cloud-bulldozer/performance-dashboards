@@ -21,10 +21,12 @@ jobs:
     # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
     - name: Import dashboards to grafana
       run: >
-        t="rendered/kube-burner.json";
-        echo "Importing ${t}";
-        dashboard=$(cat ${t});
+        t=("rendered/kube-burner.json");
+        for path in ${t}; do
+        echo "Importing ${path}";
+        dashboard=$(cat ${path});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
         curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
         "${{ secrets.GRAFANA_URL }}/api/dashboards/db" -o /dev/null;
+        done
 
