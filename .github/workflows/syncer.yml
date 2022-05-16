@@ -5,7 +5,7 @@ defaults:
 
 on:
   push:
-    branches: [ master, auto-dashboard-load ]
+    branches: [ master ]
 
 jobs:
   deploy:
