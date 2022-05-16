@@ -18,6 +18,7 @@ jobs:
     - name: Compile dashboards
       run: make build
 
+    # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
     - name: Import dashboards to grafana
       run: >
         t="rendered/kube-burner.json";
