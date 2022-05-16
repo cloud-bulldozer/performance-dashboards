@@ -20,7 +20,7 @@ jobs:
 
     - name: Import dashboards to grafana
       run: >
-        t="rendered/kube-burner.json"
+        t="rendered/kube-burner.json";
         echo "Importing ${t}";
         dashboard=$(cat ${t});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
