@@ -27,6 +27,8 @@ Usage: $(basename "${0}") [-c <kubectl_cmd>] [-n <namespace>] [-p <grafana_pwd>]
                       already-running Grafana pod. Can be a local path or a remote
                       URL beginning with http.
 
+  -t <template_path>: Use custom dittybopper template from local path, default will be templates/dittybopper.yaml.template
+
   -d                : (D)elete an existing deployment
 
   -h                : Help
@@ -46,11 +48,8 @@ k8s_cmd='oc'
 namespace='dittybopper'
 grafana_default_pass=True
 
-# Other vars
-deploy_template="templates/dittybopper.yaml.template"
-
 # Capture and act on command options
-while getopts ":c:m:n:p:i:dh" opt; do
+while getopts ":c:m:n:p:i:t:dh" opt; do
   case ${opt} in
     c)
       k8s_cmd=${OPTARG}
@@ -65,6 +64,9 @@ while getopts ":c:m:n:p:i:dh" opt; do
     i)
       dash_import+=(${OPTARG})
       ;;
+    t)
+      template=${OPTARG}
+    ;;
     d)
       delete=True
       ;;
@@ -84,6 +86,13 @@ while getopts ":c:m:n:p:i:dh" opt; do
       ;;
   esac
 done
+
+
+if [[ ! -z ${template} ]]; then
+  deploy_template=${template}
+else
+  deploy_template="templates/dittybopper.yaml.template"
+fi
 
 
       echo "${dash_import[@]}"
