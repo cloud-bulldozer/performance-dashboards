@@ -21,8 +21,6 @@ The `deploy.sh` script also requires `jq` to be installed on the system it is be
 
 ## Syncer Image and Deploying Forked Changes
 
-The image is built with the context at the root of the repository, and the image in the dittybopper/syncer directory.
-
 For disconnected support, the syncer image stores all dashboards on it. For deploying dittybopper with changed
 dashboards, you need to build it yourself from the root of the repository and update the SYNCER_IMAGE environment
 variable to match your own image repository.
@@ -30,6 +28,10 @@ variable to match your own image repository.
 If using disconnected, you need to sync the cloud-bulldozer grafana image (shown in the
 dittybopper/templates/dittybopper.yaml.template file) and your chosen syncer image
 (defaults to quay.io/cloud-bulldozer/dittybopper-syncer:latest).
+
+The syncer image is built with the context at the root of the repository, and the image in the dittybopper/syncer directory.
+You can build it with `make build-syncer-image SYNCER_IMG_TAG=container.registry.org/organization/syncer:latest`
+Alternatively, you can run the following command form the root folder of this repository: `podman build -f dittybopper/syncer/Dockerfile -t=container.registry.org/organization/syncer:latest .`
 
 ## Contribute
 
