@@ -4,7 +4,7 @@ defaults:
     shell: bash
 
 env:
-  DASHBOARDS: "[ 'rendered/kube-burner.json' ]"
+  DASHBOARDS: "rendered/kube-burner.json test/dir"
 
 on:
   push:
