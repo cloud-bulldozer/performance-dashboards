@@ -3,9 +3,12 @@ defaults:
   run:
     shell: bash
 
+env:
+  DASHBOARDS: "[ 'rendered/kube-burner.json' ]"
+
 on:
   push:
-    branches: [ master ]
+    branches: [ master, auto-dashboard-load ]
 
 jobs:
   deploy:
@@ -21,8 +24,8 @@ jobs:
     # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
     - name: Import dashboards to grafana
       run: >
-        t=("rendered/kube-burner.json");
-        for path in ${t}; do
+        readarray -t dashboard_list < <(sed -n '/{/,/}/{s/[^:]*:[^"]*"\([^"]*\).*/\1/p;}' $DASHBOARDS);
+        for path in ${dashboard_list}; do
         echo "Importing ${path}";
         dashboard=$(cat ${path});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
