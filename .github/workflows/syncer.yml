@@ -5,7 +5,7 @@ defaults:
 
 env:
   # Comma separated
-  DASHBOARDS: "kube-burner.json,uperf-perf.json"
+  DASHBOARDS: "kube-burner.json uperf-perf.json"
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
     # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
     - name: Import dashboards to grafana
       run: >
-        dashboard_list=($(echo $DASHBOARDS | tr "," "\n"));
+        dashboard_list=($(echo $DASHBOARDS));
         for path in ${dashboard_list}; do
         full_path="rendered/${path}";
         echo "Importing ${full_path}";
