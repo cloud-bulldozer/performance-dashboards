@@ -4,8 +4,8 @@ defaults:
     shell: bash
 
 env:
-  # Comma separated
-  DASHBOARDS: "kube-burner.json uperf-perf.json"
+  # Space separated list as a string of all dashboard json files in "rendered" to load
+  DASHBOARDS: "kube-burner.json"
 
 on:
   push:
