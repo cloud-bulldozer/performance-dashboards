@@ -26,7 +26,7 @@ jobs:
     - name: Import dashboards to grafana
       run: >
         dashboard_list=($(echo $DASHBOARDS));
-        for path in ${dashboard_list}; do
+        for path in "${dashboard_list[@]}"; do
         full_path="rendered/${path}";
         echo "Importing ${full_path}";
         dashboard=$(cat ${full_path});
