@@ -27,9 +27,9 @@ jobs:
       run: >
         dashboard_list=($(echo $DASHBOARDS | tr "," "\n"));
         for path in ${dashboard_list}; do
-        path="rendered/${path}"
-        echo "Importing ${path}";
-        dashboard=$(cat ${path});
+        full_path="rendered/${path}"
+        echo "Importing ${full_path}";
+        dashboard=$(cat ${full_path});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
         curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
         "${{ secrets.GRAFANA_URL }}/api/dashboards/db" -o /dev/null;
