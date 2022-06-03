@@ -5,7 +5,7 @@ defaults:
 
 env:
   # Comma separated
-  DASHBOARDS: "rendered/kube-burner.json,test/dir"
+  DASHBOARDS: "kube-burner.json,uperf-perf.json"
 
 on:
   push:
@@ -27,6 +27,7 @@ jobs:
       run: >
         dashboard_list=($(echo $DASHBOARDS | tr "," "\n"));
         for path in ${dashboard_list}; do
+        path="rendered/${path}"
         echo "Importing ${path}";
         dashboard=$(cat ${path});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
