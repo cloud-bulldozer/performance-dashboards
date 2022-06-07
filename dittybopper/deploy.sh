@@ -119,9 +119,14 @@ fi
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
 export PROMETHEUS_URL="https://$($k8s_cmd get routes -n openshift-monitoring prometheus-k8s -o json | jq -r '.spec.host')"
-export PROMETHEUS_BEARER=$($k8s_cmd sa get-token prometheus-k8s -n openshift-monitoring)
+export PROMETHEUS_BEARER=$($k8s_cmd sa get-token -n openshift-monitoring prometheus-k8s || $k8s_cmd sa new-token -n openshift-monitoring prometheus-k8s)
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
-echo "Prometheus bearer token collected."
+if [[ -n ${PROMETHEUS_BEARER} ]]; then
+  echo "Prometheus bearer token collected."
+else
+  echo "ERROR: Prometheus bearer token is not collected."
+  exit 1
+fi
 
 function namespace() {
   # Create namespace
