@@ -1,0 +1,37 @@
+name: Grafana Syncer
+defaults:
+  run:
+    shell: bash
+
+env:
+  # Space separated list as a string of all dashboard json files in "rendered" to load
+  DASHBOARDS: "kube-burner.json"
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Compile dashboards
+      run: make build
+
+    # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
+    - name: Import dashboards to grafana
+      run: >
+        dashboard_list=($(echo $DASHBOARDS));
+        for path in "${dashboard_list[@]}"; do
+        full_path="rendered/${path}";
+        echo "Importing ${full_path}";
+        dashboard=$(cat ${full_path});
+        echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
+        curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
+        "${{ secrets.GRAFANA_URL }}/api/dashboards/db" -o /dev/null;
+        done
+
