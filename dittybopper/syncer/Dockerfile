@@ -1,7 +1,12 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi8/ubi-minimal AS builder
+RUN microdnf install make git tar
+WORKDIR /performance-dashboards
+COPY . /performance-dashboards
+RUN make
 
-RUN microdnf install git make tar
-WORKDIR /dittybopper-syncer
-RUN chmod 775 /dittybopper-syncer
-COPY entrypoint.sh /bin/entrypoint.sh
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+WORKDIR /performance-dashboards
+COPY dittybopper/syncer/entrypoint.sh /bin/entrypoint.sh
+COPY --from=builder /performance-dashboards /performance-dashboards
+RUN chmod -R 775 /performance-dashboards
 ENTRYPOINT ["entrypoint.sh"]

@@ -52,9 +52,7 @@ spec:
           value: ${GRAFANA_ADMIN_PASSWORD}
         - name: DASHBOARDS
           value: ${DASHBOARDS}
-        - name: REPOSITORY
-          value: https://github.com/cloud-bulldozer/performance-dashboards.git
-        image: quay.io/cloud-bulldozer/dittybopper-syncer:latest
+        image: ${SYNCER_IMAGE}
       volumes:
       - name: sc-grafana-config
         configMap:
