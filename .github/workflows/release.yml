@@ -1,0 +1,36 @@
+name: Release syncer image
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - "*" # triggers only if push new tag version
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ORG: cloud-bulldozer
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Login in quay
+      run: podman login quay.io -u ${QUAY_USER} -p ${QUAY_TOKEN}
+      env:
+        QUAY_USER: ${{ secrets.QUAY_USER }}
+        QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+
+    - name: Build syncer image
+      run: make build-syncer-image
+
+    - name: Push syncer image
+      run: make push-syncer-image
+
+
+
+
