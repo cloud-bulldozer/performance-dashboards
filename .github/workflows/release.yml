@@ -6,8 +6,7 @@ defaults:
 on:
   push:
     branches: [ master ]
-    tags:
-      - "*" # triggers only if push new tag version
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
