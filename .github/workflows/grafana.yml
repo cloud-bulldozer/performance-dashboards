@@ -1,4 +1,4 @@
-name: Grafana Syncer
+name: Grafana Importer
 defaults:
   run:
     shell: bash
