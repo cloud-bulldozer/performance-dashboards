@@ -48,7 +48,7 @@ spec:
       containers:
       - name: dittybopper
         imagePullPolicy: Always
-        image: quay.io/cloud-bulldozer/grafana:7.3.4
+        image: ${GRAFANA_IMAGE}
         ports:
         - name: sc-grafana-http
           containerPort: 3000
