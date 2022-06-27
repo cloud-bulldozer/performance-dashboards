@@ -21,12 +21,5 @@ jobs:
         QUAY_USER: ${{ secrets.QUAY_USER }}
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
-    - name: Build syncer image
-      run: make build-syncer-image
-
-    - name: Push syncer image
-      run: make push-syncer-image
-
-
-
-
+    - name: Build & push syncer image
+      run: make build-syncer-image push-syncer-image

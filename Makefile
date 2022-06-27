@@ -4,6 +4,7 @@ TEMPLATESDIR = templates
 OUTPUTDIR = rendered
 ALLDIRS = $(BINDIR) $(OUTPUTDIR)
 SYNCER_IMG_TAG = quay.io/cloud-bulldozer/dittybopper-syncer:latest
+PLATFORM = linux/amd64,linux/arm64
 
 # Get all templates at $(TEMPLATESDIR)
 TEMPLATES = $(wildcard $(TEMPLATESDIR)/*.jsonnet)
@@ -39,8 +40,8 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
 	@echo "Building template $<"
 	$(BINDIR)/jsonnet $< > $@
 
-build-syncer-image:
-	podman build -f dittybopper/syncer/Dockerfile -t=${SYNCER_IMG_TAG} .
+build-syncer-image: build
+	podman build --platform=$(PLATFORM) -f dittybopper/syncer/Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
 push-syncer-image:
-	podman push ${SYNCER_IMG_TAG}
+	podman manifest push ${SYNCER_IMG_TAG} ${SYNCER_IMG_TAG}
