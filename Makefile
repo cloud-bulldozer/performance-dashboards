@@ -41,7 +41,7 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
 	$(BINDIR)/jsonnet $< > $@
 
 build-syncer-image: build
-	podman build --all-platforms -f dittybopper/syncer/Dockerfile --manifest=${SYNCER_IMG_TAG} .
+	podman build --platform=${PLATFORM} -f dittybopper/syncer/Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
 push-syncer-image:
 	podman manifest push ${SYNCER_IMG_TAG} ${SYNCER_IMG_TAG}
