@@ -15,18 +15,14 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: Install dependencies required for multi-arch builds
+      run: sudo apt-get update && sudo apt-get install qemu-user-static podman fuse-overlayfs
+
     - name: Login in quay
       run: podman login quay.io -u ${QUAY_USER} -p ${QUAY_TOKEN}
       env:
         QUAY_USER: ${{ secrets.QUAY_USER }}
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
-    - name: Build syncer image
-      run: make build-syncer-image
-
-    - name: Push syncer image
-      run: make push-syncer-image
-
-
-
-
+    - name: Build & push syncer image
+      run: make build-syncer-image push-syncer-image
