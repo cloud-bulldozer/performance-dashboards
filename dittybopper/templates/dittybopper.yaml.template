@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dittybopper
-  namespace: dittybopper
+  namespace: $namespace
   labels:
     metrics-infra: dittybopper
     name: dittybopper
@@ -20,7 +20,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: dittybopper
-  namespace: dittybopper
+namespace: $namespace
 spec:
   to:
     name: dittybopper
@@ -33,7 +33,7 @@ metadata:
   labels:
     app: dittybopper
   name: dittybopper
-  namespace: dittybopper
+namespace: $namespace
 spec:
   replicas: 1
   selector:
@@ -77,7 +77,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sc-ocp-prom
-  namespace: dittybopper
+namespace: $namespace
 data:
   ocp-prometheus.yml: |
     apiVersion: 1
@@ -102,7 +102,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sc-grafana-config
-  namespace: dittybopper
+namespace: $namespace
 data:
   grafana.ini: |
     ##################### Grafana Configuration Example #####################
