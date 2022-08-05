@@ -119,7 +119,7 @@ fi
 #FIXME: This is OCP-Specific; needs updating to support k8s
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
-export PROMETHEUS_URL="https://$($k8s_cmd get routes -n openshift-monitoring prometheus-k8s -o json | jq -r '.spec.host')"
+export PROMETHEUS_URL="https://$($k8s_cmd get routes -n openshift-monitoring prometheus-k8s -o jsonpath="{.spec.host}")"
 export PROMETHEUS_BEARER=$($k8s_cmd sa get-token -n openshift-monitoring prometheus-k8s || $k8s_cmd sa new-token -n openshift-monitoring prometheus-k8s)
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
 if [[ -n ${PROMETHEUS_BEARER} ]]; then
