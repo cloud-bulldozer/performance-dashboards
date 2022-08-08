@@ -119,7 +119,7 @@ function namespace() {
 }
 
 function grafana() {
-  envsubst < ${deploy_template} | $k8s_cmd "$1" -f -
+  envsubst < ${deploy_template} | $k8s_cmd "$1" -n "$namespace" -f -
   if [[ ! $delete ]]; then
     echo ""
     echo -e "\033[32mWaiting for dittybopper deployment to be available...\033[0m"
