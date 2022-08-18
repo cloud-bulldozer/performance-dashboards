@@ -17,8 +17,6 @@ k8s/OpenShift environments. It should generally deploy out-of-the-box with OpenS
 will likely have a prerequisite to first stand up a Prometheus pod, and the Dittybopper scripts and 
 templates will need adjustment accordingly.
 
-The `deploy.sh` script also requires `jq` to be installed on the system it is being run from.
-
 ## Syncer Image and Deploying Forked Changes
 
 For disconnected support, the syncer image stores all dashboards on it. For deploying dittybopper with changed
