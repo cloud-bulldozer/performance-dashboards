@@ -49,13 +49,14 @@ rm -rf bin rendered tmp templates/grafonnet-lib
 
 The following templates are available:
 
-- OpenShift Performance Dashboard
 - API Performance Dashboard
 - Etcd Dashboard
-- UPerf Results Dashboard
+- OpenShift Performance Dashboard
+- OVN Dashboard
 - Pgbench Dashboard
-- YCSB Dashboard
+- UPerf Results Dashboard
 - Vegeta Dashboard
+- YCSB Dashboard
 
 ## Dittybopper
 
