@@ -180,6 +180,18 @@ local ovnCNIDel = genericGraphLegendPanel('CNI Request DEL Latency', 's').addTar
   )
 );
 
+local ovnLatencyCalculate = genericGraphLegendPanel('Duration for OVN to apply network configuration','s').addTarget(
+  prometheus.target(
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (pod, le))',
+    legendFormat='{{pod}} - Kind Pod',
+  )
+).addTarget(
+  prometheus.target(
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (service, le))',
+    legendFormat='{{service}} - Kind Service',
+  )
+);
+
 // Creating the dashboard from the panels described above.
 
 grafana.dashboard.new(
@@ -282,6 +294,7 @@ grafana.dashboard.new(
       ovnCNIAdd { gridPos: { x: 12, y: 0, w: 12, h: 10 } },
       pod_latency { gridPos: { x: 0, y: 8, w: 24, h: 10 } },
       sync_latency { gridPos: { x: 0, y: 16, w: 24, h: 10 } },
+      ovnLatencyCalculate { gridPos: { x: 0, y: 24, w: 24, h: 10 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
