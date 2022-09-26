@@ -182,12 +182,12 @@ local ovnCNIDel = genericGraphLegendPanel('CNI Request DEL Latency', 's').addTar
 
 local ovnLatencyCalculate = genericGraphLegendPanel('Duration for OVN to apply network configuration','s').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[1m])) by (pod, le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} - Kind Pod',
   )
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[1m])) by (service, le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (service, le))',
     legendFormat='{{service}} - Kind Service',
   )
 );
