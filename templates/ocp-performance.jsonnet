@@ -20,6 +20,7 @@ local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
   legend_values=true,
   legend_alignAsTable=true,
   legend_max=true,
+  legend_min=true,
   legend_avg=true,
   legend_hideEmpty=true,
   legend_hideZero=true,
