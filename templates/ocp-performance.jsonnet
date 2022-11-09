@@ -164,8 +164,21 @@ local containerWriteBytes(nodeName) = genericGraphLegendPanel('Container fs writ
 
 // Individual panel definitions
 
-// OVN
+// Stackrox
+local stackroxCPU = genericGraphLegendPanel('Top 25 stackrox container CPU percent', 'percent').addTarget(
+  prometheus.target(
+    'topk(25, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",namespace!="",namespace=~"stackrox"}[$interval])) by (pod,container,namespace,name,service) * 100)',
+    legendFormat='{{ pod }}: {{ container }}',
+  )
+);
+local stackroxMem = genericGraphLegendPanel('Top 25 stackrox container RSS bytes', 'bytes').addTarget(
+  prometheus.target(
+    'topk(25, container_memory_rss{container!="POD",name!="",namespace!="",namespace=~"stackrox"})',
+    legendFormat='{{ pod }}: {{ container }}',
+  )
+);
 
+// OVN
 local ovnAnnotationLatency = genericGraphPanel('99% Pod Annotation Latency', 's').addTarget(
   prometheus.target(
     'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[$interval])) by (pod,le)) > 0',
@@ -497,7 +510,7 @@ grafana.dashboard.new(
     '$datasource',
     'label_values(kube_pod_info, namespace)',
     '',
-    regex='/(openshift-.*|.*ripsaw.*|.*benchmark.*|builder-.*|.*kube.*)/',
+    regex='/(openshift-.*|.*ripsaw.*|.*benchmark.*|builder-.*|.*kube.*|stackrox)/',
     refresh=2,
   ) {
     label: 'Namespace',
@@ -576,6 +589,17 @@ grafana.dashboard.new(
   .addPanel(promReplMemUsage, gridPos={ x: 0, y: 2, w: 24, h: 12 })
   , { gridPos: { x: 0, y: 1, w: 24, h: 1 } }
 )
+
+.addPanel(
+  grafana.row.new(title='Stackrox', collapse=true).addPanels(
+    [
+      stackroxMem { gridPos: { x: 0, y: 2, w: 24, h: 12 } },
+      stackroxCPU { gridPos: { x: 0, y: 2, w: 24, h: 12 } },
+    ]
+  )
+  , { gridPos: { x: 0, y: 1, w: 24, h: 1 } }
+)
+
 
 .addPanel(
   grafana.row.new(title='Cluster Kubelet', collapse=true).addPanels(
