@@ -273,6 +273,13 @@ local crioMemory = genericGraphLegendPanel('Top 10 crio memory usage', 'bytes').
   )
 );
 
+local crioINodes = genericGraphLegendPanel('inodes usage in /var/run', 'percent').addTarget(
+  prometheus.target(
+    '(1 - node_filesystem_files_free{fstype!="",mountpoint="/run"} / node_filesystem_files{fstype!="",mountpoint="/run"}) * 100',
+    legendFormat='/var/run - {{instance}}',
+  )
+);
+
 // Cluster details
 
 local current_node_count = grafana.statPanel.new(
@@ -608,6 +615,7 @@ grafana.dashboard.new(
       crioCPU { gridPos: { x: 12, y: 3, w: 12, h: 8 } },
       kubeletMemory { gridPos: { x: 0, y: 11, w: 12, h: 8 } },
       crioMemory { gridPos: { x: 12, y: 11, w: 12, h: 8 } },
+      crioINodes { gridPos: { x: 0, y: 19, w: 24, h: 8 } },
     ]
   ), { gridPos: { x: 0, y: 2, w: 24, h: 1 } }
 )
