@@ -47,6 +47,7 @@ export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:7.3.4"} #
 # Set defaults for command options
 k8s_cmd='oc'
 namespace='dittybopper'
+namespace_file="./templates/dittybopper_ns.yaml.template"
 grafana_default_pass=True
 
 # Capture and act on command options
@@ -131,7 +132,7 @@ fi
 
 function namespace() {
   # Create namespace
-  $k8s_cmd "$1" namespace "$namespace"
+  $k8s_cmd "$1" -f "$namespace_file"
 }
 
 function grafana() {
