@@ -47,6 +47,7 @@ export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:7.3.4"} #
 # Set defaults for command options
 k8s_cmd='oc'
 namespace='dittybopper'
+namespace_file="./templates/dittybopper_ns.yaml.template"
 grafana_default_pass=True
 
 # Capture and act on command options
@@ -120,7 +121,7 @@ fi
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
 export PROMETHEUS_URL="https://$($k8s_cmd get routes -n openshift-monitoring prometheus-k8s -o jsonpath="{.spec.host}")"
-export PROMETHEUS_BEARER=$($k8s_cmd sa get-token -n openshift-monitoring prometheus-k8s || $k8s_cmd sa new-token -n openshift-monitoring prometheus-k8s)
+export PROMETHEUS_BEARER=$($k8s_cmd create token -n openshift-monitoring prometheus-k8s --duration=6h || $k8s_cmd sa get-token -n openshift-monitoring prometheus-k8s || $k8s_cmd sa new-token -n openshift-monitoring prometheus-k8s)
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
 if [[ -n ${PROMETHEUS_BEARER} ]]; then
   echo "Prometheus bearer token collected."
@@ -131,7 +132,7 @@ fi
 
 function namespace() {
   # Create namespace
-  $k8s_cmd "$1" namespace "$namespace"
+  $k8s_cmd "$1" -f "$namespace_file"
 }
 
 function grafana() {
