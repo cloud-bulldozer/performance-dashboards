@@ -508,9 +508,9 @@ grafana.dashboard.new(
   grafana.template.new(
     'namespace',
     '$datasource',
-    'label_values(kube_pod_info, namespace)',
+    'label_values(kube_pod_info{namespace!="(cluster-density.*|node-density-.*)"}, namespace)',
     '',
-    regex='/(openshift-.*|.*ripsaw.*|.*benchmark.*|builder-.*|.*kube.*|stackrox)/',
+    regex='',
     refresh=2,
   ) {
     label: 'Namespace',
