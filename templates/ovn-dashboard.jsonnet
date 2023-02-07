@@ -135,7 +135,7 @@ local sync_latency = genericGraphLegendPanel('Sync Service Latency', 's').addTar
 local ovnkube_node_ready_latency = genericGraphLegendPanel('OVNKube Node Ready Latency', 's').addTarget(
   prometheus.target(
     'ovnkube_node_ready_duration_seconds{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}',
-    legendFormat='{{pod}} - Time taken to get to ready state',
+    legendFormat='{{pod}}',
   )
 );
 
