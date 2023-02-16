@@ -132,6 +132,13 @@ local sync_latency = genericGraphLegendPanel('Sync Service Latency', 's').addTar
   )
 );
 
+local ovnkube_node_ready_latency = genericGraphLegendPanel('OVNKube Node Ready Latency', 's').addTarget(
+  prometheus.target(
+    'ovnkube_node_ready_duration_seconds{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}',
+    legendFormat='{{pod}}',
+  )
+);
+
 local work_queue = genericGraphLegendPanel('OVNKube Master workqueue', 'short').addTarget(
   prometheus.target(
     'rate(ovnkube_master_workqueue_adds_total[1m])',
@@ -180,7 +187,7 @@ local ovnCNIDel = genericGraphLegendPanel('CNI Request DEL Latency', 's').addTar
   )
 );
 
-local ovnLatencyCalculate = genericGraphLegendPanel('Duration for OVN to apply network configuration','s').addTarget(
+local ovnLatencyCalculate = genericGraphLegendPanel('Duration for OVN to apply network configuration', 's').addTarget(
   prometheus.target(
     'histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (pod, le))',
     legendFormat='{{pod}} - Kind Pod',
@@ -295,6 +302,7 @@ grafana.dashboard.new(
       pod_latency { gridPos: { x: 0, y: 8, w: 24, h: 10 } },
       sync_latency { gridPos: { x: 0, y: 16, w: 24, h: 10 } },
       ovnLatencyCalculate { gridPos: { x: 0, y: 24, w: 24, h: 10 } },
+      ovnkube_node_ready_latency { gridPos: { x: 0, y: 32, w: 24, h: 10 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
