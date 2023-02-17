@@ -6,9 +6,9 @@ local stat = grafana.statPanel;
 
 // Hypershift Hosted Cluster Components
 
-local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
+local genericGraphLegendPanel(title, datasource, format) = grafana.graphPanel.new(
   title=title,
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format=format,
   legend_values=true,
   legend_alignAsTable=true,
@@ -21,47 +21,17 @@ local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
   sort='decreasing',
 );
 
-local hostedControlPlaneCPU = genericGraphLegendPanel('Hosted Control Plane CPU', 'none').addTarget(
+local hostedControlPlaneCPU = genericGraphLegendPanel('Hosted Control Plane CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~"etcd.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~".*kube.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~"cluster.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_cpu_usage_seconds{namespace=~"$namespace",app=~"openshift.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"$namespace",container!="POD",name!=""}[1m])*100)',
+    legendFormat='{{pod}}/{{container}}',
   )
 );
 
-local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane Memory', 'bytes').addTarget(
+local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane Memory', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
-    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~"etcd.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~".*kube.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~"cluster.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
-  )
-).addTarget(
-  prometheus.target(
-    'topk(10,hypershift:controlplane:component_memory_usage{namespace=~"$namespace",app=~"openshift.*"})',
-    legendFormat='hyper - {{namespace}} - {{app}}',
+    'topk(10, container_memory_rss{namespace=~"$namespace",container!="POD",name!=""})',
+    legendFormat='{{pod}}/{{container}}',
   )
 );
 
@@ -69,14 +39,14 @@ local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane M
 
 // Cluster Operators details and status
 
-local clusterOperatorsInformation = genericGraphLegendPanel('Cluster operators information', 'none').addTarget(
+local clusterOperatorsInformation = genericGraphLegendPanel('Cluster operators information', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'cluster_operator_conditions{name!="",reason!=""}',
     legendFormat='{{name}} - {{reason}}',
   )
 );
 
-local clusterOperatorsDegraded = genericGraphLegendPanel('Cluster operators degraded', 'none').addTarget(
+local clusterOperatorsDegraded = genericGraphLegendPanel('Cluster operators degraded', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'cluster_operator_conditions{condition="Degraded",name!="",reason!=""}',
     legendFormat='{{name}} - {{reason}}',
@@ -86,7 +56,7 @@ local clusterOperatorsDegraded = genericGraphLegendPanel('Cluster operators degr
 
 // Management cluster alerts
 
-local alerts = genericGraphLegendPanel('Alerts', 'none').addTarget(
+local alerts = genericGraphLegendPanel('Alerts', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'topk(10,sum(ALERTS{severity!="none"}) by (alertname, severity))',
     legendFormat='{{severity}}: {{alertname}}',
@@ -98,12 +68,13 @@ local alerts = genericGraphLegendPanel('Alerts', 'none').addTarget(
 
 local num_hosted_cluster = stat.new(
   title='Number of HostedCluster',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   graphMode='none',
   reducerFunction='max',
 ).addTarget(
   prometheus.target(
-    'count(kube_namespace_labels{namespace=~"clusters-.*"})',
+    'count(kube_namespace_labels{namespace=~"^ocm-.*"})',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
@@ -111,55 +82,59 @@ local num_hosted_cluster = stat.new(
 
 local m_ocp_version = stat.new(
   title='Management OCP Version',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_version{type="completed",version!="",namespace="openshift-cluster-version"}',
     legendFormat='{{version}}',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
 ]);
 
 local ocp_version = stat.new(
-  title='HostedCluster OCP Version',
-  datasource='$datasource',
+  title='Hosted Cluster OCP Version',
+  datasource='OBO',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_version{type="completed",version!="",namespace=~"$namespace"}',
     legendFormat='{{version}}',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
 ]);
 
 local infrastructure = stat.new(
-  title='Cloud Infrastructure',
-  datasource='$datasource',
+  title='Hosted Cluster Cloud Infrastructure',
+  datasource='OBO',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_infrastructure_provider{namespace=~"$namespace"}',
     legendFormat='{{type}}',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
 ]);
 
 local region = stat.new(
-  title='Cloud Region',
-  datasource='$datasource',
+  title='Hosted Cluster Cloud Region',
+  datasource='OBO',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_infrastructure_provider{namespace=~"$namespace"}',
     legendFormat='{{region}}',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
@@ -167,12 +142,13 @@ local region = stat.new(
 
 local m_infrastructure = stat.new(
   title='Management Cloud Infrastructure',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_infrastructure_provider{namespace="openshift-kube-apiserver-operator"}',
+    instant=true,
     legendFormat='{{type}}',
   )
 ).addThresholds([
@@ -181,54 +157,84 @@ local m_infrastructure = stat.new(
 
 local m_region = stat.new(
   title='Management Cloud Region',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   textMode='name',
   graphMode='none',
 ).addTarget(
   prometheus.target(
     'cluster_infrastructure_provider{namespace="openshift-kube-apiserver-operator"}',
     legendFormat='{{region}}',
+    instant=true,
   )
 ).addThresholds([
   { color: 'green', value: null },
 ]);
 
-local top10ContMemHosted = genericGraphLegendPanel('Top 10 Hosted Clusters container RSS', 'bytes').addTarget(
+local top10ContMemHosted = genericGraphLegendPanel('Top 10 Hosted Clusters container RSS', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
-    'topk(10, container_memory_rss{namespace=~"clusters-.*",container!="POD",name!=""})',
+    'topk(10, container_memory_rss{namespace=~"^ocm-.*",container!="POD",name!=""})',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
-local top10ContCPUHosted = genericGraphLegendPanel('Top 10 Hosted Clusters container CPU', 'percent').addTarget(
+local top10ContCPUHosted = genericGraphLegendPanel('Top 10 Hosted Clusters container CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"clusters-.*",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"^ocm-.*",container!="POD",name!=""}[1m])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
-local top10ContMemManagement = genericGraphLegendPanel('Top 10 Management Cluster container RSS', 'bytes').addTarget(
+local top10ContMemManagement = genericGraphLegendPanel('Top 10 Management Cluster container RSS', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
     'topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
-local top10ContCPUManagement = genericGraphLegendPanel('Top 10 Management Cluster container CPU', 'percent').addTarget(
+local top10ContCPUManagement = genericGraphLegendPanel('Top 10 Management Cluster container CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
     'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[1m])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
 
+local top10ContMemOBOManagement = genericGraphLegendPanel('Top 10 Management Cluster OBO NS Pods RSS', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'topk(10, container_memory_rss{namespace="openshift-observability-operator",container!="POD",name!=""})',
+    legendFormat='{{ pod }}/{{ container }}',
+  )
+);
+
+local top10ContCPUOBOManagement = genericGraphLegendPanel('Top 10 Management Cluster OBO NS Pods CPU', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace="openshift-observability-operator",container!="POD",name!=""}[1m])*100)',
+    legendFormat='{{ pod }}/{{ container }}',
+  )
+);
+
+local top10ContMemHypershiftManagement = genericGraphLegendPanel('Top 10 Management Cluster Hypershift NS Pods RSS', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'topk(10, container_memory_rss{namespace="hypershift",container!="POD",name!=""})',
+    legendFormat='{{ pod }}/{{ container }}',
+  )
+);
+
+local top10ContCPUHypershiftManagement = genericGraphLegendPanel('Top 10 Management Cluster Hypershift NS Pods CPU', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace="hypershift",container!="POD",name!=""}[1m])*100)',
+    legendFormat='{{ pod }}/{{ container }}',
+  )
+);
+
 local current_node_count = grafana.statPanel.new(
   title='Current Node Count',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   reducerFunction='last',
 ).addTarget(
   prometheus.target(
     'sum(kube_node_info{})',
     legendFormat='Number of nodes',
+    instant='true',
   )
 ).addTarget(
   prometheus.target(
@@ -242,29 +248,48 @@ local current_node_count = grafana.statPanel.new(
   )
 );
 
+local current_machine_set_replica_count = genericGraphLegendPanel('Machine Set Replicas', 'Cluster Prometheus', 'none').addTarget(
+  prometheus.target(
+    'mapi_machine_set_status_replicas{name=~".*worker.*"}',
+    legendFormat='Replicas: {{ name }}',
+  )
+).addTarget(
+  prometheus.target(
+    'mapi_machine_set_status_replicas_available{name=~".*worker.*"}',
+    legendFormat='Available: {{ name }}',
+  )
+).addTarget(
+  prometheus.target(
+    'mapi_machine_set_status_replicas_ready{name=~".*worker.*"}',
+    legendFormat='Ready: {{ name }}',
+  )
+);
+
 local current_namespace_count = grafana.statPanel.new(
   title='Current namespace Count',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   reducerFunction='last',
 ).addTarget(
   prometheus.target(
     'sum(kube_namespace_status_phase) by (phase)',
     legendFormat='{{ phase }}',
+    instant=true,
   )
 );
 
 local current_pod_count = grafana.statPanel.new(
   title='Current Pod Count',
   reducerFunction='last',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'sum(kube_pod_status_phase{}) by (phase) > 0',
     legendFormat='{{ phase}} Pods',
+    instant=true,
   )
 );
 
-local nodeCount = genericGraphLegendPanel('Number of nodes', 'none').addTarget(
+local nodeCount = genericGraphLegendPanel('Number of nodes', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'sum(kube_node_info{})',
     legendFormat='Number of nodes',
@@ -276,21 +301,21 @@ local nodeCount = genericGraphLegendPanel('Number of nodes', 'none').addTarget(
   )
 );
 
-local nsCount = genericGraphLegendPanel('Namespace count', 'none').addTarget(
+local nsCount = genericGraphLegendPanel('Namespace count', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'sum(kube_namespace_status_phase) by (phase) > 0',
     legendFormat='{{ phase }} namespaces',
   )
 );
 
-local podCount = genericGraphLegendPanel('Pod count', 'none').addTarget(
+local podCount = genericGraphLegendPanel('Pod count', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'sum(kube_pod_status_phase{}) by (phase)',
     legendFormat='{{phase}} pods',
   )
 );
 
-local FailedPods = genericGraphLegendPanel('Failed pods', 'none').addTarget(
+local FailedPods = genericGraphLegendPanel('Failed pods', 'Cluster Prometheus', 'none').addTarget(
   prometheus.target(
     'kube_pod_status_phase{phase="Failed"}',
     legendFormat='{{namespace}}/{{ pod }}:{{ phase }}',
@@ -305,7 +330,7 @@ local FailedPods = genericGraphLegendPanel('Failed pods', 'none').addTarget(
 // API 99th percentile request duration by resource, namespace
 local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
   title='request duration - 99th quantile - by resource',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -326,7 +351,7 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
 
 local mgmt_fs_writes = grafana.graphPanel.new(
   title='Etcd container disk writes',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -346,7 +371,7 @@ local mgmt_fs_writes = grafana.graphPanel.new(
 
 local mgmt_ptp = grafana.graphPanel.new(
   title='p99 peer to peer latency',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -366,7 +391,7 @@ local mgmt_ptp = grafana.graphPanel.new(
 
 local mgmt_disk_wal_sync_duration = grafana.graphPanel.new(
   title='Disk WAL Sync Duration',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -386,7 +411,7 @@ local mgmt_disk_wal_sync_duration = grafana.graphPanel.new(
 
 local mgmt_disk_backend_sync_duration = grafana.graphPanel.new(
   title='Disk Backend Sync Duration',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -406,7 +431,7 @@ local mgmt_disk_backend_sync_duration = grafana.graphPanel.new(
 
 local mgmt_db_size = grafana.graphPanel.new(
   title='DB Size',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='bytes',
   legend_values=true,
   legend_alignAsTable=true,
@@ -432,7 +457,7 @@ local mgmt_db_size = grafana.graphPanel.new(
 
 local mgmt_cpu_usage = grafana.graphPanel.new(
   title='CPU usage',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='percent',
   legend_values=true,
   legend_alignAsTable=true,
@@ -452,7 +477,7 @@ local mgmt_cpu_usage = grafana.graphPanel.new(
 
 local mgmt_mem_usage = grafana.graphPanel.new(
   title='Memory usage',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='bytes',
   legend_values=true,
   legend_alignAsTable=true,
@@ -472,7 +497,7 @@ local mgmt_mem_usage = grafana.graphPanel.new(
 
 local mgmt_network_traffic = grafana.graphPanel.new(
   title='Container network traffic',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -498,7 +523,7 @@ local mgmt_network_traffic = grafana.graphPanel.new(
 
 local mgmt_grpc_traffic = grafana.graphPanel.new(
   title='gRPC network traffic',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -523,7 +548,7 @@ local mgmt_grpc_traffic = grafana.graphPanel.new(
 
 local mgmt_peer_traffic = grafana.graphPanel.new(
   title='Peer network traffic',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -549,7 +574,7 @@ local mgmt_peer_traffic = grafana.graphPanel.new(
 
 local mgmt_active_streams = grafana.graphPanel.new(
   title='Active Streams',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'sum(grpc_server_started_total{namespace=~"openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace=~"openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})',
@@ -564,7 +589,7 @@ local mgmt_active_streams = grafana.graphPanel.new(
 
 local mgmt_snapshot_duration = grafana.graphPanel.new(
   title='Snapshot duration',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='s',
 ).addTarget(
   prometheus.target(
@@ -577,7 +602,7 @@ local mgmt_snapshot_duration = grafana.graphPanel.new(
 
 local mgmt_percent_db_used = grafana.graphPanel.new(
   title='% DB Space Used',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='percent',
 ).addTarget(
   prometheus.target(
@@ -588,7 +613,7 @@ local mgmt_percent_db_used = grafana.graphPanel.new(
 
 local mgmt_db_capacity_left = grafana.graphPanel.new(
   title='DB Left capacity (with fragmented space)',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='bytes',
 ).addTarget(
   prometheus.target(
@@ -599,7 +624,7 @@ local mgmt_db_capacity_left = grafana.graphPanel.new(
 
 local mgmt_db_size_limit = grafana.graphPanel.new(
   title='DB Size Limit (Backend-bytes)',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='bytes'
 ).addTarget(
   prometheus.target(
@@ -612,7 +637,7 @@ local mgmt_db_size_limit = grafana.graphPanel.new(
 
 local mgmt_keys = grafana.graphPanel.new(
   title='Keys',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'etcd_debugging_mvcc_keys_total{namespace=~"openshift-etcd"}',
@@ -622,7 +647,7 @@ local mgmt_keys = grafana.graphPanel.new(
 
 local mgmt_compacted_keys = grafana.graphPanel.new(
   title='Compacted Keys',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"openshift-etcd"}',
@@ -632,7 +657,7 @@ local mgmt_compacted_keys = grafana.graphPanel.new(
 
 local mgmt_heartbeat_failures = grafana.graphPanel.new(
   title='Heartbeat Failures',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'etcd_server_heartbeat_send_failures_total{namespace=~"openshift-etcd"}',
@@ -648,7 +673,7 @@ local mgmt_heartbeat_failures = grafana.graphPanel.new(
 
 local mgmt_key_operations = grafana.graphPanel.new(
   title='Key Operations',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='ops',
 ) {
   yaxes: [
@@ -675,7 +700,7 @@ local mgmt_key_operations = grafana.graphPanel.new(
 
 local mgmt_slow_operations = grafana.graphPanel.new(
   title='Slow Operations',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   format='ops',
 ) {
   yaxes: [
@@ -702,7 +727,7 @@ local mgmt_slow_operations = grafana.graphPanel.new(
 
 local mgmt_raft_proposals = grafana.graphPanel.new(
   title='Raft Proposals',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'sum(rate(etcd_server_proposals_failed_total{namespace=~"openshift-etcd"}[2m]))',
@@ -727,7 +752,7 @@ local mgmt_raft_proposals = grafana.graphPanel.new(
 
 local mgmt_leader_elections_per_day = grafana.graphPanel.new(
   title='Leader Elections Per Day',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'changes(etcd_server_leader_changes_seen_total{namespace=~"openshift-etcd"}[1d])',
@@ -737,7 +762,7 @@ local mgmt_leader_elections_per_day = grafana.graphPanel.new(
 
 local mgmt_etcd_has_leader = grafana.singlestat.new(
   title='Etcd has a leader?',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
   valueMaps=[
     {
       op: '=',
@@ -753,12 +778,13 @@ local mgmt_etcd_has_leader = grafana.singlestat.new(
 ).addTarget(
   prometheus.target(
     'max(etcd_server_has_leader{namespace=~"openshift-etcd"})',
+    instant=true,
   )
 );
 
 local mgmt_num_leader_changes = grafana.graphPanel.new(
   title='Number of leader changes seen',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'sum(rate(etcd_server_leader_changes_seen_total{namespace=~"openshift-etcd"}[2m]))',
@@ -767,10 +793,11 @@ local mgmt_num_leader_changes = grafana.graphPanel.new(
 
 local mgmt_num_failed_proposals = grafana.singlestat.new(
   title='Total number of failed proposals seen',
-  datasource='$datasource',
+  datasource='Cluster Prometheus',
 ).addTarget(
   prometheus.target(
     'max(etcd_server_proposals_committed_total{namespace=~"openshift-etcd"})',
+    instant=true,
   )
 );
 
@@ -779,7 +806,7 @@ local mgmt_num_failed_proposals = grafana.singlestat.new(
 
 local fs_writes = grafana.graphPanel.new(
   title='Etcd container disk writes',
-  datasource='$datasource',
+  datasource='OBO',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -799,7 +826,7 @@ local fs_writes = grafana.graphPanel.new(
 
 local ptp = grafana.graphPanel.new(
   title='p99 peer to peer latency',
-  datasource='$datasource',
+  datasource='OBO',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -819,7 +846,7 @@ local ptp = grafana.graphPanel.new(
 
 local disk_wal_sync_duration = grafana.graphPanel.new(
   title='Disk WAL Sync Duration',
-  datasource='$datasource',
+  datasource='OBO',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -839,7 +866,7 @@ local disk_wal_sync_duration = grafana.graphPanel.new(
 
 local disk_backend_sync_duration = grafana.graphPanel.new(
   title='Disk Backend Sync Duration',
-  datasource='$datasource',
+  datasource='OBO',
   format='s',
   legend_values=true,
   legend_alignAsTable=true,
@@ -859,7 +886,7 @@ local disk_backend_sync_duration = grafana.graphPanel.new(
 
 local db_size = grafana.graphPanel.new(
   title='DB Size',
-  datasource='$datasource',
+  datasource='OBO',
   format='bytes',
   legend_values=true,
   legend_alignAsTable=true,
@@ -885,7 +912,7 @@ local db_size = grafana.graphPanel.new(
 
 local cpu_usage = grafana.graphPanel.new(
   title='CPU usage',
-  datasource='$datasource',
+  datasource='OBO',
   format='percent',
   legend_values=true,
   legend_alignAsTable=true,
@@ -905,7 +932,7 @@ local cpu_usage = grafana.graphPanel.new(
 
 local mem_usage = grafana.graphPanel.new(
   title='Memory usage',
-  datasource='$datasource',
+  datasource='OBO',
   format='bytes',
   legend_values=true,
   legend_alignAsTable=true,
@@ -925,7 +952,7 @@ local mem_usage = grafana.graphPanel.new(
 
 local network_traffic = grafana.graphPanel.new(
   title='Container network traffic',
-  datasource='$datasource',
+  datasource='OBO',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -951,7 +978,7 @@ local network_traffic = grafana.graphPanel.new(
 
 local grpc_traffic = grafana.graphPanel.new(
   title='gRPC network traffic',
-  datasource='$datasource',
+  datasource='OBO',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -976,7 +1003,7 @@ local grpc_traffic = grafana.graphPanel.new(
 
 local peer_traffic = grafana.graphPanel.new(
   title='Peer network traffic',
-  datasource='$datasource',
+  datasource='OBO',
   format='Bps',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1002,7 +1029,7 @@ local peer_traffic = grafana.graphPanel.new(
 
 local active_streams = grafana.graphPanel.new(
   title='Active Streams',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'sum(grpc_server_started_total{namespace=~"$namespace",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace=~"$namespace",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})',
@@ -1017,7 +1044,7 @@ local active_streams = grafana.graphPanel.new(
 
 local snapshot_duration = grafana.graphPanel.new(
   title='Snapshot duration',
-  datasource='$datasource',
+  datasource='OBO',
   format='s',
 ).addTarget(
   prometheus.target(
@@ -1030,7 +1057,7 @@ local snapshot_duration = grafana.graphPanel.new(
 
 local percent_db_used = grafana.graphPanel.new(
   title='% DB Space Used',
-  datasource='$datasource',
+  datasource='OBO',
   format='percent',
 ).addTarget(
   prometheus.target(
@@ -1041,7 +1068,7 @@ local percent_db_used = grafana.graphPanel.new(
 
 local db_capacity_left = grafana.graphPanel.new(
   title='DB Left capacity (with fragmented space)',
-  datasource='$datasource',
+  datasource='OBO',
   format='bytes',
 ).addTarget(
   prometheus.target(
@@ -1052,7 +1079,7 @@ local db_capacity_left = grafana.graphPanel.new(
 
 local db_size_limit = grafana.graphPanel.new(
   title='DB Size Limit (Backend-bytes)',
-  datasource='$datasource',
+  datasource='OBO',
   format='bytes'
 ).addTarget(
   prometheus.target(
@@ -1065,7 +1092,7 @@ local db_size_limit = grafana.graphPanel.new(
 
 local keys = grafana.graphPanel.new(
   title='Keys',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'etcd_debugging_mvcc_keys_total{namespace=~"$namespace",pod=~"$pod"}',
@@ -1075,7 +1102,7 @@ local keys = grafana.graphPanel.new(
 
 local compacted_keys = grafana.graphPanel.new(
   title='Compacted Keys',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"$namespace",pod=~"$pod"}',
@@ -1085,7 +1112,7 @@ local compacted_keys = grafana.graphPanel.new(
 
 local heartbeat_failures = grafana.graphPanel.new(
   title='Heartbeat Failures',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'etcd_server_heartbeat_send_failures_total{namespace=~"$namespace",pod=~"$pod"}',
@@ -1101,7 +1128,7 @@ local heartbeat_failures = grafana.graphPanel.new(
 
 local key_operations = grafana.graphPanel.new(
   title='Key Operations',
-  datasource='$datasource',
+  datasource='OBO',
   format='ops',
 ) {
   yaxes: [
@@ -1128,7 +1155,7 @@ local key_operations = grafana.graphPanel.new(
 
 local slow_operations = grafana.graphPanel.new(
   title='Slow Operations',
-  datasource='$datasource',
+  datasource='OBO',
   format='ops',
 ) {
   yaxes: [
@@ -1155,7 +1182,7 @@ local slow_operations = grafana.graphPanel.new(
 
 local raft_proposals = grafana.graphPanel.new(
   title='Raft Proposals',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'sum(rate(etcd_server_proposals_failed_total{namespace=~"$namespace"}[2m]))',
@@ -1180,7 +1207,7 @@ local raft_proposals = grafana.graphPanel.new(
 
 local leader_elections_per_day = grafana.graphPanel.new(
   title='Leader Elections Per Day',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'changes(etcd_server_leader_changes_seen_total{namespace=~"$namespace"}[1d])',
@@ -1190,7 +1217,7 @@ local leader_elections_per_day = grafana.graphPanel.new(
 
 local etcd_has_leader = grafana.singlestat.new(
   title='Etcd has a leader?',
-  datasource='$datasource',
+  datasource='OBO',
   valueMaps=[
     {
       op: '=',
@@ -1206,12 +1233,13 @@ local etcd_has_leader = grafana.singlestat.new(
 ).addTarget(
   prometheus.target(
     'max(etcd_server_has_leader{namespace=~"$namespace"})',
+    instant=true,
   )
 );
 
 local num_leader_changes = grafana.graphPanel.new(
   title='Number of leader changes seen',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'sum(rate(etcd_server_leader_changes_seen_total{namespace=~"$namespace"}[2m]))',
@@ -1220,10 +1248,11 @@ local num_leader_changes = grafana.graphPanel.new(
 
 local num_failed_proposals = grafana.singlestat.new(
   title='Total number of failed proposals seen',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'max(etcd_server_proposals_committed_total{namespace=~"$namespace"})',
+    instant=true,
   )
 );
 
@@ -1231,7 +1260,7 @@ local num_failed_proposals = grafana.singlestat.new(
 
 local request_duration_99th_quantile = grafana.graphPanel.new(
   title='request duration - 99th quantile',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1249,7 +1278,7 @@ local request_duration_99th_quantile = grafana.graphPanel.new(
 
 local request_rate_by_instance = grafana.graphPanel.new(
   title='request rate - by instance',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1267,7 +1296,7 @@ local request_rate_by_instance = grafana.graphPanel.new(
 
 local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
   title='request duration - 99th quantile - by resource',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1285,7 +1314,7 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
 
 local request_rate_by_resource = grafana.graphPanel.new(
   title='request duration - 99th quantile',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1303,7 +1332,7 @@ local request_rate_by_resource = grafana.graphPanel.new(
 
 local request_duration_read_write = grafana.graphPanel.new(
   title='request duration - read vs write',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[1m])) by(le))',
@@ -1319,7 +1348,7 @@ local request_duration_read_write = grafana.graphPanel.new(
 
 local request_rate_read_write = grafana.graphPanel.new(
   title='request rate - read vs write',
-  datasource='$datasource',
+  datasource='OBO',
 ).addTarget(
   prometheus.target(
     'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[1m]))',
@@ -1335,7 +1364,7 @@ local request_rate_read_write = grafana.graphPanel.new(
 
 local requests_dropped_rate = grafana.graphPanel.new(
   title='requests dropped rate',
-  datasource='$datasource',
+  datasource='OBO',
   description='Number of requests dropped with "Try again later" response',
 ).addTarget(
   prometheus.target(
@@ -1346,7 +1375,7 @@ local requests_dropped_rate = grafana.graphPanel.new(
 
 local requests_terminated_rate = grafana.graphPanel.new(
   title='requests terminated rate',
-  datasource='$datasource',
+  datasource='OBO',
   description='Number of requests which apiserver terminated in self-defense',
 ).addTarget(
   prometheus.target(
@@ -1356,7 +1385,7 @@ local requests_terminated_rate = grafana.graphPanel.new(
 
 local requests_status_rate = grafana.graphPanel.new(
   title='requests status rate',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1374,7 +1403,7 @@ local requests_status_rate = grafana.graphPanel.new(
 
 local long_running_requests = grafana.graphPanel.new(
   title='long running requests',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1392,7 +1421,7 @@ local long_running_requests = grafana.graphPanel.new(
 
 local request_in_flight = grafana.graphPanel.new(
   title='requests in flight',
-  datasource='$datasource',
+  datasource='OBO',
   legend_values=true,
   legend_alignAsTable=true,
   legend_current=true,
@@ -1410,7 +1439,7 @@ local request_in_flight = grafana.graphPanel.new(
 
 local pf_requests_rejected = grafana.graphPanel.new(
   title='p&f - requests rejected',
-  datasource='$datasource',
+  datasource='OBO',
   description='Number of requests rejected by API Priority and Fairness system',
 ).addTarget(
   prometheus.target(
@@ -1420,7 +1449,7 @@ local pf_requests_rejected = grafana.graphPanel.new(
 
 local response_size_99th_quartile = grafana.graphPanel.new(
   title='response size - 99th quantile',
-  datasource='$datasource',
+  datasource='OBO',
   description='Response size distribution in bytes for each group, version, verb, resource, subresource, scope and component',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1439,7 +1468,7 @@ local response_size_99th_quartile = grafana.graphPanel.new(
 
 local pf_request_queue_length = grafana.graphPanel.new(
   title='p&f - request queue length',
-  datasource='$datasource',
+  datasource='OBO',
   description='Length of queue in the API Priority and Fairness system, as seen by each request after it is enqueued',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1458,7 +1487,7 @@ local pf_request_queue_length = grafana.graphPanel.new(
 
 local pf_request_wait_duration_99th_quartile = grafana.graphPanel.new(
   title='p&f - request wait duration - 99th quantile',
-  datasource='$datasource',
+  datasource='OBO',
   description='Length of time a request spent waiting in its queue',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1477,7 +1506,7 @@ local pf_request_wait_duration_99th_quartile = grafana.graphPanel.new(
 
 local pf_request_execution_duration = grafana.graphPanel.new(
   title='p&f - request execution duration',
-  datasource='$datasource',
+  datasource='OBO',
   description='Duration of request execution in the API Priority and Fairness system',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1496,7 +1525,7 @@ local pf_request_execution_duration = grafana.graphPanel.new(
 
 local pf_request_dispatch_rate = grafana.graphPanel.new(
   title='p&f - request dispatch rate',
-  datasource='$datasource',
+  datasource='OBO',
   description='Number of requests released by API Priority and Fairness system for service',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1515,7 +1544,7 @@ local pf_request_dispatch_rate = grafana.graphPanel.new(
 
 local pf_concurrency_limit = grafana.graphPanel.new(
   title='p&f - concurrency limit by priority level',
-  datasource='$datasource',
+  datasource='OBO',
   description='Shared concurrency limit in the API Priority and Fairness system',
 ).addTarget(
   prometheus.target(
@@ -1526,7 +1555,7 @@ local pf_concurrency_limit = grafana.graphPanel.new(
 
 local pf_pending_in_queue = grafana.graphPanel.new(
   title='p&f - pending in queue',
-  datasource='$datasource',
+  datasource='OBO',
   description='Number of requests currently pending in queues of the API Priority and Fairness system',
   legend_values=true,
   legend_alignAsTable=true,
@@ -1550,26 +1579,17 @@ grafana.dashboard.new(
   'Hypershift Performance',
   description='',
   timezone='utc',
-  time_from='now-1h',
+  time_from='now-6h',
   editable='true'
-)
-
-.addTemplate(
-  grafana.template.datasource(
-    'datasource',
-    'prometheus',
-    '',
-    label='datasource'
-  )
 )
 
 .addTemplate(
   grafana.template.new(
     'namespace',
-    '$datasource',
+    'Cluster Prometheus',
     'label_values(kube_pod_info, namespace)',
     '',
-    regex='/(clusters-.*|.*hosted.*)/',
+    regex='/^ocm/',
     refresh=2,
   ) {
     label: 'Namespace',
@@ -1582,7 +1602,7 @@ grafana.dashboard.new(
 .addTemplate(
   grafana.template.new(
     'pod',
-    '$datasource',
+    'Cluster Prometheus',
     'label_values({pod=~"etcd.*", namespace="$namespace"}, pod)',
     refresh=1,
   ) {
@@ -1595,7 +1615,7 @@ grafana.dashboard.new(
 .addTemplate(
   grafana.template.new(
     'resource',
-    '$datasource',
+    'Cluster Prometheus',
     'label_values(apiserver_request_duration_seconds_bucket, resource)',
     refresh='time',
     label='resource'
@@ -1609,7 +1629,7 @@ grafana.dashboard.new(
 .addTemplate(
   grafana.template.new(
     'code',
-    '$datasource',
+    'Cluster Prometheus',
     'label_values(code)',
     refresh='time',
     label='code',
@@ -1624,7 +1644,7 @@ grafana.dashboard.new(
 .addTemplate(
   grafana.template.new(
     'verb',
-    '$datasource',
+    'Cluster Prometheus',
     'label_values(verb)',
     refresh='time',
     label='verb',
@@ -1641,20 +1661,25 @@ grafana.dashboard.new(
     m_region { gridPos: { x: 6, y: 0, w: 6, h: 4 } },
     m_ocp_version { gridPos: { x: 12, y: 0, w: 6, h: 4 } },
     num_hosted_cluster { gridPos: { x: 18, y: 0, w: 6, h: 4 } },
-    top10ContCPUHosted { gridPos: { x: 0, y: 12, w: 12, h: 8 } },
-    top10ContMemHosted { gridPos: { x: 12, y: 12, w: 12, h: 8 } },
-    top10ContCPUManagement { gridPos: { x: 12, y: 9, w: 12, h: 8 } },
-    top10ContMemManagement { gridPos: { x: 0, y: 17, w: 12, h: 8 } },
-    current_node_count { gridPos: { x: 7, y: 5, w: 6, h: 4 } },
-    current_namespace_count { gridPos: { x: 0, y: 5, w: 7, h: 4 } },
-    current_pod_count { gridPos: { x: 13, y: 5, w: 11, h: 4 } },
-    nodeCount { gridPos: { x: 0, y: 12, w: 8, h: 8 } },
-    nsCount { gridPos: { x: 8, y: 33, w: 8, h: 8 } },
-    podCount { gridPos: { x: 16, y: 12, w: 8, h: 8 } },
-    FailedPods { gridPos: { x: 16, y: 33, w: 8, h: 8 } },
-    alerts { gridPos: { x: 0, y: 41, w: 24, h: 8 } },
-    clusterOperatorsInformation { gridPos: { x: 0, y: 25, w: 8, h: 8 } },
-    clusterOperatorsDegraded { gridPos: { x: 8, y: 4, w: 8, h: 8 } },
+    current_namespace_count { gridPos: { x: 0, y: 5, w: 8, h: 4 } },
+    current_node_count { gridPos: { x: 8, y: 5, w: 8, h: 4 } },
+    current_pod_count { gridPos: { x: 16, y: 5, w: 8, h: 4 } },
+    top10ContCPUHosted { gridPos: { x: 0, y: 8, w: 12, h: 8 } },
+    top10ContMemHosted { gridPos: { x: 12, y: 8, w: 12, h: 8 } },
+    top10ContCPUManagement { gridPos: { x: 0, y: 20, w: 12, h: 8 } },
+    top10ContMemManagement { gridPos: { x: 12, y: 20, w: 12, h: 8 } },
+    top10ContCPUOBOManagement { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
+    top10ContMemOBOManagement { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
+    top10ContCPUHypershiftManagement { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
+    top10ContMemHypershiftManagement { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
+    nodeCount { gridPos: { x: 0, y: 44, w: 6, h: 8 } },
+    current_machine_set_replica_count { gridPos: { x: 6, y: 44, w: 6, h: 8 } },
+    nsCount { gridPos: { x: 12, y: 44, w: 6, h: 8 } },
+    podCount { gridPos: { x: 18, y: 44, w: 6, h: 8 } },
+    clusterOperatorsInformation { gridPos: { x: 0, y: 52, w: 8, h: 8 } },
+    clusterOperatorsDegraded { gridPos: { x: 8, y: 52, w: 8, h: 8 } },
+    FailedPods { gridPos: { x: 16, y: 52, w: 8, h: 8 } },
+    alerts { gridPos: { x: 0, y: 60, w: 24, h: 8 } },
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
@@ -1712,7 +1737,7 @@ grafana.dashboard.new(
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
 .addPanel(
-  grafana.row.new(title='Hosted Clusters ETCD General Resource Usage', collapse=true).addPanels(
+  grafana.row.new(title='Hosted Clusters ETCD General Resource Usage - $namespace', collapse=true, repeat='namespace').addPanels(
     [
       disk_wal_sync_duration { gridPos: { x: 0, y: 2, w: 12, h: 8 } },
       disk_backend_sync_duration { gridPos: { x: 12, y: 2, w: 12, h: 8 } },
@@ -1728,7 +1753,7 @@ grafana.dashboard.new(
 )
 
 .addPanel(
-  grafana.row.new(title='Hosted Clusters ETCD General Info', collapse=true).addPanels(
+  grafana.row.new(title='Hosted Clusters ETCD General Info - $namespace', collapse=true, repeat='namespace').addPanels(
     [
       raft_proposals { gridPos: { x: 0, y: 1, w: 12, h: 8 } },
       num_leader_changes { gridPos: { x: 12, y: 1, w: 12, h: 8 } },

@@ -130,6 +130,13 @@ else
   exit 1
 fi
 
+#Identify Hypershift Management Cluster
+if [ $($k8s_cmd get crd hostedclusters.hypershift.openshift.io 2>/dev/null | wc -l) -ne 0 ] ; then
+  echo "Detected Hypershift Management Cluster"
+  export HYPERSHIFT_MANAGEMENT_CLUSTER="yes"
+  export OBO_URL="http://hypershift-monitoring-stack-prometheus.openshift-observability-operator.svc.cluster.local:9090"
+fi
+
 function namespace() {
   # Create namespace
   $k8s_cmd "$1" -f "$namespace_file"

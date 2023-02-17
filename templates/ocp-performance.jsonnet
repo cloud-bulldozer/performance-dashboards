@@ -462,6 +462,7 @@ grafana.dashboard.new(
     'datasource',
     'prometheus',
     '',
+    regex='/^Cluster Prometheus$/',
   )
 )
 
