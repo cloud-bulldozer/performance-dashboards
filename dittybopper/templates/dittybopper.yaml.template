@@ -20,7 +20,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: dittybopper
-namespace: $namespace
+  namespace: $namespace
 spec:
   to:
     name: dittybopper
@@ -33,7 +33,7 @@ metadata:
   labels:
     app: dittybopper
   name: dittybopper
-namespace: $namespace
+  namespace: $namespace
 spec:
   replicas: 1
   selector:
@@ -77,7 +77,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sc-ocp-prom
-namespace: $namespace
+  namespace: $namespace
 data:
   ocp-prometheus.yml: |
     apiVersion: 1
@@ -97,12 +97,19 @@ data:
           Bearer ${PROMETHEUS_BEARER}
       version: 1
       editable: false
+    - name: OBO
+      type: prometheus
+      access: proxy
+      orgId: 1
+      url: ${OBO_URL}
+      version: 1
+      editable: false
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sc-grafana-config
-namespace: $namespace
+  namespace: $namespace
 data:
   grafana.ini: |
     ##################### Grafana Configuration Example #####################
