@@ -474,20 +474,6 @@ grafana.dashboard.new(
   )
 )
 
-.addTemplate(
-  grafana.template.new(
-    'pod',
-    '$datasource',
-    'label_values({job="etcd"}, pod)',
-    refresh=1,
-  ) {
-    type: 'query',
-    multi: true,
-    includeAll: true,
-  }
-)
-
-
 .addPanel(
   grafana.row.new(title='General Resource Usage', collapse=true).addPanels(
     [

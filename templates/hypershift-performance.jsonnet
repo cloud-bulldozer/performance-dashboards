@@ -665,7 +665,7 @@ local mgmt_heartbeat_failures = grafana.graphPanel.new(
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{namespace=~"openshift-etcd",pod=~"$pod"}',
+    'etcd_server_health_failures{namespace=~"openshift-etcd"}',
     legendFormat='{{namespace}} - {{ pod }} health failures',
   )
 );
@@ -1095,7 +1095,7 @@ local keys = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_keys_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_debugging_mvcc_keys_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} Num keys',
   )
 );
@@ -1105,7 +1105,7 @@ local compacted_keys = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod  }} keys compacted',
   )
 );
@@ -1115,12 +1115,12 @@ local heartbeat_failures = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_server_heartbeat_send_failures_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_server_heartbeat_send_failures_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} heartbeat  failures',
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_server_health_failures{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} health failures',
   )
 );
@@ -1143,12 +1143,12 @@ local key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_mvcc_put_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_put_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_mvcc_delete_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_delete_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} deletes/s',
   )
 );
@@ -1170,12 +1170,12 @@ local slow_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_apply_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_apply_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} slow applies',
   )
 ).addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_read_indexes_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_read_indexes_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} slow read indexes',
   )
 );
@@ -1597,19 +1597,6 @@ grafana.dashboard.new(
     multi: true,
     includeAll: true,
   },
-)
-
-.addTemplate(
-  grafana.template.new(
-    'pod',
-    'Cluster Prometheus',
-    'label_values({pod=~"etcd.*", namespace="$namespace"}, pod)',
-    refresh=1,
-  ) {
-    type: 'query',
-    multi: true,
-    includeAll: false,
-  }
 )
 
 .addTemplate(
