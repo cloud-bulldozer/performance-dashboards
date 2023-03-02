@@ -84,14 +84,14 @@ local ovnKubeMasterMem = genericGraphLegendPanel('ovnkube-master Memory Usage', 
 
 local ovnKubeMasterCPU = genericGraphLegendPanel('ovnkube-master CPU Usage', 'percent').addTarget(
   prometheus.target(
-    'irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[1m])*100',
+    'irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[2m])*100',
     legendFormat='{{container}}-{{pod}}-{{node}}',
   )
 );
 
 local topOvnControllerCPU = genericGraphLegendPanel('Top 10 ovn-controller CPU Usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10, irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[1m])*100)',
+    'topk(10, irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[2m])*100)',
     legendFormat='{{node}}',
   )
 );
@@ -105,29 +105,29 @@ local topOvnControllerMem = genericGraphLegendPanel('Top 10  ovn-controller Memo
 
 local pod_latency = genericGraphLegendPanel('Pod creation Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_lsp_created_port_binding_duration_seconds_bucket[1m])) by (pod,le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_lsp_created_port_binding_duration_seconds_bucket[2m])) by (pod,le))',
     legendFormat='{{pod}} - LSP created',
   )
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_port_binding_chassis_duration_seconds_bucket[1m])) by (pod,le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_port_binding_chassis_duration_seconds_bucket[2m])) by (pod,le))',
     legendFormat='{{pod}} - Port Binding',
   )
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_chassis_port_binding_up_duration_seconds_bucket[1m])) by (pod,le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_chassis_port_binding_up_duration_seconds_bucket[2m])) by (pod,le))',
     legendFormat='{{pod}} - Port Binding Up',
   )
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_first_seen_lsp_created_duration_seconds_bucket[1m])) by (pod,le))',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_first_seen_lsp_created_duration_seconds_bucket[2m])) by (pod,le))',
     legendFormat='{{pod}} - Pod First seen',
   )
 );
 
 local sync_latency = genericGraphLegendPanel('Sync Service Latency', 's').addTarget(
   prometheus.target(
-    'rate(ovnkube_master_sync_service_latency_seconds_sum[1m])',
+    'rate(ovnkube_master_sync_service_latency_seconds_sum[2m])',
     legendFormat='{{pod}} - Sync service latency',
   )
 );
@@ -141,7 +141,7 @@ local ovnkube_node_ready_latency = genericGraphLegendPanel('OVNKube Node Ready L
 
 local work_queue = genericGraphLegendPanel('OVNKube Master workqueue', 'short').addTarget(
   prometheus.target(
-    'rate(ovnkube_master_workqueue_adds_total[1m])',
+    'rate(ovnkube_master_workqueue_adds_total[2m])',
     legendFormat='{{pod}} - Rate of handled adds',
   )
 );
@@ -168,21 +168,21 @@ local work_queue_unfinished_latency = genericGraphLegendPanel('OVNKube Master wo
 
 local ovnAnnotationLatency = genericGraphLegendPanel('Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[1m])) by (pod,le)) > 0',
+    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[2m])) by (pod,le)) > 0',
     legendFormat='{{pod}} - Pod Annotation latency',
   )
 );
 
 local ovnCNIAdd = genericGraphLegendPanel('CNI Request ADD Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[1m])) by (pod,le)) > 0',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[2m])) by (pod,le)) > 0',
     legendFormat='{{pod}}',
   )
 );
 
 local ovnCNIDel = genericGraphLegendPanel('CNI Request DEL Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[1m])) by (pod,le)) > 0',
+    'histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[2m])) by (pod,le)) > 0',
     legendFormat='{{pod}}',
   )
 );

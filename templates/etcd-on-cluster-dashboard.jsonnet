@@ -295,7 +295,7 @@ local keys = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_keys_total{namespace="openshift-etcd",pod=~"$pod"}',
+    'etcd_debugging_mvcc_keys_total{namespace="openshift-etcd"}',
     legendFormat='{{ pod }} Num keys',
   )
 );
@@ -305,7 +305,7 @@ local compacted_keys = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd",pod=~"$pod"}',
+    'etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd"}',
     legendFormat='{{ pod  }} keys compacted',
   )
 );
@@ -315,12 +315,12 @@ local heartbeat_failures = grafana.graphPanel.new(
   datasource='$datasource',
 ).addTarget(
   prometheus.target(
-    'etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd",pod=~"$pod"}',
-    legendFormat='{{ pod }} heartbeat  failures',
+    'etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd"}',
+    legendFormat='{{ pod }} heartbeat failures',
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{namespace="openshift-etcd",pod=~"$pod"}',
+    'etcd_server_health_failures{namespace="openshift-etcd"}',
     legendFormat='{{ pod }} health failures',
   )
 );
@@ -343,12 +343,12 @@ local key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_put_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_put_total{namespace="openshift-etcd"}[2m])',
     legendFormat='{{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_delete_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_delete_total{namespace="openshift-etcd"}[2m])',
     legendFormat='{{ pod }} deletes/s',
   )
 );
@@ -370,12 +370,12 @@ local slow_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_apply_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_apply_total{namespace="openshift-etcd"}[2m])',
     legendFormat='{{ pod }} slow applies',
   )
 ).addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd"}[2m])',
     legendFormat='{{ pod }} slow read indexes',
   )
 );
@@ -482,8 +482,8 @@ grafana.dashboard.new(
     refresh=1,
   ) {
     type: 'query',
-    multi: false,
-    includeAll: false,
+    multi: true,
+    includeAll: true,
   }
 )
 
