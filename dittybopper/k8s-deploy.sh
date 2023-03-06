@@ -40,7 +40,7 @@ export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
 export DASHBOARDS="k8s-performance.json"
 export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/cloud-bulldozer/dittybopper-syncer:latest"} # Syncer image
-export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:7.3.4"} # Syncer image
+export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:9.4.3"} # Syncer image
 
 
 # Set defaults for command options
