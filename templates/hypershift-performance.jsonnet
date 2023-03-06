@@ -23,7 +23,7 @@ local genericGraphLegendPanel(title, datasource, format) = grafana.graphPanel.ne
 
 local hostedControlPlaneCPU = genericGraphLegendPanel('Hosted Control Plane CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"$namespace",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"$namespace",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{pod}}/{{container}}',
   )
 );
@@ -179,7 +179,7 @@ local top10ContMemHosted = genericGraphLegendPanel('Top 10 Hosted Clusters conta
 
 local top10ContCPUHosted = genericGraphLegendPanel('Top 10 Hosted Clusters container CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"^ocm-.*",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace=~"^ocm-.*",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
@@ -193,7 +193,7 @@ local top10ContMemManagement = genericGraphLegendPanel('Top 10 Management Cluste
 
 local top10ContCPUManagement = genericGraphLegendPanel('Top 10 Management Cluster container CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{ namespace }} - {{ name }}',
   )
 );
@@ -207,7 +207,7 @@ local top10ContMemOBOManagement = genericGraphLegendPanel('Top 10 Management Clu
 
 local top10ContCPUOBOManagement = genericGraphLegendPanel('Top 10 Management Cluster OBO NS Pods CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace="openshift-observability-operator",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace="openshift-observability-operator",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{ pod }}/{{ container }}',
   )
 );
@@ -221,7 +221,7 @@ local top10ContMemHypershiftManagement = genericGraphLegendPanel('Top 10 Managem
 
 local top10ContCPUHypershiftManagement = genericGraphLegendPanel('Top 10 Management Cluster Hypershift NS Pods CPU', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'topk(10,irate(container_cpu_usage_seconds_total{namespace="hypershift",container!="POD",name!=""}[1m])*100)',
+    'topk(10,irate(container_cpu_usage_seconds_total{namespace="hypershift",container!="POD",name!=""}[2m])*100)',
     legendFormat='{{ pod }}/{{ container }}',
   )
 );
@@ -341,7 +341,7 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[1m])) by(resource, namespace, verb, le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[2m])) by(resource, namespace, verb, le))',
     legendFormat='{{verb}}:{{resource}}/{{namespace}}',
   )
 );
@@ -665,7 +665,7 @@ local mgmt_heartbeat_failures = grafana.graphPanel.new(
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{namespace=~"openshift-etcd",pod=~"$pod"}',
+    'etcd_server_health_failures{namespace=~"openshift-etcd"}',
     legendFormat='{{namespace}} - {{ pod }} health failures',
   )
 );
@@ -688,12 +688,12 @@ local mgmt_key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_put_total{namespace=~"openshift-etcd"}[2m])',
+    'rate(etcd_mvcc_put_total{namespace=~"openshift-etcd"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_delete_total{namespace=~"openshift-etcd"}[2m])',
+    'rate(etcd_mvcc_delete_total{namespace=~"openshift-etcd"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} deletes/s',
   )
 );
@@ -1095,7 +1095,7 @@ local keys = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_keys_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_debugging_mvcc_keys_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} Num keys',
   )
 );
@@ -1105,7 +1105,7 @@ local compacted_keys = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_debugging_mvcc_db_compaction_keys_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod  }} keys compacted',
   )
 );
@@ -1115,12 +1115,12 @@ local heartbeat_failures = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'etcd_server_heartbeat_send_failures_total{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_server_heartbeat_send_failures_total{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} heartbeat  failures',
   )
 ).addTarget(
   prometheus.target(
-    'etcd_server_health_failures{namespace=~"$namespace",pod=~"$pod"}',
+    'etcd_server_health_failures{namespace=~"$namespace"}',
     legendFormat='{{namespace}} - {{ pod }} health failures',
   )
 );
@@ -1143,12 +1143,12 @@ local key_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_put_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_put_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} puts/s',
   )
 ).addTarget(
   prometheus.target(
-    'rate(etcd_debugging_mvcc_delete_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'rate(etcd_mvcc_delete_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} deletes/s',
   )
 );
@@ -1170,12 +1170,12 @@ local slow_operations = grafana.graphPanel.new(
   ],
 }.addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_apply_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_apply_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} slow applies',
   )
 ).addTarget(
   prometheus.target(
-    'delta(etcd_server_slow_read_indexes_total{namespace=~"$namespace",pod=~"$pod"}[2m])',
+    'delta(etcd_server_slow_read_indexes_total{namespace=~"$namespace"}[2m])',
     legendFormat='{{namespace}} - {{ pod }} slow read indexes',
   )
 );
@@ -1271,7 +1271,7 @@ local request_duration_99th_quantile = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[1m])) by(verb,le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[2m])) by(verb,le))',
     legendFormat='{{verb}}',
   )
 );
@@ -1289,7 +1289,7 @@ local request_rate_by_instance = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",code=~"$code",verb=~"$verb"}[1m])) by(instance)',
+    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",code=~"$code",verb=~"$verb"}[2m])) by(instance)',
     legendFormat='{{instance}}',
   )
 );
@@ -1307,7 +1307,7 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[1m])) by(resource,le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[2m])) by(resource,le))',
     legendFormat='{{resource}}',
   )
 );
@@ -1325,7 +1325,7 @@ local request_rate_by_resource = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",code=~"$code",verb=~"$verb"}[1m])) by(resource)',
+    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",code=~"$code",verb=~"$verb"}[2m])) by(resource)',
     legendFormat='{{resource}}',
   )
 );
@@ -1335,12 +1335,12 @@ local request_duration_read_write = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[1m])) by(le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[2m])) by(le))',
     legendFormat='read',
   )
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[1m])) by(le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[2m])) by(le))',
     legendFormat='write',
   )
 );
@@ -1351,12 +1351,12 @@ local request_rate_read_write = grafana.graphPanel.new(
   datasource='OBO',
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[1m]))',
+    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"LIST|GET"}[2m]))',
     legendFormat='read',
   )
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[1m]))',
+    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[2m]))',
     legendFormat='write',
   )
 );
@@ -1368,7 +1368,7 @@ local requests_dropped_rate = grafana.graphPanel.new(
   description='Number of requests dropped with "Try again later" response',
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_dropped_requests_total{namespace=~"$namespace"}[1m])) by (requestKind)',
+    'sum(rate(apiserver_dropped_requests_total{namespace=~"$namespace"}[2m])) by (requestKind)',
   )
 );
 
@@ -1379,7 +1379,7 @@ local requests_terminated_rate = grafana.graphPanel.new(
   description='Number of requests which apiserver terminated in self-defense',
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_terminations_total{namespace=~"$namespace",resource=~"$resource",code=~"$code"}[1m])) by(component)',
+    'sum(rate(apiserver_request_terminations_total{namespace=~"$namespace",resource=~"$resource",code=~"$code"}[2m])) by(component)',
   )
 );
 
@@ -1396,7 +1396,7 @@ local requests_status_rate = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"$verb",code=~"$code"}[1m])) by(code)',
+    'sum(rate(apiserver_request_total{namespace=~"$namespace",resource=~"$resource",verb=~"$verb",code=~"$code"}[2m])) by(code)',
     legendFormat='{{code}}'
   )
 );
@@ -1443,7 +1443,7 @@ local pf_requests_rejected = grafana.graphPanel.new(
   description='Number of requests rejected by API Priority and Fairness system',
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_flowcontrol_rejected_requests_total{namespace=~"$namespace"}[1m])) by (reason)',
+    'sum(rate(apiserver_flowcontrol_rejected_requests_total{namespace=~"$namespace"}[2m])) by (reason)',
   )
 );
 
@@ -1461,7 +1461,7 @@ local response_size_99th_quartile = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"$verb"}[1m])) by(instance,le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket{namespace=~"$namespace",resource=~"$resource",verb=~"$verb"}[2m])) by(instance,le))',
     legendFormat='{{instance}}',
   )
 );
@@ -1480,7 +1480,7 @@ local pf_request_queue_length = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{namespace=~"$namespace"}[1m])) by(flowSchema, priorityLevel, le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))',
     legendFormat='{{flowSchema}}:{{priorityLevel}}',
   )
 );
@@ -1499,7 +1499,7 @@ local pf_request_wait_duration_99th_quartile = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{namespace=~"$namespace"}[1m])) by(flowSchema, priorityLevel, le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))',
     legendFormat='{{flowSchema}}:{{priorityLevel}}',
   )
 );
@@ -1518,7 +1518,7 @@ local pf_request_execution_duration = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{namespace=~"$namespace"}[1m])) by(flowSchema, priorityLevel, le))',
+    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))',
     legendFormat='{{flowSchema}}:{{priorityLevel}}',
   )
 );
@@ -1537,7 +1537,7 @@ local pf_request_dispatch_rate = grafana.graphPanel.new(
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'sum(rate(apiserver_flowcontrol_dispatched_requests_total{namespace=~"$namespace"}[1m])) by(flowSchema,priorityLevel)',
+    'sum(rate(apiserver_flowcontrol_dispatched_requests_total{namespace=~"$namespace"}[2m])) by(flowSchema,priorityLevel)',
     legendFormat='{{flowSchema}}:{{priorityLevel}}',
   )
 );
@@ -1597,19 +1597,6 @@ grafana.dashboard.new(
     multi: true,
     includeAll: true,
   },
-)
-
-.addTemplate(
-  grafana.template.new(
-    'pod',
-    'Cluster Prometheus',
-    'label_values({pod=~"etcd.*", namespace="$namespace"}, pod)',
-    refresh=1,
-  ) {
-    type: 'query',
-    multi: true,
-    includeAll: false,
-  }
 )
 
 .addTemplate(
