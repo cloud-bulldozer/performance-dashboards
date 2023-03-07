@@ -1,4 +1,4 @@
-JSONNET = https://github.com/google/jsonnet/releases/download/v0.15.0/jsonnet-bin-v0.15.0-linux.tar.gz
+JSONNET = https://github.com/google/jsonnet/releases/download/v0.17.0/jsonnet-bin-v0.17.0-linux.tar.gz
 BINDIR = bin
 TEMPLATESDIR = templates
 OUTPUTDIR = rendered

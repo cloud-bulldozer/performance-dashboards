@@ -28,7 +28,7 @@ jobs:
       run: make build
 
     - name: Run grafana container
-      run: sudo docker run -d -p 3000:3000 docker.io/grafana/grafana:7.1.2
+      run: sudo docker run -d -p 3000:3000 docker.io/grafana/grafana:9.4.3
 
     - name: Wait for grafana
       run: while [[ $(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/api/health) != "200" ]]; do  sleep 1; done
