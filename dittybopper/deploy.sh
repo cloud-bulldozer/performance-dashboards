@@ -93,7 +93,7 @@ done
 if [[ ! -z ${template} ]]; then
   deploy_template=${template}
 else
-  deploy_template="templates/dittybopper.yaml.template"
+  deploy_template="$(dirname $(realpath ${BASH_SOURCE[0]}))/templates/dittybopper.yaml.template"
 fi
 
 
