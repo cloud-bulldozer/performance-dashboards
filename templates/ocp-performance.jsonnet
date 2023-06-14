@@ -55,7 +55,7 @@ local nodeMemory(nodeName) = genericGraphLegendPanel('System Memory: ' + nodeNam
 
 local nodeCPU(nodeName) = genericGraphLegendPanel('CPU Basic: ' + nodeName, 'percent').addTarget(
   prometheus.target(
-    'sum by (instance, mode)(rate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[$interval])) * 100',
+    'sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"' + nodeName + '",job=~".*"}[$interval])) * 100',
     legendFormat='Busy {{mode}}',
   )
 );
@@ -247,14 +247,14 @@ local promReplMemUsage = genericGraphLegendPanel('Prometheus Replica Memory usag
 
 local kubeletCPU = genericGraphLegendPanel('Top 10 Kubelet CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[$interval])*100)',
+    'topk(10,irate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[$interval])*100)',
     legendFormat='kubelet - {{node}}',
   )
 );
 
 local crioCPU = genericGraphLegendPanel('Top 10 crio CPU usage', 'percent').addTarget(
   prometheus.target(
-    'topk(10,rate(process_cpu_seconds_total{service="kubelet",job="crio"}[$interval])*100)',
+    'topk(10,irate(process_cpu_seconds_total{service="kubelet",job="crio"}[$interval])*100)',
     legendFormat='crio - {{node}}',
   )
 );
