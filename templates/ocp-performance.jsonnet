@@ -50,6 +50,11 @@ local nodeMemory(nodeName) = genericGraphLegendPanel('System Memory: ' + nodeNam
     'node_memory_MemAvailable_bytes{instance=~"' + nodeName + '"}',
     legendFormat='Available',
   )
+).addTarget(
+  prometheus.target(
+    '(node_memory_MemTotal_bytes{instance=~"' + nodeName + '"} - (node_memory_MemFree_bytes{instance=~"' + nodeName + '"} + node_memory_Buffers_bytes{instance=~"' + nodeName + '"} +  node_memory_Cached_bytes{instance=~"' + nodeName + '"}))',
+    legendFormat='Used',
+  )
 );
 
 
