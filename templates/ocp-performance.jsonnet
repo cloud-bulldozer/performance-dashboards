@@ -25,6 +25,7 @@ local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
   legend_hideEmpty=true,
   legend_hideZero=true,
   legend_sort='max',
+  legend_sortDesc='true',
   nullPointMode='null as zero',
   sort='decreasing',
 );
