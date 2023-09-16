@@ -17,6 +17,19 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: make deps
+
+    - name: Run jsonnetfmt
+      run: for t in templates/**/*.jsonnet; do echo "Testing template ${t}"; ./bin/jsonnetfmt --test $t; echo 'Results:' ${?}; done
+
   build:
     runs-on: ubuntu-latest
 
@@ -35,23 +48,10 @@ jobs:
 
     - name: Import dashboards to grafana
       run: >
-        for t in rendered/*.json; do
+        for t in rendered/**/*.json; do
         echo "Importing ${t}";
         dashboard=$(cat ${t});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
         curl -k -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
         "http://admin:admin@localhost:3000/api/dashboards/db" -o /dev/null;
         done
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: make deps
-
-    - name: Run jsonnetfmt
-      run: for t in templates/*.jsonnet; do echo "Testing template ${t}"; ./bin/jsonnetfmt --test $t; echo 'Results:' ${?}; done
