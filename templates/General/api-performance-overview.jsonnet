@@ -1,4 +1,4 @@
-local grafana = import 'grafonnet-lib/grafonnet/grafana.libsonnet';
+local grafana = import '../grafonnet-lib/grafonnet/grafana.libsonnet';
 local prometheus = grafana.prometheus;
 
 //Panel definitions

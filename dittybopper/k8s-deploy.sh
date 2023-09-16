@@ -38,6 +38,7 @@ END
 
 export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
+export GRAFANA_URL="http://admin:${GRAFANA_ADMIN_PASSWORD}@localhost:3000"
 export DASHBOARDS="k8s-performance.json"
 export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/cloud-bulldozer/dittybopper-syncer:latest"} # Syncer image
 export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:9.4.3"} # Syncer image
