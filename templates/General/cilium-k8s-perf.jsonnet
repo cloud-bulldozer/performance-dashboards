@@ -1,4 +1,4 @@
-local grafana = import 'grafonnet-lib/grafonnet/grafana.libsonnet';
+local grafana = import '../grafonnet-lib/grafonnet/grafana.libsonnet';
 local prometheus = grafana.prometheus;
 
 
@@ -23,7 +23,7 @@ local genericGraphLegendPanel(title, format) = grafana.graphPanel.new(
   legend_avg=true,
   legend_hideEmpty=true,
   legend_hideZero=true,
-  legend_sort='max',
+  legend_sort='min',
   nullPointMode='null as zero',
   sort='decreasing',
 );
@@ -336,6 +336,51 @@ local goroutines_count = genericGraphPanel('Goroutines count', 'none').addTarget
   )
 );
 
+// Cilium Panels
+
+local cilium_container_cpu = genericGraphLegendPanel('Cilium Container CPU', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{container=~"cilium.*",container!="cilium-operator.*",namespace!=""}[$interval])) by (instance,pod,container,namespace,name,service) * 100',
+    legendFormat='{{ instance }} - {{ pod }}'
+  )
+);
+
+local cilium_container_mem = genericGraphLegendPanel('Cilium Container Memory', 'bytes').addTarget(
+  prometheus.target(
+    'container_memory_rss{container=~"cilium.*",namespace!=""}',
+    legendFormat='{{ instance }} - {{ pod }}'
+  )
+);
+
+local cilium_ip_addresses = genericGraphLegendPanel('Cilium IP Address Allocation', 'none').addTarget(
+  prometheus.target(
+    'cilium_ip_addresses',
+    legendFormat='{{ pod }} - {{ family }}'
+  )
+);
+
+local cilium_netpol = genericGraphLegendPanel('Cilium Network Polices Per Agent', 'none').addTarget(
+  prometheus.target(
+    'cilium_policy',
+    legendFormat='{{ instance }} - {{ pod }}'
+  )
+);
+
+local cilium_bpf_op = genericGraphLegendPanel('Cilium BPF Operations', 'none').addTarget(
+  prometheus.target(
+    'sum by (instance,map_name,operation,outcome)(rate(cilium_bpf_map_ops_total[2m]))',
+    legendFormat='{{instance}} - {{map_name}} - {{operation}}'
+  )
+);
+
+local cilium_failing_control = genericGraphLegendPanel('Cilium Controller Failures', 'none').addTarget(
+  prometheus.target(
+    'cilium_controllers_failing',
+    legendFormat='{{ instance }} - {{ pod }}'
+  )
+);
+
+
 // Cluster operators
 
 local clusterOperatorsOverview = grafana.statPanel.new(
@@ -366,8 +411,8 @@ local clusterOperatorsDegraded = genericGraphLegendPanel('Cluster operators degr
 // Dashboard
 
 grafana.dashboard.new(
-  'k8s Performance',
-  description='Performance dashboard for Red Hat k8s',
+  'Cilium k8s Performance',
+  description='Performance dashboard for k8s w/ Cilium as the CNI',
   time_from='now-1h',
   timezone='utc',
   refresh='30s',
@@ -464,6 +509,17 @@ grafana.dashboard.new(
 )
 
 // Dashboard definition
+
+.addPanel(grafana.row.new(title='Cilium Details', collapse=true).addPanels(
+  [
+    cilium_failing_control { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
+    cilium_ip_addresses { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
+    cilium_container_cpu { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
+    cilium_container_mem { gridPos: { x: 12, y: 4, w: 12, h: 8 } },
+    cilium_netpol { gridPos: { x: 0, y: 4, w: 12, h: 8 } },
+    cilium_bpf_op { gridPos: { x: 12, y: 12, w: 12, h: 8 } },
+  ]
+), { gridPos: { x: 0, y: 3, w: 24, h: 1 } })
 
 .addPanel(grafana.row.new(title='Cluster Details', collapse=true).addPanels(
   [

@@ -3,10 +3,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  # Space separated list as a string of all dashboard json files in "rendered" to load
-  DASHBOARDS: "kube-burner.json"
-
 on:
   push:
     branches: [ master ]
@@ -25,13 +21,10 @@ jobs:
     # The secret GRAFANA_URL must be set with the format http://username:password@url.org without a trailing /
     - name: Import dashboards to grafana
       run: >
-        dashboard_list=($(echo $DASHBOARDS));
-        for path in "${dashboard_list[@]}"; do
-        full_path="rendered/${path}";
-        echo "Importing ${full_path}";
-        dashboard=$(cat ${full_path});
+        for t in rendered/**/*.json; do
+        echo "Importing ${t}";
+        dashboard=$(cat ${t});
         echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" |
         curl -k -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@-
         "${{ secrets.GRAFANA_URL }}/api/dashboards/db" -o /dev/null;
-        done
-
+        done 

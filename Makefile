@@ -7,10 +7,10 @@ SYNCER_IMG_TAG ?= quay.io/cloud-bulldozer/dittybopper-syncer:latest
 PLATFORM = linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
 # Get all templates at $(TEMPLATESDIR)
-TEMPLATES = $(wildcard $(TEMPLATESDIR)/*.jsonnet)
+TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*.jsonnet)
 
 # Replace $(TEMPLATESDIR)/*.jsonnet by $(OUTPUTDIR)/*.json
-outputs = $(patsubst $(TEMPLATESDIR)/%.jsonnet, $(OUTPUTDIR)/%.json, $(TEMPLATES))
+outputs := $(patsubst $(TEMPLATESDIR)/%.jsonnet, $(OUTPUTDIR)/%.json, $(TEMPLATES))
 
 all: deps format build
 
@@ -38,10 +38,11 @@ $(BINDIR)/jsonnet:
 # Build each template and output to $(OUTPUTDIR)
 $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
 	@echo "Building template $<"
+	mkdir -p $(dir $@)
 	$(BINDIR)/jsonnet $< > $@
 
 build-syncer-image: build
-	podman build --platform=${PLATFORM} -f dittybopper/syncer/Dockerfile --manifest=${SYNCER_IMG_TAG} .
+	podman build --platform=${PLATFORM} -f Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
 push-syncer-image:
 	podman manifest push ${SYNCER_IMG_TAG} ${SYNCER_IMG_TAG}

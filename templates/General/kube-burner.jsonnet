@@ -1,4 +1,4 @@
-local grafana = import 'grafonnet-lib/grafonnet/grafana.libsonnet';
+local grafana = import '../grafonnet-lib/grafonnet/grafana.libsonnet';
 local es = grafana.elasticsearch;
 
 local worker_count = grafana.statPanel.new(

@@ -60,10 +60,10 @@ spec:
       - name: dittybopper-syncer
         imagePullPolicy: Always
         env:
-        - name: GRAFANA_ADMIN_PASSWORD
-          value: ${GRAFANA_ADMIN_PASSWORD}
-        - name: DASHBOARDS
-          value: ${DASHBOARDS}
+        - name: GRAFANA_URL
+          value: ${GRAFANA_URL}
+        - name: INPUT_DIR
+          value: "/performance-dashboards/rendered/"
         image: ${SYNCER_IMAGE}
       volumes:
       - name: sc-grafana-config
