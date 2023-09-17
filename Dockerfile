@@ -1,23 +1,21 @@
-FROM ubuntu
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
+# Set the working directory
 WORKDIR /performance-dashboards
-ARG DEBIAN_FRONTEND=noninteractive
 
 # Install necessary libraries for subsequent commands
-RUN apt-get update && apt-get install -y podman dumb-init python3.6 python3-distutils python3-pip python3-apt
+RUN microdnf install -y podman python3 python3-pip && \
+    microdnf clean all && \
+    rm -rf /var/cache/yum
 
 COPY . .
+
+# Set permissions
 RUN chmod -R 775 /performance-dashboards
 
 # Install dependencies
-RUN python3 -m pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Cleanup the installation remainings
-RUN apt-get clean autoclean && \
-    apt-get autoremove --yes && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt
 
 # Start the command
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["python3", "dittybopper/syncer/entrypoint.py"]

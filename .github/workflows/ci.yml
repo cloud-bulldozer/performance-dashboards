@@ -28,7 +28,7 @@ jobs:
       run: make deps
 
     - name: Run jsonnetfmt
-      run: for t in templates/**/*.jsonnet; do echo "Testing template ${t}"; ./bin/jsonnetfmt --test $t; echo 'Results:' ${?}; done
+      run: make format
 
   build:
     runs-on: ubuntu-latest
