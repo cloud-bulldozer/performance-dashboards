@@ -240,12 +240,13 @@ local pf_request_wait_duration_99th_quartile = grafana.graphPanel.new(
   legend_rightSide=true,
   legend_sort='max',
   legend_sortDesc=true,
+  legend_max=true,
+  legend_avg=true,
   nullPointMode='null as zero',
   legend_hideZero=true,
 ).addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=~"$instance",flowSchema=~"$flowSchema",priorityLevel=~"$priorityLevel"}[$interval])) by(flowSchema, priorityLevel, le))',
-    legendFormat='{{flowSchema}}:{{priorityLevel}}',
+    'histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=~"$instance"}[5m])) by(flow_schema, priority_level, le))',
   )
 );
 
@@ -288,13 +289,18 @@ local pf_request_dispatch_rate = grafana.graphPanel.new(
 );
 
 local pf_concurrency_limit = grafana.graphPanel.new(
-  title='p&f - concurrency limit by priority level',
+  title='p&f - concurrency limit by kube-apiserver',
   datasource='$datasource',
   description='Shared concurrency limit in the API Priority and Fairness system',
+  legend_values=true,
+  legend_alignAsTable=true,
+  legend_current=true,
+  legend_rightSide=true,
+  legend_sort='max',
+  legend_sortDesc=true,
 ).addTarget(
   prometheus.target(
-    'sum(apiserver_flowcontrol_request_concurrency_limit{instance=~"$instance",priorityLevel=~"$priorityLevel"}) by (priorityLevel)',
-    legendFormat='{{priorityLevel}}'
+    'sum(apiserver_flowcontrol_request_concurrency_limit{instance=~".*:6443",priorityLevel=~"$priorityLevel"}) by (instance,priorityLevel)',
   )
 );
 
@@ -469,7 +475,7 @@ grafana.dashboard.new(
 .addPanel(pf_requests_rejected, gridPos={ x: 12, y: 40, w: 12, h: 8 })
 .addPanel(response_size_99th_quartile, gridPos={ x: 0, y: 48, w: 12, h: 8 })
 .addPanel(pf_request_queue_length, gridPos={ x: 12, y: 48, w: 12, h: 8 })
-.addPanel(pf_request_wait_duration_99th_quartile, gridPos={ x: 0, y: 56, w: 12, h: 8 })
+.addPanel(pf_request_wait_duration_99th_quartile, gridPos={ x: 0, y: 56, w: 24, h: 8 })
 .addPanel(pf_request_execution_duration, gridPos={ x: 12, y: 56, w: 12, h: 8 })
 .addPanel(pf_request_dispatch_rate, gridPos={ x: 0, y: 64, w: 12, h: 8 })
 .addPanel(pf_concurrency_limit, gridPos={ x: 12, y: 64, w: 12, h: 8 })
