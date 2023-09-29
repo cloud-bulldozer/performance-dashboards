@@ -34,6 +34,28 @@ bin/jsonnet templates/ocp-performance.jsonnet > rendered/ocp-performance.json
 $ ls rendered
 ocp-ingress-controller.json ocp-performance.json
 ```
+Similarly for V2 workflow, the dashboards that are built using latest grafonnet library, use 
+```
+$ make v2
+mkdir -p bin rendered
+Downloading jsonnet binary
+curl -s -L https://github.com/cloud-bulldozer/utils/releases/download/v0.0.0/jsonnet-bin-v0.20.0-linux.tar.gz | tar xz -C bin
+Downloading jb binary
+curl -s -L https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-linux-amd64 -o bin/jb
+chmod +x bin/jb
+Downloading vendor files
+cd templates && ../bin/jb install && cd ../
+GET https://github.com/grafana/grafonnet/archive/f40876da40d787e9c288de0b547ac85597c781d9.tar.gz 200
+GET https://github.com/grafana/grafonnet/archive/f40876da40d787e9c288de0b547ac85597c781d9.tar.gz 200
+GET https://github.com/jsonnet-libs/docsonnet/archive/cc9df63eaca56f39e8e4e1ce192141333257b08d.tar.gz 200
+GET https://github.com/jsonnet-libs/xtd/archive/0256a910ac71f0f842696d7bca0bf01ea77eb654.tar.gz 200
+bin/jsonnetfmt -i templates/General/ocp-performance-v2.jsonnet
+Building template templates/General/ocp-performance-v2.jsonnet
+mkdir -p rendered/General/
+bin/jsonnet -J ./templates/vendor templates/General/ocp-performance-v2.jsonnet > rendered/General/ocp-performance-v2.json
+Rendered the v2 dashboards with latest grafonnet library
+```
+Rest all operations reamin same as before.
 
 In order to clean up the environment execute `make clean`.
 
