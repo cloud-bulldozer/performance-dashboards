@@ -27,9 +27,9 @@ If using disconnected, you need to sync the cloud-bulldozer grafana image (shown
 dittybopper/templates/dittybopper.yaml.template file) and your chosen syncer image
 (defaults to quay.io/cloud-bulldozer/dittybopper-syncer:latest).
 
-The syncer image is built with the context at the root of the repository, and the image in the dittybopper/syncer directory.
+The syncer image is built with the context at the root of the repository, and the image in the root directory.
 You can build it with `make build-syncer-image SYNCER_IMG_TAG=container.registry.org/organization/syncer:latest`
-Alternatively, you can run the following command form the root folder of this repository: `podman build -f dittybopper/syncer/Dockerfile -t=container.registry.org/organization/syncer:latest .`
+Alternatively, you can run the following command from the root folder of this repository: `podman build -f Dockerfile -t=container.registry.org/organization/syncer:latest .`
 
 ## Contribute
 
