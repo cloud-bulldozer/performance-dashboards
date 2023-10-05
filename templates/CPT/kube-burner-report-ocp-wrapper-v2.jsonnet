@@ -14,7 +14,7 @@ g.dashboard.new('Kube-burner Report - OCP wrapper')
 + g.dashboard.timepicker.withRefreshIntervals(['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'])
 + g.dashboard.timepicker.withTimeOptions(['5m', '15m', '1h', '6h', '12h', '24h', '2d', '7d', '30d'])
 + g.dashboard.withRefresh('')
-+ g.dashboard.withEditable(true)
++ g.dashboard.withEditable(false)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.Datasource,
