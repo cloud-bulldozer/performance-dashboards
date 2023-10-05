@@ -7,8 +7,8 @@ SYNCER_IMG_TAG ?= quay.io/cloud-bulldozer/dittybopper-syncer:latest
 PLATFORM = linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
 ifeq ($(filter v2,$(MAKECMDGOALS)),v2)
-  # Set variables and instructions for v2
-  TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*-v2.jsonnet)
+  	# Set variables and instructions for v2
+  	TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*-v2.jsonnet)
 	LIBRARY_PATH := $(TEMPLATESDIR)/vendor
 	JSONNET := https://github.com/cloud-bulldozer/utils/releases/download/v0.0.0/jsonnet-bin-v0.20.0-linux.tar.gz
 else
