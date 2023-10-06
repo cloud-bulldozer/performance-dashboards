@@ -208,14 +208,14 @@ local ovnCNIDel = genericGraphPanel('99% CNI Request DEL Latency', 's').addTarge
 
 local ovnKubeMasterMem = genericGraphLegendPanel('ovnkube-master Memory Usage', 'bytes').addTarget(
   prometheus.target(
-    'container_memory_rss{pod=~"ovnkube-master-.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}',
+    'container_memory_rss{pod!~"ovnkube-node.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}',
     legendFormat='{{container}}-{{pod}}-{{node}}',
   )
 );
 
 local ovnKubeMasterCPU = genericGraphLegendPanel('ovnkube-master CPU Usage', 'percent').addTarget(
   prometheus.target(
-    'irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100',
+    'irate(container_cpu_usage_seconds_total{pod!~"ovnkube-node.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100',
     legendFormat='{{container}}-{{pod}}-{{node}}',
   )
 );
