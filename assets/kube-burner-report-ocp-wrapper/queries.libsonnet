@@ -1276,8 +1276,6 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withQuery(query)
         + elasticsearch.withTimeField('timestamp'),
     queries(): [
-      self.base("Available", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryAvailable-Masters\" AND labels.instance.keyword: $master"),
-      self.base("Total", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryTotal-Masters\" AND labels.instance.keyword: $master"),
       self.base("Utilization", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryUtilization-Masters\" AND labels.instance.keyword: $master"),
     ],
   },
@@ -1362,8 +1360,6 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withQuery(query)
         + elasticsearch.withTimeField('timestamp'),
     queries(): [
-      self.base("available", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryAvailable-Workers\" AND labels.instance.keyword: \"$worker\""),
-      self.base("Total", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryTotal-Workers\" AND labels.instance.keyword: $worker"),
       self.base("Utilization", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryUtilization-Workers\" AND labels.instance.keyword: $worker"),
     ],
   },
@@ -1534,7 +1530,6 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withTimeField('timestamp'),
     queries(): [
       self.base("Available", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryAvailable-AggregatedWorkers\""),
-      self.base("Total", "uuid.keyword: $uuid AND metricName.keyword: \"nodeMemoryTotal-AggregatedWorkers\""),
     ],
   },
   aggWorkerNodeContainerCpuUsage: {
