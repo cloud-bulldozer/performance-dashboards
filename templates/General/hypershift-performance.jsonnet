@@ -35,6 +35,74 @@ local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane M
   )
 );
 
+// Serving node stats and other daemons
+
+local nodeMemory = genericGraphLegendPanel('Serving Node Memory, 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'node_memory_Active_bytes and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - Active',
+  )
+).addTarget(
+  prometheus.target(
+    'node_memory_MemTotal_bytes and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - Total',
+  )
+).addTarget(
+  prometheus.target(
+    '(node_memory_Cached_bytes + node_memory_Buffers_bytes) and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - Cached + Buffers',
+  )
+).addTarget(
+  prometheus.target(
+    'node_memory_MemAvailable_bytes and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - Available',
+  )
+).addTarget(
+  prometheus.target(
+    '(node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Buffers_bytes +  node_memory_Cached_bytes)) and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - Used',
+  )
+);
+
+
+local nodeCPU = genericGraphLegendPanel('Serving Node CPU Basic, 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum by (instance, mode)(irate(node_cpu_seconds_total{job=~".*"}[$interval])) * 100 and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    legendFormat='{{instance}} - {{mode}}',
+  )
+);
+
+local suricataCPU = genericGraphLegendPanel('Suricata CPU(Running on Serving node)', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"openshift-suricata",container!="POD",name!=""}[2m])*100) by (node) on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
+    legendFormat='{{pod}}/{{container}}',
+  )
+);
+
+local suricataMemory = genericGraphLegendPanel('Suricata Memory(Running on Serving node)', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'sum(container_memory_rss{namespace=~"openshift-suricata",container!="POD",name!=""}) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
+    legendFormat='{{pod}}/{{container}}',
+  )
+);
+
+local dynatraceCPU = genericGraphLegendPanel('Dynatrace CPU(Running on Serving node)', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace",container!="POD",name!=""}[2m])*100) by (node) on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
+    legendFormat='{{pod}}/{{container}}',
+  )
+);
+
+local dynatraceMemory = genericGraphLegendPanel('Dynatrace Memory(Running on Serving node)', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'sum(container_memory_rss{namespace=~"dynatrace",container!="POD",name!=""}) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
+    legendFormat='{{pod}}/{{container}}',
+  )
+);
+
+
+
+
 // Overall stats on the management cluster
 
 // Cluster Operators details and status
@@ -1694,6 +1762,19 @@ grafana.dashboard.new(
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
+.addPanel(
+  grafana.row.new(title='Hosted Clusters Serving Node stats - $namespace', collapse=true, repeat='namespace').addPanels(
+    [
+      nodeCPU { gridPos: { x: 0, y: 2, w: 12, h: 8 } },
+      nodeMemory { gridPos: { x: 12, y: 2, w: 12, h: 8 } },
+      dynatraceCPU { gridPos: { x: 0, y: 10, w: 12, h: 8 } },
+      dynatraceMemory { gridPos: { x: 12, y: 10, w: 12, h: 8 } },
+      suricataCPU { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
+      suricataMemory { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
+    ]
+  ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } }
+)
+
 .addPanel(grafana.row.new(title='HostedControlPlane stats - $namespace', collapse=true, repeat='namespace').addPanels(
   [
     infrastructure { gridPos: { x: 0, y: 0, w: 8, h: 4 } },
@@ -1735,23 +1816,17 @@ grafana.dashboard.new(
       grpc_traffic { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
       active_streams { gridPos: { x: 0, y: 26, w: 12, h: 8 } },
       snapshot_duration { gridPos: { x: 12, y: 26, w: 12, h: 8 } },
+
+      raft_proposals { gridPos: { x: 0, y: 34, w: 12, h: 8 } },
+      num_leader_changes { gridPos: { x: 12, y: 34, w: 12, h: 8 } },
+      etcd_has_leader { gridPos: { x: 0, y: 42, w: 6, h: 2 } },
+      num_failed_proposals { gridPos: { x: 6, y: 42, w: 6, h: 2 } },
+      leader_elections_per_day { gridPos: { x: 0, y: 44, w: 12, h: 6 } },
+      keys { gridPos: { x: 12, y: 44, w: 12, h: 8 } },
+      slow_operations { gridPos: { x: 0, y: 52, w: 12, h: 8 } },
+      key_operations { gridPos: { x: 12, y: 52, w: 12, h: 8 } },
+      heartbeat_failures { gridPos: { x: 0, y: 60, w: 12, h: 8 } },
+      compacted_keys { gridPos: { x: 12, y: 60, w: 12, h: 8 } },      
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
-)
-
-.addPanel(
-  grafana.row.new(title='Hosted Clusters ETCD General Info - $namespace', collapse=true, repeat='namespace').addPanels(
-    [
-      raft_proposals { gridPos: { x: 0, y: 1, w: 12, h: 8 } },
-      num_leader_changes { gridPos: { x: 12, y: 1, w: 12, h: 8 } },
-      etcd_has_leader { gridPos: { x: 0, y: 8, w: 6, h: 2 } },
-      num_failed_proposals { gridPos: { x: 6, y: 8, w: 6, h: 2 } },
-      leader_elections_per_day { gridPos: { x: 0, y: 12, w: 12, h: 6 } },
-      keys { gridPos: { x: 12, y: 12, w: 12, h: 8 } },
-      slow_operations { gridPos: { x: 0, y: 20, w: 12, h: 8 } },
-      key_operations { gridPos: { x: 12, y: 20, w: 12, h: 8 } },
-      heartbeat_failures { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
-      compacted_keys { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
-    ]
-  ), { gridPos: { x: 0, y: 3, w: 24, h: 1 } }
 )
