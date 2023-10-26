@@ -67,40 +67,24 @@ local nodeMemory = genericGraphLegendPanel('Serving Node Memory', 'Cluster Prome
 
 local nodeCPU = genericGraphLegendPanel('Serving Node CPU Basic', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'sum by (instance, mode)(irate(node_cpu_seconds_total{job=~".*"}[$interval])) * 100 and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
+    'sum by (instance, mode)(irate(node_cpu_seconds_total{job=~".*"}[2m])) * 100 and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
     legendFormat='{{instance}} - {{mode}}',
   )
 );
 
 local suricataCPU = genericGraphLegendPanel('Suricata CPU(Running on Serving node)', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'sum(irate(container_cpu_usage_seconds_total{namespace=~"openshift-suricata",container!="POD",name!=""}[2m])*100) by (node) on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{pod}}/{{container}}',
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"openshift-suricata",container!="POD",name!=""}[2m])*100) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
+    legendFormat='{{node}}',
   )
 );
 
 local suricataMemory = genericGraphLegendPanel('Suricata Memory(Running on Serving node)', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
     'sum(container_memory_rss{namespace=~"openshift-suricata",container!="POD",name!=""}) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{pod}}/{{container}}',
+    legendFormat='{{node}}',
   )
 );
-
-local dynatraceCPU = genericGraphLegendPanel('Dynatrace CPU(Running on Serving node)', 'Cluster Prometheus', 'percent').addTarget(
-  prometheus.target(
-    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace",container!="POD",name!=""}[2m])*100) by (node) on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{pod}}/{{container}}',
-  )
-);
-
-local dynatraceMemory = genericGraphLegendPanel('Dynatrace Memory(Running on Serving node)', 'Cluster Prometheus', 'bytes').addTarget(
-  prometheus.target(
-    'sum(container_memory_rss{namespace=~"dynatrace",container!="POD",name!=""}) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{pod}}/{{container}}',
-  )
-);
-
-
 
 
 // Overall stats on the management cluster
@@ -1767,8 +1751,6 @@ grafana.dashboard.new(
     [
       nodeCPU { gridPos: { x: 0, y: 2, w: 12, h: 8 } },
       nodeMemory { gridPos: { x: 12, y: 2, w: 12, h: 8 } },
-      dynatraceCPU { gridPos: { x: 0, y: 10, w: 12, h: 8 } },
-      dynatraceMemory { gridPos: { x: 12, y: 10, w: 12, h: 8 } },
       suricataCPU { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
       suricataMemory { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
     ]
@@ -1826,7 +1808,7 @@ grafana.dashboard.new(
       slow_operations { gridPos: { x: 0, y: 52, w: 12, h: 8 } },
       key_operations { gridPos: { x: 12, y: 52, w: 12, h: 8 } },
       heartbeat_failures { gridPos: { x: 0, y: 60, w: 12, h: 8 } },
-      compacted_keys { gridPos: { x: 12, y: 60, w: 12, h: 8 } },      
+      compacted_keys { gridPos: { x: 12, y: 60, w: 12, h: 8 } },
     ]
   ), { gridPos: { x: 0, y: 0, w: 24, h: 1 } }
 )
