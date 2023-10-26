@@ -37,7 +37,7 @@ local hostedControlPlaneMemory = genericGraphLegendPanel('Hosted Control Plane M
 
 // Serving node stats and other daemons
 
-local nodeMemory = genericGraphLegendPanel('Serving Node Memory, 'Cluster Prometheus', 'bytes').addTarget(
+local nodeMemory = genericGraphLegendPanel('Serving Node Memory', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
     'node_memory_Active_bytes and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
     legendFormat='{{instance}} - Active',
@@ -65,7 +65,7 @@ local nodeMemory = genericGraphLegendPanel('Serving Node Memory, 'Cluster Promet
 );
 
 
-local nodeCPU = genericGraphLegendPanel('Serving Node CPU Basic, 'Cluster Prometheus', 'percent').addTarget(
+local nodeCPU = genericGraphLegendPanel('Serving Node CPU Basic', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
     'sum by (instance, mode)(irate(node_cpu_seconds_total{job=~".*"}[$interval])) * 100 and on (instance) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "instance", "$1", "node", "(.+)")',
     legendFormat='{{instance}} - {{mode}}',
