@@ -469,7 +469,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -477,7 +477,7 @@ local elasticsearch = g.query.elasticsearch;
          elasticsearch.metrics.Count.withId("1")
          + elasticsearch.metrics.Count.withType('count'),
         ])
-        + elasticsearch.withQuery("uuid.keyword: $uuid AND metricName: \"nodeRoles\"")
+        + elasticsearch.withQuery("uuid.keyword: $uuid AND metricName.keyword: \"nodeRoles\"")
         + elasticsearch.withTimeField('timestamp')
   },
   aggregatesCount: {
@@ -499,9 +499,9 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withQuery(query)
         + elasticsearch.withTimeField('timestamp'),
     queries(): [
-        self.base("Namespaces", "uuid.keyword: $uuid AND metricName: \"namespaceCount\" AND labels.phase: \"Active\""),
-        self.base("Services", "uuid.keyword: $uuid AND metricName: \"serviceCount\""),
-        self.base("Deployments", "uuid.keyword: $uuid AND metricName: \"deploymentCount\""),
+        self.base("Namespaces", "uuid.keyword: $uuid AND metricName.keyword: \"namespaceCount\" AND labels.phase: \"Active\""),
+        self.base("Services", "uuid.keyword: $uuid AND metricName.keyword: \"serviceCount\""),
+        self.base("Deployments", "uuid.keyword: $uuid AND metricName.keyword: \"deploymentCount\""),
         self.base("Secrets", "uuid.keyword: $uuid AND metricName.keyword: \"secretCount\""),
         self.base("ConfigMaps", "uuid.keyword: $uuid AND metricName.keyword: \"configmapCount\""),
     ]
@@ -570,7 +570,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -608,7 +608,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -639,7 +639,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -658,7 +658,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -686,7 +686,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -709,11 +709,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -740,11 +740,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
@@ -767,11 +767,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
         ])
@@ -790,7 +790,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -812,18 +812,18 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.Terms.withField("labels.To.keyword")
           + elasticsearch.bucketAggs.Terms.withId("3")
           + elasticsearch.bucketAggs.Terms.withType('terms')
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -845,11 +845,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
         ])
@@ -875,18 +875,18 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.Terms.withField("labels.resource.keyword")
           + elasticsearch.bucketAggs.Terms.withId("3")
           + elasticsearch.bucketAggs.Terms.withType('terms')
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -908,11 +908,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -934,11 +934,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -960,11 +960,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -983,7 +983,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1016,7 +1016,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1041,7 +1041,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1057,7 +1057,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1083,7 +1083,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1099,7 +1099,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1126,7 +1126,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1"),
         ])
         + elasticsearch.withMetrics([
@@ -1141,7 +1141,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1"),
         ])
         + elasticsearch.withMetrics([
@@ -1166,7 +1166,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1182,7 +1182,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1205,18 +1205,18 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.Terms.withField("labels.container.keyword")
           + elasticsearch.bucketAggs.Terms.withId("3")
           + elasticsearch.bucketAggs.Terms.withType('terms')
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto'),
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
         ])
         + elasticsearch.withMetrics([
          elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("value")
@@ -1236,11 +1236,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1264,7 +1264,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1289,18 +1289,18 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.Terms.withField("labels.container.keyword")
           + elasticsearch.bucketAggs.Terms.withId("3")
           + elasticsearch.bucketAggs.Terms.withType('terms')
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto'),
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
         ])
         + elasticsearch.withMetrics([
          elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("value")
@@ -1320,11 +1320,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1348,7 +1348,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1384,7 +1384,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1403,18 +1403,18 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.Terms.withField("labels.container.keyword")
           + elasticsearch.bucketAggs.Terms.withId("3")
           + elasticsearch.bucketAggs.Terms.withType('terms')
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto'),
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
         ])
         + elasticsearch.withMetrics([
          elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("value")
@@ -1435,11 +1435,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1463,7 +1463,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1489,11 +1489,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1517,7 +1517,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
           + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
         ])
@@ -1546,7 +1546,7 @@ local elasticsearch = g.query.elasticsearch;
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
           + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
         ])
         + elasticsearch.withMetrics([
@@ -1567,11 +1567,11 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount("1")
-          + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
           elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
           + elasticsearch.bucketAggs.DateHistogram.withId("2")
           + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto'),
+          + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
         ])
         + elasticsearch.withMetrics([
          elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("value")
