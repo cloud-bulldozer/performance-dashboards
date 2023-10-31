@@ -400,6 +400,13 @@ local top10ContMem = genericGraphLegendPanel('Top 10 container RSS', 'bytes').ad
   )
 );
 
+local contMemRSSSystemSlice = genericGraphLegendPanel('container RSS system.slice', 'bytes').addTarget(
+  prometheus.target(
+    'sum by (node)(container_memory_rss{id="/system.slice"})',
+    legendFormat='system.slice - {{ node }}',
+  )
+);
+
 local podDistribution = genericGraphLegendPanel('Pod Distribution', 'none').addTarget(
   prometheus.target(
     'count(kube_pod_info{}) by (node)',
@@ -641,7 +648,8 @@ grafana.dashboard.new(
     routesCount { gridPos: { x: 0, y: 20, w: 8, h: 8 } },
     alerts { gridPos: { x: 8, y: 20, w: 8, h: 8 } },
     podDistribution { gridPos: { x: 16, y: 20, w: 8, h: 8 } },
-    top10ContMem { gridPos: { x: 0, y: 28, w: 24, h: 8 } },
+    top10ContMem { gridPos: { x: 0, y: 28, w: 12, h: 8 } },
+    contMemRSSSystemSlice { gridPos: { x: 12, y: 28, w: 12, h: 8 } },
     top10ContCPU { gridPos: { x: 0, y: 36, w: 12, h: 8 } },
     goroutines_count { gridPos: { x: 12, y: 36, w: 12, h: 8 } },
   ]
