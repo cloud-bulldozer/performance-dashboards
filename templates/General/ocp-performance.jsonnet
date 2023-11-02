@@ -184,49 +184,6 @@ local stackroxMem = genericGraphLegendPanel('Top 25 stackrox container RSS bytes
   )
 );
 
-// Dynatrace
-local dynaoneagentMem = genericGraphLegendPanel('OneAgent Memory Usage', 'bytes').addTarget(
-  prometheus.target(
-    'container_memory_rss{namespace="dynatrace",pod=~".*-oneagent-.*",container!=""}' ,
-    legendFormat='{{ pod }}',
-  )
-);
-
-local dynaoneagentCPU = genericGraphLegendPanel('OneAgent CPU Usage', 'percent').addTarget(
-  prometheus.target(
-    'irate(container_cpu_usage_seconds_total{namespace="dynatrace", pod=~".*-oneagent-.*",container!~"POD|"}[$interval])*100',
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
-  )
-);
-
-local dynaactivegateMem = genericGraphLegendPanel('Active Gate Memory Usage', 'bytes').addTarget(
-  prometheus.target(
-    'container_memory_rss{namespace="dynatrace",pod=~".*-activegate-.*",container!=""}' ,
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
-  )
-);
-
-local dynaactivegateCPU = genericGraphLegendPanel('Active Gate CPU Usage', 'percent').addTarget(
-  prometheus.target(
-    'irate(container_cpu_usage_seconds_total{namespace="dynatrace", pod=~".*-activegate-.*",container!~"POD|"}[$interval])*100',
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
-  )
-);
-
-local opentelemetryCPU = genericGraphLegendPanel('Opentelemetry CPU Usage', 'percent').addTarget(
-  prometheus.target(
-    'irate(container_cpu_usage_seconds_total{namespace="dynatrace", pod=~"opentelemetry-.*",container!~"POD|"}[$interval])*100',
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
-  )
-);
-
-local opentelemetryMem = genericGraphLegendPanel('Opentelemetry Memory Usage', 'bytes').addTarget(
-  prometheus.target(
-    'container_memory_rss{namespace="dynatrace",pod=~"opentelemetry-.*",container!=""}' ,
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
-  )
-);
-
 // OVN
 local ovnAnnotationLatency = genericGraphPanel('99% Pod Annotation Latency', 's').addTarget(
   prometheus.target(
@@ -706,16 +663,6 @@ grafana.dashboard.new(
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
-.addPanel(grafana.row.new(title='Dynatrace Details', collapse=true).addPanels(
-  [
-    dynaoneagentCPU { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    dynaoneagentMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    dynaactivegateCPU { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    dynaactivegateMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    opentelemetryCPU { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    opentelemetryMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-  ],
-), {gridPos: {x: 0, y: 5, w: 24, h: 1 } })
 
 .addPanel(grafana.row.new(title='Master: $_master_node', collapse=true, repeat='_master_node').addPanels(
   [
