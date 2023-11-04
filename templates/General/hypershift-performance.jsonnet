@@ -88,15 +88,15 @@ local suricataMemory = genericGraphLegendPanel('Suricata Memory(Running on Servi
 
 local dynaoneagentMem = genericGraphLegendPanel('OneAgent Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
-    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-oneagent-.*",container!=""}) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{ node }}',
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-oneagent-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
 local dynaoneagentCPU = genericGraphLegendPanel('OneAgent CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-oneagent-.*", container!~"POD|"}[2m])*100) by (node) and on (node) label_replace(cluster:nodes_roles{label_hypershift_openshift_io_cluster=~"$namespace"}, "node", "$1", "node", "(.+)")',
-    legendFormat='{{ node }}',
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-oneagent-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
@@ -414,29 +414,29 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
 // Dynatrace on the management cluster
 local dynaactivegateMem = genericGraphLegendPanel('Active Gate Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
-    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-activegate-.*",container!=""})',
-    legendFormat='{{ node }}',
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-activegate-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
 local dynaactivegateCPU = genericGraphLegendPanel('Active Gate CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-activegate-.*", container!~"POD|"}[2m])*100)',
-    legendFormat='{{ node }}',
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-activegate-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
 local opentelemetryMem = genericGraphLegendPanel('Opentelemetry Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
   prometheus.target(
-    'sum(container_memory_rss{namespace=~"dynatrace",pod=~"opentelemetry-.*",container!=""})',
-    legendFormat='{{ node }}',
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~"opentelemetry-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
 local opentelemetryCPU = genericGraphLegendPanel('Opentelemetry CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
   prometheus.target(
-    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~"opentelemetry-.*", container!~"POD|"}[2m])*100)',
-    legendFormat='{{ node }}',
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~"opentelemetry-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
   )
 );
 
