@@ -663,7 +663,6 @@ grafana.dashboard.new(
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
-
 .addPanel(grafana.row.new(title='Master: $_master_node', collapse=true, repeat='_master_node').addPanels(
   [
     nodeCPU('$_master_node') { gridPos: { x: 0, y: 0, w: 12, h: 8 } },
