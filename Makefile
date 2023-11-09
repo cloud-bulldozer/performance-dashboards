@@ -1,8 +1,5 @@
-ARCH := $(shell arch)
-OS_TYPE := $(shell uname)
-JB_OS_TYPE := $(shell uname | tr '[:upper:]' '[:lower:]')
-JSONNET := https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_$(OS_TYPE)_$(ARCH).tar.gz
-JB = https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-$(JB_OS_TYPE)-$(ARCH)
+JSONNET := https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz
+JB = https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-linux-amd64
 BINDIR = bin
 TEMPLATESDIR = templates
 OUTPUTDIR = rendered
