@@ -78,6 +78,7 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.generic('Alerts', 'none', queries.alerts.query(), { x: 8, y: 20, w: 8, h: 8 }),
     panels.timeSeries.genericLegend('Pod Distribution', 'none', queries.podDistribution.query(), { x: 16, y: 20, w: 8, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 container RSS', 'bytes', queries.top10ContMem.query(), { x: 0, y: 28, w: 24, h: 8 }),
+    panels.timeSeries.genericLegend('container RSS system.slice', 'bytes', queries.contMemRSSSystemSlice.query(), { x: 12, y: 28, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 container CPU', 'percent', queries.top10ContCPU.query(), { x: 0, y: 36, w: 12, h: 8 }),
     panels.timeSeries.generic('Goroutines count', 'none', queries.goroutinesCount.query(), { x: 12, y: 36, w: 12, h: 8 }),
   ]),

@@ -178,6 +178,10 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
         generateTimeSeriesQuery('topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})', '{{ namespace }} - {{ name }}')
   },
+  contMemRSSSystemSlice: {
+    query():
+        generateTimeSeriesQuery('sum by (node)(container_memory_rss{id="/system.slice"})', 'system.slice - {{ node }}')
+  },
   top10ContCPU: {
     query():
         generateTimeSeriesQuery('topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[$interval])*100)', '{{ namespace }} - {{ name }}')
