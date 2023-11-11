@@ -15,18 +15,22 @@ g.dashboard.new('k8s-netperf')
 + g.dashboard.withVariables([
   variables.datasource,
   variables.platform,
-  variables.samples,
+  variables.workers,
   variables.uuid,
   variables.hostNetwork,
   variables.service,
   variables.streams,
-  variables.profile,
+  variables.throughput_profile,
+  variables.latency_profile,
   variables.messageSize,
   variables.driver,
 ])
 + g.dashboard.withPanels([
-  panels.row.base('$profile', 'profile', { x: 0, y: 0, w: 24, h: 1 }),
-  panels.timeSeries.base('$profile - $driver - $messageSize', queries.all.query(), { x: 0, y: 0, w: 12, h: 8 }),
-  panels.row.base('Parallelism $parallelism', 'parallelism', { x: 0, y: 9, w: 24, h: 1 }),
-  panels.table.base('Result Table - Parallelism: $parallelism', queries.parallelismAll.query(), { x: 0, y: 10, w: 24, h: 11 }),
+  panels.row.base('$latency_profile', 'latency_profile', { x: 0, y: 0, w: 24, h: 1 }),
+  panels.timeSeries.base('$latency_profile - $driver - $messageSize', queries.all.query('$latency_profile', 'latency'), { x: 0, y: 0, w: 24, h: 8 }),
+  panels.row.base('$throughput_profile', 'throughput_profile', { x: 0, y: 9, w: 24, h: 1 }),
+  panels.timeSeries.withThroughputOverrides('$throughput_profile - $driver - $messageSize', queries.all.query('$throughput_profile', 'throughput'), { x: 0, y: 10, w: 24, h: 8 }),
+  panels.row.base('Parallelism $parallelism', 'parallelism', { x: 0, y: 18, w: 24, h: 1 }),
+  panels.table.base('Throughput - Parallelism: $parallelism', queries.parallelismAll.query('$throughput_profile', 'throughput'), { x: 0, y: 19, w: 24, h: 11 }),
+  panels.table.withLatencyOverrides('Latency - Parallelism: $parallelism', queries.parallelismAll.query('$latency_profile', 'latency'), { x: 0, y: 19, w: 24, h: 11 }),
 ])

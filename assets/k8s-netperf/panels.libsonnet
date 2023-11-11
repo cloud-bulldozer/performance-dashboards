@@ -29,6 +29,67 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + table.gridPos.withY(gridPos.y)
       + table.gridPos.withH(gridPos.h)
       + table.gridPos.withW(gridPos.w)
+      + table.queryOptions.withTransformations([
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average latency": true,
+              "ltcyMetric.keyword": true,
+              "tputMetric.keyword": true
+            },
+            "indexByName": {
+              "Average": 10,
+              "hostNetwork": 8,
+              "ltcyMetric.keyword": 7,
+              "messageSize": 3,
+              "metadata.clusterName.keyword": 1,
+              "metadata.platform.keyword": 5,
+              "metadata.workerNodesType.keyword": 9,
+              "profile.keyword": 2,
+              "service": 6,
+              "tputMetric.keyword": 4,
+              "uuid.keyword": 0
+            },
+            "renameByName": {
+              "Average": "Throughput",
+              "Average latency": "P99 latency",
+              "ltcyMetric.keyword": "",
+              "metadata.clusterName.keyword": "clusterName",
+              "metadata.platform.keyword": "Platform",
+              "metadata.workerNodesType.keyword": "workers",
+              "profile.keyword": "Profile",
+              "uuid.keyword": "uuid"
+            }
+          }
+        }
+      ])
+      + table.standardOptions.withOverrides([
+        {
+          "matcher": {
+            "id": "byName",
+            "options": "Average"
+          },
+          "properties": [
+            {
+              "id": "unit",
+              "value": "Mbits"
+            }
+          ]
+        },
+        {
+          "matcher": {
+            "id": "byName",
+            "options": "messageSize"
+          },
+          "properties": [
+            {
+              "id": "unit",
+              "value": "bytes"
+            }
+          ]
+        }
+      ])
       + options.withCellHeight("sm")
       + options.withFooter({
           "countRows": false,
@@ -44,6 +105,68 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             "displayName": "ea7b29d7-8991-4752-a0d4-e26446d34915 TCP_STREAM 4096 Mb/s AWS"
           }
         ]),
+
+    withLatencyOverrides(title, targets, gridPos):
+      self.base(title, targets, gridPos)
+      + table.queryOptions.withTransformations([
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average latency": true,
+              "ltcyMetric.keyword": true,
+              "tputMetric.keyword": true
+            },
+            "indexByName": {
+              "Average": 8,
+              "hostNetwork": 6,
+              "messageSize": 3,
+              "metadata.clusterName.keyword": 1,
+              "metadata.platform.keyword": 4,
+              "metadata.workerNodesType.keyword": 7,
+              "profile.keyword": 2,
+              "service": 5,
+              "uuid.keyword": 0
+            },
+            "renameByName": {
+              "Average": "P99 latency",
+              "Average latency": "P99 latency",
+              "ltcyMetric.keyword": "",
+              "metadata.clusterName.keyword": "clusterName",
+              "metadata.platform.keyword": "Platform",
+              "metadata.workerNodesType.keyword": "workers",
+              "profile.keyword": "Profile",
+              "uuid.keyword": "uuid"
+            }
+          }
+        }
+      ])
+      + table.standardOptions.withOverrides([
+        {
+          "matcher": {
+            "id": "byName",
+            "options": "Average"
+          },
+          "properties": [
+            {
+              "id": "unit",
+              "value": "µs"
+            }
+          ]
+        },
+        {
+          "matcher": {
+            "id": "byName",
+            "options": "messageSize"
+          },
+          "properties": [
+            {
+              "id": "unit",
+              "value": "bytes"
+            }
+          ]
+        }
+      ]),
   },
 
   timeSeries: {
@@ -86,6 +209,41 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.tooltip.withSort('none')
       + options.legend.withShowLegend(true)
       + options.legend.withPlacement('bottom')
-      + options.legend.withDisplayMode('list'),
+      + options.legend.withDisplayMode('table')
+      + options.legend.withCalcs(['lastNotNull'])
+      + timeSeries.standardOptions.withOverrides([
+      {
+        "matcher": {
+          "id": "byFrameRefID",
+          "options": "A"
+        },
+        "properties": [
+          {
+            "id": "unit",
+            "value": "µs"
+          }
+        ]
+      }
+    ]),
+
+    withThroughputOverrides(title, targets, gridPos):
+      self.base(title, targets, gridPos)
+      + options.legend.withSortBy("Last *")
+      + options.legend.withPlacement('right')
+      + options.legend.withSortDesc(false)
+      + timeSeries.standardOptions.withOverrides([
+      {
+        "matcher": {
+          "id": "byFrameRefID",
+          "options": "A"
+        },
+        "properties": [
+          {
+            "id": "unit",
+            "value": "Mbits"
+          }
+        ]
+      }
+    ]),
   },
 }

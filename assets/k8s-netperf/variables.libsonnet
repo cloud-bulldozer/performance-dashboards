@@ -17,17 +17,17 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('Platform'),
-  
-  samples:
-    var.query.new('samples', "{\"find\": \"terms\", \"field\": \"samples\"}")
+
+  workers:
+    var.query.new('workerNodesType', "{\"find\": \"terms\", \"field\": \"metadata.workerNodesType.keyword\", \"query\": \"metadata.platform.keyword: $platform\"}")
     + var.query.withDatasourceFromVariable(self.datasource)
-    + var.query.withRefresh(1)
+    + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(false)
-    + var.query.selectionOptions.withIncludeAll(false)
-    + var.query.generalOptions.withLabel('samples'),
-  
+    + var.query.selectionOptions.withIncludeAll(true)
+    + var.query.generalOptions.withLabel('workers'),
+
   uuid:
-    var.query.new('uuid', "{\"find\": \"terms\", \"field\": \"uuid.keyword\", \"query\":\"metadata.platform.keyword: $platform AND samples: $samples\"}")
+    var.query.new('uuid', "{\"find\": \"terms\", \"field\": \"uuid.keyword\", \"query\":\"metadata.platform.keyword: $platform AND  metadata.workerNodesType.keyword: $workerNodesType\"}")
     + var.query.withDatasourceFromVariable(self.datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
@@ -54,13 +54,23 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('streams'),
   
-  profile:
-    var.query.new('profile', "{\"find\": \"terms\", \"field\": \"profile.keyword\", \"query\":\"uuid:$uuid\"}")
+  throughput_profile:
+    var.query.new('throughput_profile', "{\"find\": \"terms\", \"field\": \"profile.keyword\", \"query\":\"uuid:$uuid\"}")
     + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withRegex(".*STREAM.*")
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
-    + var.query.generalOptions.withLabel('profile'),
+    + var.query.generalOptions.withLabel('Throughput profile'),
+
+  latency_profile:
+    var.query.new('latency_profile', "{\"find\": \"terms\", \"field\": \"profile.keyword\", \"query\":\"uuid:$uuid\"}")
+    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withRegex(".*RR.*")
+    + var.query.withRefresh(2)
+    + var.query.selectionOptions.withMulti(true)
+    + var.query.selectionOptions.withIncludeAll(true)
+    + var.query.generalOptions.withLabel('Latency profile'),
   
   messageSize:
     var.query.new('messageSize', "{\"find\": \"terms\", \"field\": \"messageSize\",\"query\":\"uuid:$uuid\"}")
