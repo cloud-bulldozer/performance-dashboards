@@ -25,7 +25,7 @@ mkdir -p bin rendered tmp
 git clone --depth 1 https://github.com/grafana/grafonnet-lib.git templates/grafonnet-lib
 Cloning into 'templates/grafonnet-lib'...
 Downloading jsonnet binary
-curl -s -L https://github.com/google/jsonnet/releases/download/v0.15.0/jsonnet-bin-v0.15.0-linux.tar.gz | tar xzf - -C bin
+curl -s -L https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz | tar xz -C bin
 Formating template templates/ocp-performance.jsonnet
 bin/jsonnetfmt templates/ocp-performance.jsonnet > tmp/ocp-performance.jsonnet
 mv tmp/ocp-performance.jsonnet templates/ocp-performance.jsonnet
@@ -39,7 +39,7 @@ Similarly for V2, the dashboards that are built using latest grafonnet library, 
 $ make v2
 mkdir -p bin rendered
 Downloading jsonnet binary
-curl -s -L https://github.com/cloud-bulldozer/utils/releases/download/v0.0.0/jsonnet-bin-v0.20.0-linux.tar.gz | tar xz -C bin
+curl -s -L https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz | tar xz -C bin
 Downloading jb binary
 curl -s -L https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-linux-amd64 -o bin/jb
 chmod +x bin/jb
