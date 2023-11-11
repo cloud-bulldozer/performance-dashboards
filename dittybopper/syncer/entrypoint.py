@@ -13,9 +13,10 @@ class GrafanaOperations:
     """
     This class is responsible for Grafana operations
     """
-    def __init__(self, grafana_url: str, input_directory: str):
+    def __init__(self, grafana_url: str, input_directory: str, git_commit_hash: str):
         self.grafana_url = grafana_url
         self.input_directory = input_directory
+        self.git_commit_hash = git_commit_hash
         self.dashboards = defaultdict(list)
         self.folder_map = dict()
         self.logger = logging.getLogger(__name__)
@@ -102,6 +103,10 @@ class GrafanaOperations:
         for folder_id, files in self.dashboards.items():
             for json_file in set(files):
                 dashboard_json = self.read_dashboard_json(json_file)
+                if "tags" in dashboard_json.keys():
+                    dashboard_json["tags"].append(self.git_commit_hash)
+                else:
+                    dashboard_json["tags"] = self.git_commit_hash
                 try:
                     response = requests.post(
                         f"{self.grafana_url}/api/dashboards/db",
@@ -122,7 +127,7 @@ class GrafanaOperations:
                     raise Exception(f"Error creating dashboard '{dashboard_json['title']}' in folder '{folder_id}'. Message: {e}")
 
 if __name__ == '__main__':
-    grafana_operations = GrafanaOperations(os.environ.get("GRAFANA_URL"), os.environ.get("INPUT_DIR"))
+    grafana_operations = GrafanaOperations(os.environ.get("GRAFANA_URL"), os.environ.get("INPUT_DIR"), os.environ.get("GIT_COMMIT_HASH"))
     grafana_operations.fetch_all_dashboards()
     grafana_operations.create_dashboards()
     while True:

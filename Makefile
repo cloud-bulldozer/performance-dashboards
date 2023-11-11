@@ -1,3 +1,4 @@
+JSONNET := https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz
 JB = https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-linux-amd64
 BINDIR = bin
 TEMPLATESDIR = templates
@@ -7,15 +8,13 @@ SYNCER_IMG_TAG ?= quay.io/cloud-bulldozer/dittybopper-syncer:latest
 PLATFORM = linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
 ifeq ($(filter v2,$(MAKECMDGOALS)),v2)
-    # Set variables and instructions for v2
-  TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*-v2.jsonnet)
+  	# Set variables and instructions for v2
+  	TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*-v2.jsonnet)
 	LIBRARY_PATH := $(TEMPLATESDIR)/vendor
-	JSONNET := https://github.com/cloud-bulldozer/utils/releases/download/v0.0.0/jsonnet-bin-v0.20.0-linux.tar.gz
 else
 	# Get all templates at $(TEMPLATESDIR)
 	TEMPLATES := $(filter-out %-v2.jsonnet, $(wildcard $(TEMPLATESDIR)/**/*.jsonnet))
 	LIBRARY_PATH := $(TEMPLATESDIR)/grafonnet-lib
-	JSONNET := https://github.com/google/jsonnet/releases/download/v0.17.0/jsonnet-bin-v0.17.0-linux.tar.gz
 endif
 
 # Replace $(TEMPLATESDIR)/*.jsonnet by $(OUTPUTDIR)/*.json
