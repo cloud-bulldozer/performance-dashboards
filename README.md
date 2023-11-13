@@ -55,7 +55,7 @@ mkdir -p rendered/General/
 bin/jsonnet -J ./templates/vendor templates/General/ocp-performance-v2.jsonnet > rendered/General/ocp-performance-v2.json
 Rendered the v2 dashboards with latest grafonnet library
 ```
-Rest all operations reamin same as before.
+Rest all operations remain same as before.
 
 In order to clean up the environment execute `make clean`.
 
