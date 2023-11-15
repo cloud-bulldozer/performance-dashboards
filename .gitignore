@@ -1,4 +1,5 @@
 templates/grafonnet-lib
+templates/vendor
 rendered
 tmp
 bin
