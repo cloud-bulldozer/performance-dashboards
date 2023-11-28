@@ -16,7 +16,7 @@ class GrafanaOperations:
     def __init__(self, grafana_url: str, input_directory: str, git_commit_hash: str):
         self.grafana_url = grafana_url
         self.input_directory = input_directory
-        self.git_commit_hash = git_commit_hash
+        self.git_commit_hash = git_commit_hash if git_commit_hash else ''
         self.dashboards = defaultdict(list)
         self.folder_map = dict()
         self.logger = logging.getLogger(__name__)
