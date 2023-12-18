@@ -106,7 +106,7 @@ class GrafanaOperations:
                 if "tags" in dashboard_json.keys():
                     dashboard_json["tags"].append(self.git_commit_hash)
                 else:
-                    dashboard_json["tags"] = self.git_commit_hash
+                    dashboard_json["tags"] = [self.git_commit_hash]
                 try:
                     response = requests.post(
                         f"{self.grafana_url}/api/dashboards/db",
