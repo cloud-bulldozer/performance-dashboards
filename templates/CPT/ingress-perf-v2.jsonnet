@@ -54,9 +54,12 @@ g.dashboard.new('Ingress-perf')
     panels.timeSeries.withMeanReq('$latency_metric trend', 'µs', queries.latencyTrend.query(), { x: 12, y: 15, w: 12, h: 8 }),
     panels.bargauge.withAvgTimeThresholds('RPS $termination', 'reqps', queries.terminationRPS.query(), { x: 0, y: 23, w: 12, h: 7 }),
     panels.bargauge.withAvgTimeThresholds('$latency_metric $termination', 'µs', queries.latencyTermination.query(), { x: 12, y: 23, w: 12, h: 7 }),
+    panels.bargauge.withAvgTimeThresholds('HAProxy avg CPU usage $termination', 'percent', queries.HAProxyAvgCPUUsage.query(), { x: 0, y: 30, w: 12, h: 7 }),
+    panels.bargauge.withAvgTimeThresholds('Infra nodes CPU usage $termination', 'percent', queries.InfraNodesCPUUsageEdge.query(), { x: 12, y: 30, w: 12, h: 7 }),
     panels.gauge.withAvgTimeThresholds('RPS data quality', 'none', queries.qualityRPS.query(), { x: 0, y: 30, w: 12, h: 4 }),
     panels.gauge.withAvgTimeThresholds('Data quality: $latency_metric', 'none', queries.dataQuality.query(), { x: 12, y: 30, w: 12, h: 4 }),
     panels.table.withTerminationRawData('$termination raw data', 'short', queries.rawData.query(), { x: 8, y: 118, w: 24, h: 8 }),
+
   ]),
 
 ])

@@ -232,6 +232,70 @@ local elasticsearch = g.query.elasticsearch;
 
     },
 
+    HAProxyAvgCPUUsage: {
+        query():
+            elasticsearch.withAlias("")
+            + elasticsearch.withHide(false)
+            + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField("$compare_by")
+                + elasticsearch.bucketAggs.Terms.withId("7")
+                + elasticsearch.bucketAggs.Terms.withType('terms')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
+                elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
+                + elasticsearch.bucketAggs.DateHistogram.withId("8")
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
+
+            ])
+            + elasticsearch.withMetrics([
+            elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("infra_metrics.avg_cpu_usage_router_pods")
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("1")
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value*100')
+            ])
+            + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
+            + elasticsearch.withTimeField('timestamp')
+
+    },
+
+    InfraNodesCPUUsageEdge: {
+        query():
+            elasticsearch.withAlias("")
+            + elasticsearch.withHide(false)
+            + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField("$compare_by")
+                + elasticsearch.bucketAggs.Terms.withId("7")
+                + elasticsearch.bucketAggs.Terms.withType('terms')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
+                elasticsearch.bucketAggs.DateHistogram.withField("timestamp")
+                + elasticsearch.bucketAggs.DateHistogram.withId("8")
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
+
+            ])
+            + elasticsearch.withMetrics([
+            elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("infra_metrics.avg_cpu_usage_router_nodes")
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("1")
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+            + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value*100')
+            ])
+            + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
+            + elasticsearch.withTimeField('timestamp')
+
+    },
+
     qualityRPS: {
         query():
             elasticsearch.withAlias("")
