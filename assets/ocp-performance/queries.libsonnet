@@ -75,6 +75,16 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
         generateTimeSeriesQuery('topk(25, container_memory_rss{container!="POD",name!="",namespace!="",namespace=~"stackrox"})', '{{ pod }}: {{ container }}')
   },
+  OVSCPU: {
+    query(nodeName):
+        generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{id=~"/system.slice/ovs-vswitchd.service", node=~"' + nodeName + '"}[$interval])*100', 'OVS CPU - {{ node }}')
+        + generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{id=~"/system.slice/ovsdb-server.service", node=~"' + nodeName + '"}[$interval])*100', 'OVS DB CPU - {{ node }}')
+  },
+  OVSMemory: {
+    query(nodeName):
+        generateTimeSeriesQuery('container_memory_rss{id=~"/system.slice/ovs-vswitchd.service", node=~"' + nodeName + '"}', 'OVS Memory - {{ node }}')
+        + generateTimeSeriesQuery('container_memory_rss{id=~"/system.slice/ovsdb-server.service", node=~"' + nodeName + '"}', 'OVS DB Memory - {{ node }}')
+  },
   ovnAnnotationLatency: {
     query():
         generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[$interval])) by (pod,le)) > 0', '{{ pod }}')
