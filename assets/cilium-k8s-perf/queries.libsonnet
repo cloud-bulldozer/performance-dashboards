@@ -23,7 +23,7 @@ local prometheus = g.query.prometheus;
 
     ciliumContainerCPU: {
         query():
-            prometheus.withExpr('sum(irate(container_cpu_usage_seconds_total{container=~\"cilium.*\",container!=\"cilium-operator.*\",namespace!=\"\"}[$interval])) by (instance,pod,container,namespace,name,service) * 100')
+            prometheus.withExpr('sum(irate(container_cpu_usage_seconds_total{container=~"cilium.*",container!="cilium-operator.*",namespace!=""}[$interval])) by (instance,pod,container,namespace,name,service) * 100')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ instance }} - {{ pod }}')
@@ -32,7 +32,7 @@ local prometheus = g.query.prometheus;
 
     ciliumConatinerMemory: {
         query():
-            prometheus.withExpr('container_memory_rss{container=~\"cilium.*\",namespace!=\"\"}')
+            prometheus.withExpr('container_memory_rss{container=~"cilium.*",namespace!=""}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ instance }} - {{ pod }}')
@@ -65,7 +65,8 @@ local prometheus = g.query.prometheus;
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Number of nodes')
             + prometheus.withDatasource('$Datasource') ,
-            prometheus.withExpr('sum(kube_node_status_condition{status=\"true\"}) by (condition) > 0')
+
+            prometheus.withExpr('sum(kube_node_status_condition{status="true"}) by (condition) > 0')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Node: {{ condition }}')
@@ -99,7 +100,8 @@ local prometheus = g.query.prometheus;
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Number of nodes')
             + prometheus.withDatasource('$Datasource'),
-            prometheus.withExpr('sum(kube_node_status_condition{status=\"true\"}) by (condition) > 0')
+
+            prometheus.withExpr('sum(kube_node_status_condition{status="true"}) by (condition) > 0')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Node: {{ condition }}')
@@ -161,7 +163,7 @@ local prometheus = g.query.prometheus;
 
     top10ContainerRSS: {
         query():
-            prometheus.withExpr('topk(10, container_memory_rss{namespace!=\"\",container!=\"POD\",name!=\"\"})')
+            prometheus.withExpr('topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ namespace }} - {{ name }}')
@@ -170,7 +172,7 @@ local prometheus = g.query.prometheus;
 
     top10ContainerCPU: {
         query():
-            prometheus.withExpr('topk(10,irate(container_cpu_usage_seconds_total{namespace!=\"\",container!=\"POD\",name!=\"\"}[$interval])*100)')
+            prometheus.withExpr('topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[$interval])*100)')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ namespace }} - {{ name }}')
@@ -197,35 +199,35 @@ local prometheus = g.query.prometheus;
 
     CPUBasic: {
         query():
-            prometheus.withExpr('sum by (instance, mode)(rate(node_cpu_seconds_total{node=~\"$_worker_node\",job=~\".*\"}[$interval])) * 100')
+            prometheus.withExpr('sum by (instance, mode)(rate(node_cpu_seconds_total{node=~"$_worker_node",job=~".*"}[$interval])) * 100')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Busy {{mode}}')
             + prometheus.withDatasource('$Datasource') 
     },
 
-    SystemMemory: {
+    systemMemory: {
         query():
            [
-            prometheus.withExpr('node_memory_Active_bytes{node=~\"$_worker_node\"}')
+            prometheus.withExpr('node_memory_Active_bytes{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Active')
             + prometheus.withDatasource('$Datasource') ,
 
-            prometheus.withExpr('node_memory_MemTotal_bytes{node=~\"$_worker_node\"}')
+            prometheus.withExpr('node_memory_MemTotal_bytes{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Total')
             + prometheus.withDatasource('$Datasource'),
 
-             prometheus.withExpr('node_memory_Cached_bytes{node=~\"$_worker_node\"} + node_memory_Buffers_bytes{node=~\"$_worker_node\"}')
+             prometheus.withExpr('node_memory_Cached_bytes{node=~"$_worker_node"} + node_memory_Buffers_bytes{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Total')
             + prometheus.withDatasource('$Datasource'),
 
-             prometheus.withExpr('node_memory_MemAvailable_bytes{node=~\"$_worker_node\"}')
+             prometheus.withExpr('node_memory_MemAvailable_bytes{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('Total')
@@ -234,16 +236,16 @@ local prometheus = g.query.prometheus;
            ]
     },
 
-    DiskThroughput: {
+    diskThroughput: {
         query():
             [
-                prometheus.withExpr('rate(node_disk_read_bytes_total{device=~\"$block_device\",node=~\"$_worker_node\"}[$interval])')
+                prometheus.withExpr('rate(node_disk_read_bytes_total{device=~"$block_device",node=~"$_worker_node"}[$interval])')
                 + prometheus.withFormat('time_series')
                 + prometheus.withIntervalFactor(2)
                 + prometheus.withLegendFormat('{{ device }} - read')
                 + prometheus.withDatasource('$Datasource') ,
 
-                prometheus.withExpr('rate(node_disk_written_bytes_total{device=~\"$block_device\",node=~\"$_worker_node\"}[$interval])')
+                prometheus.withExpr('rate(node_disk_written_bytes_total{device=~"$block_device",node=~"$_worker_node"}[$interval])')
                 + prometheus.withFormat('time_series')
                 + prometheus.withIntervalFactor(2)
                 + prometheus.withLegendFormat('{{ device }} - write')
@@ -251,16 +253,16 @@ local prometheus = g.query.prometheus;
             ]
     },
 
-    DiskIOPS: {
+    diskIOPS: {
         query():
             [
-                prometheus.withExpr('rate(node_disk_reads_completed_total{device=~\"$block_device\",node=~\"$_worker_node\"}[$interval])')
+                prometheus.withExpr('rate(node_disk_reads_completed_total{device=~"$block_device",node=~"$_worker_node"}[$interval])')
                 + prometheus.withFormat('time_series')
                 + prometheus.withIntervalFactor(2)
                 + prometheus.withLegendFormat('{{ device }} - read')
                 + prometheus.withDatasource('$Datasource') ,
 
-                prometheus.withExpr('rate(node_disk_writes_completed_total{device=~\"$block_device\",node=~\"$_worker_node\"}[$interval])')
+                prometheus.withExpr('rate(node_disk_writes_completed_total{device=~"$block_device",node=~"$_worker_node"}[$interval])')
                 + prometheus.withFormat('time_series')
                 + prometheus.withIntervalFactor(2)
                 + prometheus.withLegendFormat('{{ device }} - write')
@@ -271,13 +273,13 @@ local prometheus = g.query.prometheus;
     networkUtilization: {
         query(): 
         [
-            prometheus.withExpr('rate(node_network_receive_bytes_total{node=~\"$_worker_node\",device=~\"$net_device\"}[$interval]) * 8')
+            prometheus.withExpr('rate(node_network_receive_bytes_total{node=~"$_worker_node",device=~"$net_device"}[$interval]) * 8')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{instance}} - {{device}} - RX')
             + prometheus.withDatasource('$Datasource'),
 
-            prometheus.withExpr('rate(node_network_transmit_bytes_total{node=~\"$_worker_node\",device=~\"$net_device\"}[$interval]) * 8')
+            prometheus.withExpr('rate(node_network_transmit_bytes_total{node=~"$_worker_node",device=~"$net_device"}[$interval]) * 8')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{instance}} - {{device}} - TX')
@@ -288,13 +290,13 @@ local prometheus = g.query.prometheus;
     networkPackets: {
         query():
         [
-            prometheus.withExpr('rate(node_network_receive_packets_total{node=~\"$_worker_node\",device=~\"$net_device\"}[$interval])')
+            prometheus.withExpr('rate(node_network_receive_packets_total{node=~"$_worker_node",device=~"$net_device"}[$interval])')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{instance}} - {{device}} - RX')
             + prometheus.withDatasource('$Datasource'),
 
-           prometheus.withExpr('rate(node_network_transmit_packets_total{node=~\"$_worker_node\",device=~\"$net_device\"}[$interval])')
+           prometheus.withExpr('rate(node_network_transmit_packets_total{node=~"$_worker_node",device=~"$net_device"}[$interval])')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{instance}} - {{device}} - TX')
@@ -307,13 +309,13 @@ local prometheus = g.query.prometheus;
     networkPacketDrop: {
         query():
         [
-            prometheus.withExpr('topk(10, rate(node_network_receive_drop_total{node=~\"$_worker_node\"}[$interval]))')
+            prometheus.withExpr('topk(10, rate(node_network_receive_drop_total{node=~"$_worker_node"}[$interval]))')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('rx-drop-{{ device }}')
             + prometheus.withDatasource('$Datasource'),
 
-            prometheus.withExpr('topk(10,rate(node_network_transmit_drop_total{node=~\"$_worker_node\"}[$interval]))')
+            prometheus.withExpr('topk(10,rate(node_network_transmit_drop_total{node=~"$_worker_node"}[$interval]))')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('tx-drop-{{ device }}')
@@ -324,13 +326,13 @@ local prometheus = g.query.prometheus;
     conntrackStats: {
         query():
         [
-            prometheus.withExpr('node_nf_conntrack_entries{node=~\"$_worker_node\"}')
+            prometheus.withExpr('node_nf_conntrack_entries{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('conntrack_entries')
             + prometheus.withDatasource('$Datasource'),
 
-            prometheus.withExpr('node_nf_conntrack_entries_limit{node=~\"$_worker_node\"}')
+            prometheus.withExpr('node_nf_conntrack_entries_limit{node=~"$_worker_node"}')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('conntrack_limit')
@@ -340,7 +342,7 @@ local prometheus = g.query.prometheus;
 
     top10ContainerCPUNode: {
         query():
-            prometheus.withExpr('topk(10, sum(irate(container_cpu_usage_seconds_total{container!=\"POD\",name!=\"\",instance=~\"$_worker_node\",namespace!=\"\",namespace=~\"$namespace\"}[$interval])) by (pod,container,namespace,name,service) * 100)')
+            prometheus.withExpr('topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD", instance=~"$_worker_node", namespace=~"$namespace"}[$interval])) by (pod, container) * 100)')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ pod }}: {{ container }}')
@@ -349,16 +351,10 @@ local prometheus = g.query.prometheus;
 
     top10ContainerRSSNode: {
         query():
-            prometheus.withExpr('topk(10, container_memory_rss{container!=\"POD\",name!=\"\",instance=~\"$_worker_node\",namespace!=\"\",namespace=~\"$namespace\"})')
+            prometheus.withExpr('topk(10, container_memory_rss{container!="POD",name!="",instance=~"$_worker_node",namespace!="",namespace=~"$namespace"})')
             + prometheus.withFormat('time_series')
             + prometheus.withIntervalFactor(2)
             + prometheus.withLegendFormat('{{ pod }}: {{ container }}')
             + prometheus.withDatasource('$Datasource')
     },
-
-
-
-
-
-
 }

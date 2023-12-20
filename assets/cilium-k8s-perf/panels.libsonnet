@@ -48,15 +48,6 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + options.legend.withPlacement('bottom')
             + options.legend.withDisplayMode('table')
             + options.legend.withCalcs([])
-        
-
-
-
-            
-
-
-
-      
     },
 
     stat: {
@@ -77,16 +68,11 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + options.withGraphMode("area")
             + options.text.withTitleSize(12),
 
-
         withclusterAgg(title, unit, targets, gridPos):
             self.base(title, unit, targets, gridPos)
             + options.reduceOptions.withCalcs([
                 'last',
             ])
             + stat.standardOptions.thresholds.withSteps([]),
-
     }
-
-
-
 }

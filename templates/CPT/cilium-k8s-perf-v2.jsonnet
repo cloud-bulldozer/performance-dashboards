@@ -51,16 +51,15 @@ g.dashboard.new('Cilium k8s Performance')
     panels.timeSeries.withClusterAgg('Goroutines count', 'none', queries.goroutinesCount.query(), { x: 12, y: 53, w: 12, h: 8 }),
     panels.timeSeries.withCiliumAgg('Pod Distribution', 'none', queries.podDistribution.query(), { x: 0, y: 61, w: 24, h: 8 }),
   ]),
-
   g.panel.row.new('Node: $_worker_node')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withRepeat('_worker_node')
   + g.panel.row.withPanels([
     panels.timeSeries.withCiliumAgg('CPU Basic: $_worker_node', 'percent', queries.CPUBasic.query(), { x: 0, y: 70, w: 12, h: 8 }),
-    panels.timeSeries.withCiliumAgg('System Memory: $_worker_node', 'bytes', queries.SystemMemory.query(), { x: 12, y: 70, w: 12, h: 8 }),
-    panels.timeSeries.withCiliumAgg('Disk throughput: $_worker_node', 'Bps', queries.DiskThroughput.query(), { x: 0, y: 78, w: 12, h: 8 }),
-    panels.timeSeries.withCiliumAgg('Disk IOPS: $_worker_node', 'iops', queries.DiskIOPS.query(), { x: 12, y: 78, w: 12, h: 8 }),
+    panels.timeSeries.withCiliumAgg('System Memory: $_worker_node', 'bytes', queries.systemMemory.query(), { x: 12, y: 70, w: 12, h: 8 }),
+    panels.timeSeries.withCiliumAgg('Disk throughput: $_worker_node', 'Bps', queries.diskThroughput.query(), { x: 0, y: 78, w: 12, h: 8 }),
+    panels.timeSeries.withCiliumAgg('Disk IOPS: $_worker_node', 'iops', queries.diskIOPS.query(), { x: 12, y: 78, w: 12, h: 8 }),
     panels.timeSeries.withCiliumAgg('Network Utilization: $_worker_node', 'bps', queries.networkUtilization.query(), { x: 0, y: 86, w: 12, h: 8 }),
     panels.timeSeries.withCiliumAgg('Network Packets: $_worker_node', 'pps', queries.networkPackets.query(), { x: 12, y: 86, w: 12, h: 8 }),
     panels.timeSeries.withCiliumAgg('Network packets drop: $_worker_node', 'pps', queries.networkPacketDrop.query(), { x: 0, y: 94, w: 12, h: 8 }),
@@ -68,6 +67,4 @@ g.dashboard.new('Cilium k8s Performance')
     panels.timeSeries.withCiliumAgg('Top 10 container CPU: $_worker_node', 'percent', queries.top10ContainerCPUNode.query(), { x: 0, y: 102, w: 12, h: 8 }),
     panels.timeSeries.withCiliumAgg('Top 10 container RSS: $_worker_node', 'bytes', queries.top10ContainerRSSNode.query(), { x: 12, y: 102, w: 12, h: 8 }),
   ]),
-
-
 ])
