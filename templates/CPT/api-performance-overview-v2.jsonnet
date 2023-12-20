@@ -47,6 +47,6 @@ g.dashboard.new('API-Performance')
   panels.timeSeries.withRequestWaitDurationAggregations('p&f - request wait duration - 99th quantile', 'short', queries.requestWaitDuration99QuatilePandF.query(), { x: 0, y: 56, w: 24, h: 8 }),
   panels.timeSeries.withCommonAggregations('p&f - request dispatch rate', 'short', queries.requestDispatchRatePandF.query(), { x: 0, y: 64, w: 12, h: 8 }),
   panels.timeSeries.withCommonAggregations('p&f - request execution duration', 'short', queries.requestExecutionDurationPandF.query(), { x: 12, y: 64, w: 12, h: 8 }),
-  panels.timeSeries.withCommonAggregations('p&f - pending in queue', 'short', queries.PendingInQueuePandF.query(), { x: 0, y: 72, w: 12, h: 8 }),
-  panels.timeSeries.withCommonAggregations('p&f - concurrency limit by kube-apiserver', 'short', queries.ConcurrencyLimitByKubeapiserverPandF.query(), { x: 12, y: 72, w: 12, h: 8 }),
+  panels.timeSeries.withCommonAggregations('p&f - pending in queue', 'short', queries.pendingInQueuePandF.query(), { x: 0, y: 72, w: 12, h: 8 }),
+  panels.timeSeries.withCommonAggregations('p&f - concurrency limit by kube-apiserver', 'short', queries.concurrencyLimitByKubeapiserverPandF.query(), { x: 12, y: 72, w: 12, h: 8 }),
 ])
