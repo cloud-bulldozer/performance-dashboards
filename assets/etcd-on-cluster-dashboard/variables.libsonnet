@@ -8,7 +8,5 @@ local var = g.dashboard.variable;
         + var.query.generalOptions.withLabel('Datasource')
         + var.query.withRefresh(1) 
         + var.query.selectionOptions.withMulti(false)
-        + var.query.selectionOptions.withIncludeAll(false),
-
-        
+        + var.query.selectionOptions.withIncludeAll(false),        
 }
