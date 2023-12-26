@@ -86,6 +86,19 @@ local suricataMemory = genericGraphLegendPanel('Suricata Memory(Running on Servi
   )
 );
 
+local dynaoneagentMem = genericGraphLegendPanel('OneAgent Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-oneagent-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
+
+local dynaoneagentCPU = genericGraphLegendPanel('OneAgent CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-oneagent-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
 
 // Overall stats on the management cluster
 
@@ -398,6 +411,34 @@ local request_duration_99th_quantile_by_resource = grafana.graphPanel.new(
   )
 );
 
+// Dynatrace on the management cluster
+local dynaactivegateMem = genericGraphLegendPanel('Active Gate Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~".*-activegate-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
+
+local dynaactivegateCPU = genericGraphLegendPanel('Active Gate CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~".*-activegate-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
+
+local opentelemetryMem = genericGraphLegendPanel('Opentelemetry Memory Usage', 'Cluster Prometheus', 'bytes').addTarget(
+  prometheus.target(
+    'sum(container_memory_rss{namespace=~"dynatrace",pod=~"opentelemetry-.*",container!=""}) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
+
+local opentelemetryCPU = genericGraphLegendPanel('Opentelemetry CPU Usage', 'Cluster Prometheus', 'percent').addTarget(
+  prometheus.target(
+    'sum(irate(container_cpu_usage_seconds_total{namespace=~"dynatrace", pod=~"opentelemetry-.*", container!~"POD|"}[2m])*100) by (node, namespace, pod)',
+    legendFormat='{{ node }}: {{ namespace }} : {{ pod }}',
+  )
+);
 
 // Management cluster metrics
 
@@ -1719,6 +1760,10 @@ grafana.dashboard.new(
     clusterOperatorsDegraded { gridPos: { x: 8, y: 52, w: 8, h: 8 } },
     FailedPods { gridPos: { x: 16, y: 52, w: 8, h: 8 } },
     alerts { gridPos: { x: 0, y: 60, w: 24, h: 8 } },
+    dynaactivegateMem { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
+    dynaactivegateCPU { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
+    opentelemetryCPU { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
+    opentelemetryMem { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
 
@@ -1753,6 +1798,8 @@ grafana.dashboard.new(
       nodeMemory { gridPos: { x: 12, y: 2, w: 12, h: 8 } },
       suricataCPU { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
       suricataMemory { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
+      dynaoneagentCPU { gridPos: { x: 0, y: 18, w: 12, h: 8 } },
+      dynaoneagentMem { gridPos: { x: 12, y: 18, w: 12, h: 8 } },
     ]
   ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } }
 )
