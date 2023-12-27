@@ -9,7 +9,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         base(title, unit, targets, gridPos):
             timeSeries.new(title)
             + timeSeries.queryOptions.withTargets(targets)
-            + timeSeries.datasource.withType('elasticsearch')
+            + timeSeries.datasource.withType('prometheus')
             + timeSeries.datasource.withUid('$Datasource')
             + timeSeries.standardOptions.withUnit(unit)
             + timeSeries.gridPos.withX(gridPos.x)
