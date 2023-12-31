@@ -147,7 +147,14 @@ function grafana() {
   if [[ ! $delete ]]; then
     echo ""
     echo -e "\033[32mWaiting for dittybopper deployment to be available...\033[0m"
-    $k8s_cmd wait --for=condition=available -n $namespace deployment/dittybopper --timeout=60s
+    if $k8s_cmd wait --for=condition=available -n $namespace deployment/dittybopper --timeout=60s; then
+      exit 0
+    else
+      $k8s_cmd get pods -n $namespace
+      $k8s_cmd get deploy -n $namespace
+      $k8s_cmd logs -l app=dittybopper --max-log-requests=100 -n $namespace --all-containers=true
+      exit 1
+    fi
   fi
 }
 
