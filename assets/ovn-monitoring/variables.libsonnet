@@ -40,7 +40,5 @@ local var = g.dashboard.variable;
         + var.query.generalOptions.withLabel('OVNKube-Node')
         + var.query.selectionOptions.withMulti(true)
         + var.query.selectionOptions.withIncludeAll(false)
-        + var.query.withRefresh(1),
-
-    
+        + var.query.withRefresh(1), 
 }
