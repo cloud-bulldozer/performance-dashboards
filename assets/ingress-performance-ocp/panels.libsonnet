@@ -21,17 +21,13 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.withShowThresholdMarkers(true)
       + options.text.withTitleSize(12),
       
-
-    
      withAvgRPS(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
       + options.reduceOptions.withCalcs([
         'stdDev'
-        
       ])
       + options.reduceOptions.withValues(true)
       + options.reduceOptions.withFields('/^CV$/'),
-
 
       withAvgTimeThresholds(title, unit, targets, gridPos):
         self.withAvgRPS(title, unit, targets, gridPos)
@@ -58,11 +54,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
                 "replaceFields": false
               }
             }
-        ])
-        ,
-
+        ]),
   },
-
 
   bargauge: {
     local bargauge = g.panel.barGauge,
@@ -86,12 +79,10 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.withMinVizHeight(10)
       + options.text.withTitleSize(12),
 
-
     withAvgRPS(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
       + options.reduceOptions.withCalcs([
         'lastNotNull',
-        
       ]),
 
     withAvgTimeThresholds(title, unit, targets, gridPos):
@@ -100,11 +91,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + bargauge.standardOptions.thresholds.withSteps([{"value": null,"color": "green"}, {"value": 80,"color": "red"}])
       + bargauge.standardOptions.color.withMode("palette-classic")
       + bargauge.standardOptions.withDecimals(2)
-      + bargauge.standardOptions.withMin(0)
-      
+      + bargauge.standardOptions.withMin(0),  
   },
-
-
 
   timeSeries: {
     local timeSeries = g.panel.timeSeries,
@@ -142,16 +130,12 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.legend.withCalcs([
         'lastNotNull',
         'mean',
-        
       ])
       + custom.withPointSize(9)
       + custom.withLineWidth(6)
       + custom.withDrawStyle('points')
       + custom.withAxisSoftMin(0)
       + custom.lineStyle.withFill('solid'),
-
-            
-    
   },
 
   stat: {
@@ -171,7 +155,6 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.withJustifyMode("auto")
       + options.withGraphMode("none")
       + options.text.withTitleSize(12),
-
 
     withAvgCalcs(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
@@ -198,8 +181,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         ],
         "fields": {}
       }
-    }
-      ]),
+    }]),
 
     withAvgTimeThresholds(title,unit,targets,gridPos):
       self.withAvgCalcs(title, unit, targets, gridPos)
@@ -527,9 +509,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
           "write_errors": ""
         }
       }
-    }
-      ])
-      ,
+    }]),
 
     withWorkloadSummary(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
@@ -800,7 +780,4 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
     }
      ])
     },
-
-    
-
 }

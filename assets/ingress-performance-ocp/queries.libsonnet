@@ -26,13 +26,11 @@ local elasticsearch = g.query.elasticsearch;
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("total_avg_rps")
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("1")
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
-                // + elasticsearch.metrics.ExtendedStats.withMeta()
             ])
             + elasticsearch.withQuery("uuid.keyword: $all_uuids AND config.termination.keyword: $termination AND ocpMajorVersion.keyword: $ocpMajorVersion")
             + elasticsearch.withTimeField('timestamp')
-
-
     },
+
     avgRPS: {
         query():
             elasticsearch.withAlias("{{ocpMajorVersion.keyword}}")
@@ -58,8 +56,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination AND ocpMajorVersion.keyword: $ocpMajorVersion")
             + elasticsearch.withTimeField('timestamp')
-
-
     },
 
     avgTime: {
@@ -88,7 +84,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $all_uuids AND config.termination.keyword: $termination AND ocpMajorVersion.keyword: $ocpMajorVersion")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     workloadSummary: {
@@ -99,11 +94,9 @@ local elasticsearch = g.query.elasticsearch;
             + elasticsearch.withMetrics([
                elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId("1")
                 + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType("raw_data")
-
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     trendRPS: {
@@ -125,19 +118,14 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("total_avg_rps")
             + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("1")
-            // + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript("_value * 100")
             + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
-
-
     },
 
     latencyTrend: {
@@ -159,7 +147,6 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("$latency_metric")
@@ -173,7 +160,6 @@ local elasticsearch = g.query.elasticsearch;
     terminationRPS: {
         query():
             elasticsearch.withAlias("")
-            
             + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField("$compare_by")
                 + elasticsearch.bucketAggs.Terms.withId("7")
@@ -189,7 +175,6 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("total_avg_rps")
@@ -198,7 +183,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     latencyTermination: {
@@ -220,7 +204,6 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("$latency_metric")
@@ -229,7 +212,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     HAProxyAvgCPUUsage: {
@@ -251,7 +233,6 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("infra_metrics.avg_cpu_usage_router_pods")
@@ -261,7 +242,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     InfraNodesCPUUsageEdge: {
@@ -283,7 +263,6 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("0")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges("0"),
-
             ])
             + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("infra_metrics.avg_cpu_usage_router_nodes")
@@ -293,7 +272,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     qualityRPS: {
@@ -326,7 +304,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
     },
 
     dataQuality: {
@@ -359,9 +336,6 @@ local elasticsearch = g.query.elasticsearch;
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-
-
-
     },
 
     rawData: {
@@ -371,15 +345,9 @@ local elasticsearch = g.query.elasticsearch;
             + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId("1")
                 +elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize("500")
-                + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
-
-                
+                + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),  
             ])
             + elasticsearch.withQuery("uuid.keyword: $uuid AND config.termination.keyword: $termination")
             + elasticsearch.withTimeField('timestamp')
-    }
-
-    
-
-
+    },
 }

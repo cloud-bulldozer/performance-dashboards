@@ -14,7 +14,7 @@ g.dashboard.new('Ingress-perf')
 + g.dashboard.timepicker.withRefreshIntervals(['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'])
 + g.dashboard.timepicker.withTimeOptions(['5m', '15m', '1h', '6h', '12h', '24h', '2d', '7d', '30d'])
 + g.dashboard.withRefresh('')
-+ g.dashboard.withEditable(true)
++ g.dashboard.withEditable(false)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.Datasource,
@@ -37,14 +37,12 @@ g.dashboard.new('Ingress-perf')
     panels.stat.withAvgThresholds('Average RPS - $termination', 'reqps', queries.avgRPSAll.query(), { x: 0, y: 1, w: 6, h: 3 }),
     panels.stat.withAvgTimeThresholds('$latency_metric - $termination', 'µs', queries.avgTime.query(), { x: 0, y: 1, w: 6, h: 3 }),
   ]),
-
   g.panel.row.new('Workloads summary')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.table.withWorkloadSummary('', '', queries.workloadSummary.query(), { x: 0, y: 2, w: 24, h: 6 }),
   ]),
-
   g.panel.row.new('$termination')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
@@ -59,7 +57,5 @@ g.dashboard.new('Ingress-perf')
     panels.gauge.withAvgTimeThresholds('RPS data quality', 'none', queries.qualityRPS.query(), { x: 0, y: 30, w: 12, h: 4 }),
     panels.gauge.withAvgTimeThresholds('Data quality: $latency_metric', 'none', queries.dataQuality.query(), { x: 12, y: 30, w: 12, h: 4 }),
     panels.table.withTerminationRawData('$termination raw data', 'short', queries.rawData.query(), { x: 8, y: 118, w: 24, h: 8 }),
-
   ]),
-
 ])
