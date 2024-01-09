@@ -3,7 +3,7 @@ local queries = import '../../assets/api-performance-overview/queries.libsonnet'
 local variables = import '../../assets/api-performance-overview/variables.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
-g.dashboard.new('API-Performance')
+g.dashboard.new('API Performance Dashboard')
 + g.dashboard.withDescription(|||
   Dashboard for Api-performance-overview
 |||)
@@ -14,7 +14,7 @@ g.dashboard.new('API-Performance')
 + g.dashboard.timepicker.withRefreshIntervals(['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'])
 + g.dashboard.timepicker.withTimeOptions(['5m', '15m', '1h', '6h', '12h', '24h', '2d', '7d', '30d'])
 + g.dashboard.withRefresh('30s')
-+ g.dashboard.withEditable(true)
++ g.dashboard.withEditable(false)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.Datasource,
@@ -27,9 +27,7 @@ g.dashboard.new('API-Performance')
   variables.priorityLevel,
   variables.interval,
 ])
-
 + g.dashboard.withPanels([
-
   panels.timeSeries.withCommonAggregations('request duration - 99th quantile', 'short', queries.requestDuration99thQuantile.query(), { x: 0, y: 0, w: 12, h: 8 }),
   panels.timeSeries.withCommonAggregations('request rate - by instance', 'short', queries.requestRateByInstance.query(), { x: 12, y: 0, w: 12, h: 8 }),
   panels.timeSeries.withCommonAggregations('request duration - 99th quantile - by resource', 'short', queries.requestDuarationByResource.query(), { x: 0, y: 8, w: 12, h: 8 }),

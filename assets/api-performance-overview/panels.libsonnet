@@ -53,9 +53,6 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
                 'mean',
                 'max',
                 'lastNotNull'
-            ])
-
-            
-        
+            ])  
     }
 }
