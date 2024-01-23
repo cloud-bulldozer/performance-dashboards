@@ -50,7 +50,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + options.tooltip.withMode('multi'),
             
         withRequestWaitDurationAggregations(title, unit, targets, gridPos):
-            self.withCommonAggregations(title, unit, targets, gridPos)
+            self.legendRightPlacement(title, unit, targets, gridPos)
             + options.legend.withCalcs([
                 'mean',
                 'max',
