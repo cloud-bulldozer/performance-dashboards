@@ -29,7 +29,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + custom.stacking.withMode("none")
             + custom.withShowPoints('never'),
 
-        withCommonAggregations(title, unit, targets, gridPos):
+        legendRightPlacement(title, unit, targets, gridPos):
             self.base(title, unit, targets, gridPos)
             + options.legend.withCalcs([
                 'lastNotNull'
@@ -41,7 +41,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + options.legend.withAsTable(true)
             + options.tooltip.withMode('multi'),
 
-        withReadWriteSettings(title, unit, targets, gridPos):
+        legendBottomPlacement(title, unit, targets, gridPos):
             self.base(title, unit, targets, gridPos)
             + options.tooltip.withMode('multi')
             + options.legend.withShowLegend(true)
