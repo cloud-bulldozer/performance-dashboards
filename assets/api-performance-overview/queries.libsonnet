@@ -3,7 +3,7 @@ local variables = import './variables.libsonnet';
 local prometheus = g.query.prometheus;
 
 {
-    requestDuration99thQuantile: {
+    request_duration_99th_quantile: {
         query():
             prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(verb,le))')
             + prometheus.withFormat('time_series')

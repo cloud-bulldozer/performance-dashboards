@@ -37,6 +37,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + options.legend.withShowLegend(true)
             + options.legend.withDisplayMode('table')
             + options.legend.withPlacement('right')
+            + options.legend.withSortDesc(true)
+            + options.legend.withAsTable(true)
             + options.tooltip.withMode('multi'),
 
         withReadWriteSettings(title, unit, targets, gridPos):
