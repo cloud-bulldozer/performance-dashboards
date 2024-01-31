@@ -27,17 +27,20 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
             + custom.withSpanNulls(false)
             + custom.stacking.withGroup("A")
             + custom.stacking.withMode("none")
-            + custom.withShowPoints('never'),
+            + custom.withShowPoints('never')
+            + options.tooltip.withSort('desc')
+            + timeSeries.queryOptions.withTimeFrom(null)
+            + timeSeries.queryOptions.withTimeShift(null)
+            + options.legend.withSortDesc(true),
 
         legendRightPlacement(title, unit, targets, gridPos):
             self.base(title, unit, targets, gridPos)
             + options.legend.withCalcs([
-                'lastNotNull'
+                'max'
             ])
             + options.legend.withShowLegend(true)
             + options.legend.withDisplayMode('table')
             + options.legend.withPlacement('right')
-            + options.legend.withSortDesc(true)
             + options.legend.withAsTable(true)
             + options.tooltip.withMode('multi'),
 
