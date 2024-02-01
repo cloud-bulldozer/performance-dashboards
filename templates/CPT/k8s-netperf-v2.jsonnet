@@ -24,8 +24,11 @@ g.dashboard.new('k8s-netperf')
   variables.latency_profile,
   variables.messageSize,
   variables.driver,
+  variables.compare_by,
 ])
 + g.dashboard.withPanels([
+  panels.row.base('Workload Summary', '', { x: 0, y: 0, w: 24, h: 0 }),
+  panels.table.workloadSummary('', queries.summary.query('$throughput_profile', 'throughput'), { x: 0, y: 0, w: 24, h: 11 }),
   panels.row.base('$latency_profile', 'latency_profile', { x: 0, y: 0, w: 24, h: 1 }),
   panels.timeSeries.base('$latency_profile - $driver - $messageSize', queries.all.query('$latency_profile', 'latency'), { x: 0, y: 0, w: 24, h: 8 }),
   panels.row.base('$throughput_profile', 'throughput_profile', { x: 0, y: 9, w: 24, h: 1 }),
@@ -33,4 +36,16 @@ g.dashboard.new('k8s-netperf')
   panels.row.base('Parallelism $parallelism', 'parallelism', { x: 0, y: 18, w: 24, h: 1 }),
   panels.table.base('Throughput - Parallelism: $parallelism', queries.parallelismAll.query('$throughput_profile', 'throughput'), { x: 0, y: 19, w: 24, h: 11 }),
   panels.table.withLatencyOverrides('Latency - Parallelism: $parallelism', queries.parallelismAll.query('$latency_profile', 'latency'), { x: 0, y: 19, w: 24, h: 11 }),
+
+  panels.row.base('Node to Node', '', { x: 0, y: 20, w: 24, h: 1 }),
+  panels.barGauge.withThroughput('$throughput_profile - $driver - $messageSize', queries.metricCompare.query('TCP_STREAM', 'throughput', true, false), { x: 0, y: 21, w: 11, h: 11 }),
+  panels.barGauge.withLatency('Latency - $driver - $messageSize', queries.metricCompare.query('TCP_RR', 'latency', true, false), { x: 0, y: 21, w: 11, h: 11 }),
+
+  panels.row.base('Pod to Pod', '', { x: 0, y: 22, w: 24, h: 1 }),
+  panels.barGauge.withThroughput('$throughput_profile - $driver - $messageSize', queries.metricCompare.query('TCP_STREAM', 'throughput', false, false), { x: 0, y: 23, w: 11, h: 11 }),
+  panels.barGauge.withLatency('Latency - $driver - $messageSize', queries.metricCompare.query('TCP_RR', 'latency', false, false), { x: 0, y: 23, w: 11, h: 11 }),
+
+  panels.row.base('Pod to Pod via Service', '', { x: 0, y: 24, w: 24, h: 1 }),
+  panels.barGauge.withThroughput('$throughput_profile - $driver - $messageSize', queries.metricCompare.query('TCP_STREAM', 'throughput', false, true), { x: 0, y: 25, w: 11, h: 11 }),
+  panels.barGauge.withLatency('Latency - $driver - $messageSize', queries.metricCompare.query('TCP_RR', 'latency', false, true), { x: 0, y: 25, w: 11, h: 11 }),
 ])
