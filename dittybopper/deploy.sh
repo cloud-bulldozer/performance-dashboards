@@ -37,7 +37,6 @@ END
 }
 
 # Set default template variables
-
 export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
 export GRAFANA_URL="http://admin:${GRAFANA_ADMIN_PASSWORD}@localhost:3000"
@@ -97,7 +96,7 @@ else
 fi
 
 
-      echo "${dash_import[@]}"
+echo "${dash_import[@]}"
 echo -e "\033[32m
     ____  _ __  __        __
    / __ \(_) /_/ /___  __/ /_  ____  ____  ____  ___  _____
@@ -130,7 +129,7 @@ else
   exit 1
 fi
 
-#Identify Hypershift Management Cluster
+# Identify Hypershift Management Cluster
 if [ $($k8s_cmd get crd hostedclusters.hypershift.openshift.io 2>/dev/null | wc -l) -ne 0 ] ; then
   echo "Detected Hypershift Management Cluster"
   export HYPERSHIFT_MANAGEMENT_CLUSTER="yes"
@@ -148,7 +147,7 @@ function grafana() {
     echo ""
     echo -e "\033[32mWaiting for dittybopper deployment to be available...\033[0m"
     if $k8s_cmd wait --for=condition=available -n $namespace deployment/dittybopper --timeout=60s; then
-      exit 0
+      return 0
     else
       $k8s_cmd get pods -n $namespace
       $k8s_cmd get deploy -n $namespace
@@ -159,6 +158,7 @@ function grafana() {
 }
 
 function dash_import(){
+  sleep 5
   echo -e "\033[32mImporting dashboards...\033[0m"
   for dash in ${dash_import[@]}; do
     if [[ $dash =~ ^http ]]; then
@@ -170,9 +170,19 @@ function dash_import(){
       dashfile=$dash
     fi
     dashboard=$(cat ${dashfile})
-    echo "{\"dashboard\": ${dashboard}, \"overwrite\": true}" | \
-    curl -Ss -XPOST -H "Content-Type: application/json" -H "Accept: application/json" -d@- \
-    "http://admin:${GRAFANA_ADMIN_PASSWORD}@${dittybopper_route}/api/dashboards/db" -o /dev/null
+    dashboard_request="{\"dashboard\": ${dashboard}, \"overwrite\": true}"
+    response_code=$(curl -Ss -w "%{http_code}" -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "${dashboard_request}" \
+    "http://admin:${GRAFANA_ADMIN_PASSWORD}@${dittybopper_route}/api/dashboards/db" -o /tmp/resp.txt)
+    if [[ $response_code != "200" ]]; then
+      echo ""
+      echo -e "\033[31mFailed to import dashboard ${dash}\033[0m"
+      cat  /tmp/resp.txt
+      echo ""
+      echo -e "\033[31mYou can find the above output in /tmp/resp.txt\033[0m"
+      exit 1
+    else
+      echo -e "\033[32mImported dashboard ${dash}\033[0m"
+    fi
   done
 }
 
