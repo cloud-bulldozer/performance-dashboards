@@ -3,7 +3,7 @@ local queries = import '../../assets/k8s-perf/queries.libsonnet';
 local variables = import '../../assets/k8s-perf/variables.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
-g.dashboard.new('k8s Performance')
+g.dashboard.new('k8s Performance dashboard')
 + g.dashboard.time.withFrom('now-1h')
 + g.dashboard.time.withTo('now')
 + g.dashboard.withTimezone('utc')
