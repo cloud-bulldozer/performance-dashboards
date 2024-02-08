@@ -5,7 +5,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 
 g.dashboard.new('Public - UPerf Results dashboard')
 + g.dashboard.withTags(['network', 'performance'])
-+ g.dashboard.time.withFrom('now/y')
++ g.dashboard.time.withFrom('now-1h')
 + g.dashboard.time.withTo('now')
 + g.dashboard.withTimezone('utc')
 + g.dashboard.timepicker.withRefreshIntervals(['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'])
