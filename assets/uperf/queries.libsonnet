@@ -88,8 +88,7 @@ local elasticsearch = g.query.elasticsearch;
 
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("norm_ops")
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("6")
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.script.withInline('_value * 8'),
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
 
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("norm_ltcy")
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId("7")

@@ -81,7 +81,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
                     "properties": [
                     {
                         "id": "unit",
-                        "value": "Bps"
+                        "value": ""
                     },
                     {
                         "id": "custom.align",
