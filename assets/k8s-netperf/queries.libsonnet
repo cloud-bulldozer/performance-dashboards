@@ -3,7 +3,7 @@ local elasticsearch = g.query.elasticsearch;
 
 {
   all: {
-    query(metric, aggregationMetric): 
+    query(metric, aggregationMetric):
         elasticsearch.withAlias("{{metadata.ocpVersion.keyword}} hostNetwork={{hostNetwork}} procs={{parallelism}}")
         + elasticsearch.withBucketAggs([
           elasticsearch.bucketAggs.Terms.withField("messageSize")
@@ -79,7 +79,7 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withTimeField('timestamp')
   },
   parallelismAll: {
-    query(metric, aggregationMetric): 
+    query(metric, aggregationMetric):
         elasticsearch.withAlias("")
         + elasticsearch.withBucketAggs([
           elasticsearch.bucketAggs.Terms.withField("uuid.keyword")
@@ -161,4 +161,52 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.withQuery('uuid: $uuid AND parallelism: $parallelism AND profile: ' + metric + ' AND messageSize: $messageSize AND driver.keyword: $driver AND metadata.platform: $platform AND hostNetwork: $hostNetwork AND service: $service')
         + elasticsearch.withTimeField('timestamp')
   },
+  summary: {
+    query(metric, aggregationMetric):
+      elasticsearch.withAlias("")
+      + elasticsearch.withBucketAggs([
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.RawData.withHide(false)
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId("1")
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType("raw_data")
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize("500")
+      ])
+      + elasticsearch.withQuery('uuid: $uuid AND parallelism: $parallelism AND profile: ' + metric + ' AND messageSize: $messageSize AND driver.keyword: $driver AND metadata.platform: $platform AND hostNetwork: $hostNetwork AND service: $service')
+      + elasticsearch.withTimeField('timestamp')
+  },
+  metricCompare: {
+    query(metric, aggregationMetric, hostNetwork, service):
+      elasticsearch.withAlias("{{$compare_by}} Procs: {{parallelism}}")
+      + elasticsearch.withBucketAggs([
+        elasticsearch.bucketAggs.Terms.withField("parallelism")
+        + elasticsearch.bucketAggs.Terms.withId("1")
+        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+        + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+        + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.Terms.settings.withSize("0"),
+        elasticsearch.bucketAggs.Terms.withField("$compare_by")
+        + elasticsearch.bucketAggs.Terms.withId("2")
+        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+        + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+        + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.Terms.settings.withSize("10"),
+        elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+        + elasticsearch.bucketAggs.DateHistogram.withId("3")
+        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount("1")
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.Average.withField(aggregationMetric)
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId("1")
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType("avg")
+      ])
+        + elasticsearch.withQuery('uuid: $uuid AND parallelism: $parallelism AND profile: ' + metric + ' AND messageSize: $messageSize AND driver.keyword: $driver AND hostNetwork: ' + hostNetwork + ' AND service: ' + service + ' AND acrossAZ: false' )
+        + elasticsearch.withTimeField('timestamp')
+  }
 }
