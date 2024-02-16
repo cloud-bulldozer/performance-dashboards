@@ -13,7 +13,7 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(0)
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(null),
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
             ])
             + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField("tps")
@@ -44,7 +44,7 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(0)
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(null)
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0)
             ])
             + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("tps_incl_con_est")
@@ -66,7 +66,7 @@ local elasticsearch = g.query.elasticsearch;
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(0)
                 + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone("utc")
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(null)
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0)
             ])
             + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField("latency_ms")

@@ -28,5 +28,4 @@ g.dashboard.new('Pgbench')
   panels.timeSeries.avg_tps('Overall Average TPS Per Run', 'ops', queries.avg_tps.query(), { x: 12, y: 0, w: 12, h: 9 }),
   panels.heatmap.base('Latency Report', 'ms', queries.latency_report.query(), { x: 0, y: 9, w: 12, h: 9 }),
   panels.table.base('Result Summary', queries.results.query(), { x: 12, y: 9, w: 12, h: 9 }),
-
 ])
