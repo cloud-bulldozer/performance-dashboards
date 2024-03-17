@@ -69,7 +69,7 @@ rm -rf bin rendered tmp templates/grafonnet-lib
 
 ## Templates available
 
-The following templates are available:
+The following templates are available with latest grafonnet library integrated (i.e v2):
  
 - CPT
     - [x] Ingress Perf Dashboard.
