@@ -69,8 +69,7 @@ rm -rf bin rendered tmp templates/grafonnet-lib
 
 ## Templates available
 
-The following templates are available:
- 
+Dashboards Available after Migration to Grafonnet v10.1.0(latest): 
 - CPT
     - [x] Ingress Perf Dashboard.
     - [x] K8s Netperf Dashboard.
@@ -79,7 +78,7 @@ The following templates are available:
     - [x] API Performance Dashboard.
     - [x] Cilium K8s Performance Dashboard.
     - [x] Etcd Dashboard.
-    - [ ] Hypershift Performance Dashboard.
+    - [x] Hypershift Performance Dashboard.
     - [x] K8s Performance Dashboard.
     - [ ] Kube Burner Dashboard.
     - [x] OpenShift Performance Dashboard.
