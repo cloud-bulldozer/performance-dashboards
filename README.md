@@ -79,7 +79,7 @@ The following templates are available:
     - [x] API Performance Dashboard.
     - [x] Cilium K8s Performance Dashboard.
     - [x] Etcd Dashboard.
-    - [ ] Hypershift Performance Dashboard.
+    - [x] Hypershift Performance Dashboard.
     - [x] K8s Performance Dashboard.
     - [ ] Kube Burner Dashboard.
     - [x] OpenShift Performance Dashboard.
