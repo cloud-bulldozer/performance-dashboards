@@ -69,8 +69,7 @@ rm -rf bin rendered tmp templates/grafonnet-lib
 
 ## Templates available
 
-The following templates are available:
- 
+Dashboards Available after Migration to Grafonnet: 
 - CPT
     - [x] Ingress Perf Dashboard.
     - [x] K8s Netperf Dashboard.
