@@ -25,4 +25,4 @@ jobs:
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
     - name: Build & push syncer image
-      run: make build-syncer-image v2 push-syncer-image
+      run: make v2 build-syncer-image push-syncer-image
