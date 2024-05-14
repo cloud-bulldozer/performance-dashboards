@@ -373,7 +373,7 @@ local elasticsearch = g.query.elasticsearch;
           + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
           + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
           + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-          + elasticsearch.bucketAggs.Terms.settings.withSize("1"),
+          + elasticsearch.bucketAggs.Terms.settings.withSize("3"),
           elasticsearch.bucketAggs.Terms.withField("labels.container.keyword")
           + elasticsearch.bucketAggs.Terms.withId("4")
           + elasticsearch.bucketAggs.Terms.withType('terms')
