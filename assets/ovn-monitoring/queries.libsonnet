@@ -57,7 +57,7 @@ local generateTimeSeriesQuery(query, legend) = [
 
     ovnAnnotationLatency: {
         query():
-            generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[2m])) by (pod,le)) > 0','{{pod}} - Pod Annotation latency')
+            generateTimeSeriesQuery('histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m]))) > 0','{{pod}} - Pod Annotation latency')
     },
 
     ovnCNIAdd: {

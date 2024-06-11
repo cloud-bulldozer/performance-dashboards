@@ -168,7 +168,7 @@ local work_queue_unfinished_latency = genericGraphLegendPanel('OVNKube Master wo
 
 local ovnAnnotationLatency = genericGraphLegendPanel('Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[2m])) by (pod,le)) > 0',
+    'histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m]))) > 0',
     legendFormat='{{pod}} - Pod Annotation latency',
   )
 );
