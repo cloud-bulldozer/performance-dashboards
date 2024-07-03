@@ -30,7 +30,7 @@ g.dashboard.new('Openshift Performance')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
-    panels.timeSeries.generic('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 1, w: 24, h: 12 }),
+    panels.timeSeries.generic('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 1, w: 24, h: 4 }),
     panels.timeSeries.generic('99% CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 0, y: 13, w: 12, h: 8 }),
     panels.timeSeries.generic('99% CNI Request DEL Latency', 's', queries.ovnCNIDel.query(), { x: 12, y: 13, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('ovnkube-master CPU Usage', 'percent', queries.ovnKubeMasterCPU.query(), { x: 0, y: 21, w: 12, h: 8 }),
@@ -42,14 +42,17 @@ g.dashboard.new('Openshift Performance')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
-    panels.timeSeries.genericLegend('Prometheus Replica Memory usage', 'bytes', queries.promReplMemUsage.query(), { x: 0, y: 2, w: 24, h: 12 }),
+    panels.timeSeries.genericLegend('Prometheus Replica CPU', 'percent', queries.promReplCpuUsage.query(), { x: 0, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Prometheus Replica RSS', 'bytes', queries.promReplMemUsage.query(), { x: 12, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('metrics-server/prom-adapter CPU', 'percent', queries.metricsServerCpuUsage.query(), { x: 0, y: 10, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('metrics-server/prom-adapter RSS', 'bytes', queries.metricsServerMemUsage.query(), { x: 12, y: 10, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Stackrox')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
-    panels.timeSeries.genericLegend('Top 25 stackrox container RSS bytes', 'bytes', queries.stackroxMem.query(), { x: 0, y: 2, w: 24, h: 12 }),
-    panels.timeSeries.genericLegend('Top 25 stackrox container CPU percent', 'percent', queries.stackroxCPU.query(), { x: 0, y: 2, w: 24, h: 12 }),
+    panels.timeSeries.genericLegend('Top 25 stackrox container RSS bytes', 'bytes', queries.stackroxMem.query(), { x: 0, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Top 25 stackrox container CPU percent', 'percent', queries.stackroxCPU.query(), { x: 12, y: 2, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Cluster Kubelet')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
