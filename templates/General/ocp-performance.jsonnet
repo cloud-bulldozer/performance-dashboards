@@ -187,7 +187,7 @@ local stackroxMem = genericGraphLegendPanel('Top 25 stackrox container RSS bytes
 // OVN
 local ovnAnnotationLatency = genericGraphPanel('99% Pod Annotation Latency', 's').addTarget(
   prometheus.target(
-    'histogram_quantile(0.99, sum(rate(ovnkube_master_pod_creation_latency_seconds_bucket[$interval])) by (pod,le)) > 0',
+    'histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[$interval]))) > 0',
     legendFormat='{{pod}}',
   )
 );

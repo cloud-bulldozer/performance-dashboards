@@ -62,7 +62,7 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
 v2: all
 	@echo "Rendered the v2 dashboards with latest grafonnet library"
 
-build-syncer-image: build
+build-syncer-image: v2
 	podman build --platform=${PLATFORM} -f Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
 push-syncer-image:
