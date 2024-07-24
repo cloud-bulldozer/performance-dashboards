@@ -29,7 +29,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         'max',
         'min',
       ])
-      + options.legend.withSortBy('max')
+      + options.legend.withSortBy('Max')
       + options.legend.withSortDesc(true)
       + options.legend.withPlacement('bottom'),
   },

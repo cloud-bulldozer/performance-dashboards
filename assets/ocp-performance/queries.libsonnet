@@ -103,10 +103,25 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
         generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (node))', '{{node}}')
   },
+  promReplCpuUsage: {
+    query():
+        generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-0",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container) * 100', '{{pod}}')
+        + generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-1",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container) * 100', '{{pod}}')
+  },
   promReplMemUsage: {
     query():
         generateTimeSeriesQuery('sum(container_memory_rss{pod="prometheus-k8s-1",namespace!="",name!="",container="prometheus"}) by (pod)', '{{pod}}')
         + generateTimeSeriesQuery('sum(container_memory_rss{pod="prometheus-k8s-0",namespace!="",name!="",container="prometheus"}) by (pod)', '{{pod}}')
+  },
+  metricsServerCpuUsage: {
+    query():
+        generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{pod=~"metrics-server-.*",namespace!="",name!=""}[$interval])) by (pod,container) * 100', '{{pod}}')
+        + generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}[$interval])) by (pod,container) * 100', '{{pod}}')
+  },
+  metricsServerMemUsage: {
+    query():
+        generateTimeSeriesQuery('sum(container_memory_rss{pod=~"metrics-server-.*",namespace!="",name!=""}) by (pod)', '{{pod}}')
+        + generateTimeSeriesQuery('sum(container_memory_rss{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}) by (pod)', '{{pod}}')
   },
   kubeletCPU: {
     query():
