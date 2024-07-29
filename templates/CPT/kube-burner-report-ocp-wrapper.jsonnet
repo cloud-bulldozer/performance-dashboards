@@ -20,7 +20,7 @@ g.dashboard.new('Kube-burner Report - OCP wrapper')
   variables.Datasource,
   variables.platform,
   variables.sdn,
-  variables.workload,
+  variables.job,
   variables.nodes,
   variables.uuid,
   variables.master,
@@ -31,10 +31,10 @@ g.dashboard.new('Kube-burner Report - OCP wrapper')
 + g.dashboard.withPanels([
   panels.stat.withLastNotNullCalcs('Node count', 'none', queries.nodeCount.query(), { x: 0, y: 0, w: 4, h: 3 }),
   panels.stat.withLastNotNullCalcs('', '', queries.aggregatesCount.queries(), { x: 4, y: 0, w: 12, h: 3 }),
-  panels.stat.withFieldSummary('OpenShift version', '', '/^metadata\\.ocpVersion$/', queries.openshiftVersion.query(), { x: 16, y: 0, w: 6, h: 3 }),
+  panels.stat.withFieldSummary('OpenShift version', '', 'ocpVersion', queries.openshiftVersion.query(), { x: 16, y: 0, w: 6, h: 3 }),
   panels.stat.withFieldSummary('Etcd version', '', '/^labels\\.cluster_version$/', queries.openshiftVersion.query(), { x: 22, y: 0, w: 2, h: 3 }),
-  panels.table.withJobSummary('', '', queries.jobSummary.query(), { x: 0, y: 3, w: 24, h: 3 }),
-  panels.table.withClusterMetadata('', '', queries.clusterMetadata.query(), { x: 0, y: 6, w: 24, h: 3 }),
+  panels.table.withPlatformOverview('', '', queries.platformOverview.query(), { x: 0, y: 3, w: 24, h: 3 }),
+  panels.table.withJobSummary('', '', queries.jobSummary.query(), { x: 0, y: 6, w: 24, h: 3 }),
   panels.table.withAlerts('Alerts', '', queries.alerts.query(), { x: 0, y: 9, w: 24, h: 4 }),
   g.panel.row.new('Cluster status')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })

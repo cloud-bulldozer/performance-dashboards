@@ -33,16 +33,16 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('Cluster Type'),
 
-  benchmark:
-    var.query.new('benchmark', '{"find": "terms", "field": "benchmark.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND clusterType.keyword: $clusterType"}')
+  job:
+    var.query.new('job', '{"find": "terms", "field": "jobConfig.name.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND clusterType.keyword: $clusterType"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(false)
-    + var.query.generalOptions.withLabel('Benchmark'),
+    + var.query.generalOptions.withLabel('Job'),
 
   workerNodesCount:
-    var.query.new('workerNodesCount', '{"find": "terms", "field": "workerNodesCount", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND benchmark.keyword: $benchmark AND clusterType.keyword: $clusterType"}')
+    var.query.new('workerNodesCount', '{"find": "terms", "field": "workerNodesCount", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND jobConfig.name.keyword: $job AND clusterType.keyword: $clusterType"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
@@ -50,7 +50,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('Workers'),
 
   ocpMajorVersion:
-    var.query.new('ocpMajorVersion', '{"find": "terms", "field": "ocpMajorVersion.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND benchmark.keyword: $benchmark AND workerNodesCount: $workerNodesCount AND  clusterType.keyword: $clusterType"}')
+    var.query.new('ocpMajorVersion', '{"find": "terms", "field": "ocpMajorVersion.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND jobConfig.name.keyword: $job AND workerNodesCount: $workerNodesCount AND  clusterType.keyword: $clusterType"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(true)
@@ -58,7 +58,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('OCP Major'),
 
   uuid:
-    var.query.new('uuid', '{"find": "terms", "field": "uuid.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND benchmark.keyword: $benchmark AND workerNodesCount: $workerNodesCount AND  ocpMajorVersion.keyword: $ocpMajorVersion AND clusterType.keyword: $clusterType"}')
+    var.query.new('uuid', '{"find": "terms", "field": "uuid.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND jobConfig.name.keyword: $job AND workerNodesCount: $workerNodesCount AND  ocpMajorVersion.keyword: $ocpMajorVersion AND clusterType.keyword: $clusterType"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(true)
@@ -66,7 +66,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('UUID'),
 
   compare_by:
-    var.custom.new('compare_by', ['uuid', 'metadata.ocpVersion', 'metadata.ocpMajorVersion'])
+    var.custom.new('compare_by', ['uuid', '.ocpVersion', 'ocpMajorVersion'])
     + var.custom.generalOptions.withLabel('Compare by')
     + var.custom.selectionOptions.withIncludeAll(false)
     + var.custom.selectionOptions.withMulti(false),

@@ -14,14 +14,14 @@ g.dashboard.new('Kube-burner Report Mode')
 + g.dashboard.timepicker.withRefreshIntervals(['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'])
 + g.dashboard.timepicker.withTimeOptions(['5m', '15m', '1h', '6h', '12h', '24h', '2d', '7d', '30d'])
 + g.dashboard.withRefresh('')
-+ g.dashboard.withEditable(true)
++ g.dashboard.withEditable(false)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.Datasource,
   variables.platform,
   variables.sdn,
   variables.clusterType,
-  variables.benchmark,
+  variables.job,
   variables.workerNodesCount,
   variables.ocpMajorVersion,
   variables.uuid,
@@ -30,8 +30,8 @@ g.dashboard.new('Kube-burner Report Mode')
   variables.node_roles,
 ])
 + g.dashboard.withPanels([
-  panels.table.withBenchmarkOverview('', '', queries.benchmarkOveriew.query(), { x: 6, y: 0, w: 24, h: 6 }),
-  panels.table.withGarbageCollection('', '', queries.garbageCollection.query(), { x: 0, y: 6, w: 24, h: 5 }),
+  panels.table.withPlatformOverview('', '', queries.platformOverview.query(), { x: 6, y: 0, w: 24, h: 6 }),
+  panels.table.withJobSummary('', '', queries.jobSummary.query(), { x: 0, y: 6, w: 24, h: 5 }),
   g.panel.row.new('Node Usage')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
