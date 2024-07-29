@@ -5,6 +5,7 @@ JSONNET := https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jso
 JB := https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-$(JB_OS_TYPE)-$(subst x86_64,amd64,$(ARCH))
 BINDIR = bin
 TEMPLATESDIR = templates
+ASSETS := $(wildcard assets/**/*.libsonnet)
 OUTPUTDIR = rendered
 ALLDIRS = $(BINDIR) $(OUTPUTDIR)
 SYNCER_IMG_TAG ?= quay.io/cloud-bulldozer/dittybopper-syncer:latest
@@ -54,7 +55,7 @@ $(TEMPLATESDIR)/vendor:
 	cd $(TEMPLATESDIR) && ../$(BINDIR)/jb install && cd ../
 
 # Build each template and output to $(OUTPUTDIR)
-$(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
+$(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet $(ASSETS)
 	@echo "Building template $<"
 	mkdir -p $(dir $@)
 	$(BINDIR)/jsonnet -J ./$(LIBRARY_PATH) $< > $@
