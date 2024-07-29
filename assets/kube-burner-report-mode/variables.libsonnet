@@ -66,7 +66,7 @@ local var = g.dashboard.variable;
         + var.query.generalOptions.withLabel('UUID'),
 
     compare_by:
-        var.custom.new('compare_by', ['uuid', '.ocpVersion', 'ocpMajorVersion'])
+        var.custom.new('compare_by', ['uuid', 'ocpVersion', 'ocpMajorVersion'])
         + var.custom.generalOptions.withLabel('Compare by')
         + var.custom.selectionOptions.withIncludeAll(false)
         + var.custom.selectionOptions.withMulti(false),
