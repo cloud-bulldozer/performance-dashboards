@@ -544,293 +544,293 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       }
     ]),
 
-    withJobSummary(title, unit, targets, gridPos):
-     self.base(title, unit, targets, gridPos)
-     + table.options.withSortBy([])
-     + table.queryOptions.withTransformations([
-    {
-      "id": "organize",
-      "options": {
-        "excludeByName": {
-          "_id": true,
-          "_index": true,
-          "_type": true,
-          "highlight": true,
-          "jobConfig.churnDelay": true,
-          "jobConfig.churnDuration": true,
-          "jobConfig.churnPercent": true,
-          "jobConfig.cleanup": true,
-          "jobConfig.errorOnVerify": true,
-          "jobConfig.jobIterationDelay": true,
-          "jobConfig.jobIterations": false,
-          "jobConfig.jobPause": true,
-          "jobConfig.jobType": true,
-          "jobConfig.maxWaitTimeout": true,
-          "jobConfig.name": true,
-          "jobConfig.namespace": true,
-          "jobConfig.namespaceLabels.pod-security.kubernetes.io/audit": true,
-          "jobConfig.namespaceLabels.pod-security.kubernetes.io/enforce": true,
-          "jobConfig.namespaceLabels.pod-security.kubernetes.io/warn": true,
-          "jobConfig.namespaceLabels.security.openshift.io/scc.podSecurityLabelSync": true,
-          "jobConfig.namespaced": true,
-          "jobConfig.namespacedIterations": true,
-          "jobConfig.objects": true,
-          "jobConfig.podWait": true,
-          "jobConfig.preLoadImages": true,
-          "jobConfig.preLoadPeriod": true,
-          "jobConfig.verifyObjects": true,
-          "jobConfig.waitFor": true,
-          "jobConfig.waitForDeletion": true,
-          "jobConfig.waitWhenFinished": true,
-          "metadata.cloud-bulldozer": true,
-          "metadata.k8sVersion": true,
-          "metadata.ocpVersion": true,
-          "metadata.platform": true,
-          "metadata.sdnType": true,
-          "metadata.totalNodes": true,
-          "metricName": true,
-          "sort": true,
-          "timestamp": true,
-          "uuid": false
-        },
-        "indexByName": {
-          "_id": 1,
-          "_index": 2,
-          "_type": 3,
-          "elapsedTime": 8,
-          "jobConfig.burst": 7,
-          "jobConfig.cleanup": 12,
-          "jobConfig.errorOnVerify": 13,
-          "jobConfig.jobIterationDelay": 14,
-          "jobConfig.jobIterations": 9,
-          "jobConfig.jobPause": 15,
-          "jobConfig.jobType": 10,
-          "jobConfig.maxWaitTimeout": 16,
-          "jobConfig.name": 5,
-          "jobConfig.namespace": 17,
-          "jobConfig.namespacedIterations": 18,
-          "jobConfig.objects": 19,
-          "jobConfig.podWait": 11,
-          "jobConfig.qps": 6,
-          "jobConfig.verifyObjects": 20,
-          "jobConfig.waitFor": 21,
-          "jobConfig.waitForDeletion": 22,
-          "jobConfig.waitWhenFinished": 23,
-          "metricName": 24,
-          "timestamp": 0,
-          "uuid": 4
-        },
-        "renameByName": {
-          "_type": "",
-          "elapsedTime": "Elapsed time",
-          "elapsedTimeNs": "Elapsed Time",
-          "highlight": "",
-          "jobConfig.burst": "Burst",
-          "jobConfig.churn": "Churn",
-          "jobConfig.churnDelay": "",
-          "jobConfig.cleanup": "",
-          "jobConfig.errorOnVerify": "errorOnVerify",
-          "jobConfig.iterationsPerNamespace": "iterationsPerNs",
-          "jobConfig.jobIterationDelay": "jobIterationDelay",
-          "jobConfig.jobIterations": "Iterations",
-          "jobConfig.jobPause": "jobPause",
-          "jobConfig.jobType": "Job Type",
-          "jobConfig.maxWaitTimeout": "maxWaitTImeout",
-          "jobConfig.name": "Name",
-          "jobConfig.namespace": "namespacePrefix",
-          "jobConfig.namespaceLabels.pod-security.kubernetes.io/audit": "",
-          "jobConfig.namespaced": "",
-          "jobConfig.namespacedIterations": "Namespaced iterations",
-          "jobConfig.objects": "",
-          "jobConfig.podWait": "podWait",
-          "jobConfig.preLoadImages": "Preload Images",
-          "jobConfig.preLoadPeriod": "",
-          "jobConfig.qps": "QPS",
-          "jobConfig.verifyObjects": "",
-          "metadata.platform": "Platform",
-          "metricName": "",
-          "timestamp": "",
-          "uuid": "UUID",
-          "version": "Kube-burner version"
-        }
-      }
-    }
-  ])
-     + table.standardOptions.withOverrides([
-      {
-        "matcher": {
-          "id": "byName",
-          "options": "Elapsed time"
-        },
-        "properties": [
-          {
-            "id": "unit",
-            "value": "s"
-          }
-        ]
-      },
-      {
-        "matcher": {
-          "id": "byName",
-          "options": "Elapsed Time"
-        },
-        "properties": [
-          {
-            "id": "unit",
-            "value": "ns"
-          }
-        ]
-      }
-    ]),
-
-    withClusterMetadata(title, unit, targets, gridPos):
-     self.base(title, unit, targets, gridPos)
-     + table.options.withSortBy([])
-     + table.standardOptions.withMappings([
+    withPlatformOverview(title, unit, targets, gridPos):
+      self.base(title, unit, targets, gridPos)
+      + table.queryOptions.withTransformations([
         {
-          "options": {
-            "passed": {
-              "color": "green",
-              "index": 0
-            }
+          id: 'organize',
+          options: {
+            excludeByName: {
+              _id: true,
+              _index: true,
+              _type: true,
+              clustertype: true,
+              endDate: true,
+              highlight: true,
+              'jobConfig.cleanup': true,
+              'jobConfig.errorOnVerify': true,
+              'jobConfig.jobIterationDelay': true,
+              'jobConfig.jobIterations': true,
+              'jobConfig.jobPause': true,
+              'jobConfig.maxWaitTimeout': true,
+              'jobConfig.namespace': true,
+              'jobConfig.namespaced': true,
+              'jobConfig.namespacedIterations': true,
+              'jobConfig.objects': true,
+              'jobConfig.preLoadPeriod': true,
+              'jobConfig.verifyObjects': true,
+              'jobConfig.waitFor': true,
+              'jobConfig.waitForDeletion': true,
+              'jobConfig.waitWhenFinished': true,
+              'jobConfig.churnDelay': true,
+              'jobConfig.churnDeletionStrategy': true,
+              'jobConfig.churnDuration': true,
+              'jobConfig.churnPercent': true,
+              'jobConfig.iterationsPerNamespace': true,
+              'jobConfig.jobType': true,
+              'jobConfig.name': true,
+              'jobConfig.preLoadImages': true,
+              'jobConfig.qps': true,
+              'jobConfig.burst': true,
+              k8sVersion: true,
+              metricName: true,
+              ocpMajorVersion: true,
+              ocpVersion: true,
+              sort: true,
+              timestamp: true,
+              workload: true,
+              elapsedTime: true,
+              endTimestamp: true,
+              version: true,
+            },
+            indexByName: {
+              _id: 1,
+              _index: 2,
+              _type: 3,
+              clusterName: 8,
+              endDate: 9,
+              highlight: 6,
+              infraNodesCount: 20,
+              infraNodesType: 21,
+              k8sVersion: 10,
+              masterNodesType: 16,
+              metricName: 13,
+              ocpVersion: 11,
+              passed: 15,
+              platform: 12,
+              sdnType: 14,
+              sort: 7,
+              timestamp: 0,
+              totalNodes: 17,
+              uuid: 4,
+              workerNodesCount: 18,
+              workerNodesType: 19,
+            },
+            renameByName: {
+              _type: '',
+              clusterName: 'Cluster',
+              elapsedTime: '',
+              endDate: '',
+              infraNodesCount: 'infra count',
+              infraNodesType: 'infra type',
+              k8sVersion: 'k8s version',
+              masterNodesType: 'master type',
+              metricName: '',
+              ocpVersion: 'OCP version',
+              passed: 'Passed',
+              platform: 'Platform',
+              result: 'Result',
+              sdnType: 'SDN',
+              timestamp: '',
+              totalNodes: 'total nodes',
+              uuid: 'UUID',
+              workerNodesCount: 'worker count',
+              workerNodesType: 'worker type',
+              workload: '',
+              _index: '',
+              version: '',
+            },
           },
-          "type": "value"
-        }
+        },
       ])
-     + table.queryOptions.withTransformations([
-    {
-      "id": "organize",
-      "options": {
-        "excludeByName": {
-          "_id": true,
-          "_index": true,
-          "_type": true,
-          "benchmark": false,
-          "clustertype": true,
-          "endDate": true,
-          "end_date": true,
-          "highlight": true,
-          "jobConfig.cleanup": true,
-          "jobConfig.errorOnVerify": true,
-          "jobConfig.jobIterationDelay": true,
-          "jobConfig.jobIterations": false,
-          "jobConfig.jobPause": true,
-          "jobConfig.maxWaitTimeout": true,
-          "jobConfig.namespace": true,
-          "jobConfig.namespaced": true,
-          "jobConfig.namespacedIterations": false,
-          "jobConfig.objects": true,
-          "jobConfig.preLoadPeriod": true,
-          "jobConfig.verifyObjects": true,
-          "jobConfig.waitFor": true,
-          "jobConfig.waitForDeletion": true,
-          "jobConfig.waitWhenFinished": true,
-          "metricName": true,
-          "ocp_version": true,
-          "platform": false,
-          "sdn_type": false,
-          "sort": true,
-          "timestamp": true,
-          "total_nodes": false,
-          "uuid": true,
-          "workload": true,
-          "workload_nodes_count": true,
-          "workload_nodes_type": true
+      + table.standardOptions.withOverrides([
+        {
+          matcher: {
+            id: 'byName',
+            options: 'passed',
+          },
+          properties: [
+            {
+              id: 'custom.cellOptions',
+              value: {
+                mode: 'basic',
+                type: 'color-background',
+              },
+            },
+          ],
         },
-        "indexByName": {
-          "_id": 1,
-          "_index": 2,
-          "_type": 3,
-          "benchmark": 5,
-          "clusterName": 8,
-          "endDate": 9,
-          "highlight": 6,
-          "infraNodesCount": 20,
-          "infraNodesType": 21,
-          "k8sVersion": 10,
-          "masterNodesType": 16,
-          "metricName": 13,
-          "ocpVersion": 11,
-          "passed": 15,
-          "platform": 12,
-          "sdnType": 14,
-          "sort": 7,
-          "timestamp": 0,
-          "totalNodes": 17,
-          "uuid": 4,
-          "workerNodesCount": 18,
-          "workerNodesType": 19
+      ])
+      + table.standardOptions.withMappings([
+        {
+          options: {
+            passed: {
+              color: 'green',
+              index: 0,
+            },
+          },
+          type: 'value',
         },
-        "renameByName": {
-          "_type": "",
-          "clusterName": "Cluster",
-          "elapsedTime": "Elapsed time",
-          "endDate": "",
-          "infraNodesCount": "infra count",
-          "infraNodesType": "infra type",
-          "infra_nodes_count": "Infra nodes",
-          "infra_nodes_type": "Infra flavor",
-          "jobConfig.burst": "Burst",
-          "jobConfig.cleanup": "",
-          "jobConfig.errorOnVerify": "errorOnVerify",
-          "jobConfig.jobIterationDelay": "jobIterationDelay",
-          "jobConfig.jobIterations": "Iterations",
-          "jobConfig.jobPause": "jobPause",
-          "jobConfig.jobType": "Job Type",
-          "jobConfig.maxWaitTimeout": "maxWaitTImeout",
-          "jobConfig.name": "Name",
-          "jobConfig.namespace": "namespacePrefix",
-          "jobConfig.namespaced": "",
-          "jobConfig.namespacedIterations": "Namespaced iterations",
-          "jobConfig.objects": "",
-          "jobConfig.podWait": "podWait",
-          "jobConfig.preLoadImages": "Preload Images",
-          "jobConfig.preLoadPeriod": "",
-          "jobConfig.qps": "QPS",
-          "jobConfig.verifyObjects": "",
-          "k8sVersion": "k8s version",
-          "k8s_version": "k8s version",
-          "masterNodesType": "master type",
-          "master_nodes_count": "Master nodes",
-          "master_nodes_type": "Masters flavor",
-          "metricName": "",
-          "ocpVersion": "OCP version",
-          "passed": "Passed",
-          "platform": "Platform",
-          "result": "Result",
-          "sdnType": "SDN",
-          "sdn_type": "SDN",
-          "timestamp": "",
-          "totalNodes": "total nodes",
-          "total_nodes": "Total nodes",
-          "uuid": "UUID",
-          "workerNodesCount": "worker count",
-          "workerNodesType": "worker type",
-          "worker_nodes_count": "Worker nodes",
-          "worker_nodes_type": "Workers flavor",
-          "workload": "",
-          "workload_nodes_count": "Workload nodes",
-          "workload_nodes_type": "Workload flavor"
-        }
-      }
-    }
-  ])
-     + table.standardOptions.withOverrides([
-      {
-        "matcher": {
-          "id": "byName",
-          "options": "passed"
+      ])
+      + table.standardOptions.thresholds.withSteps([
+        {
+          color: 'green',
+          value: null,
         },
-        "properties": [
-          {
-            "id": "custom.cellOptions",
-            "value": {
-              "mode": "basic",
-              "type": "color-background"
-            }
-          }
-        ]
-      }
-    ]),
+      ]),
+
+    withJobSummary(title, unit, targets, gridPos):
+      self.base(title, unit, targets, gridPos)
+      + table.queryOptions.withTransformations([
+        {
+          id: 'organize',
+          options: {
+            excludeByName: {
+              _id: true,
+              _index: true,
+              _type: true,
+              highlight: true,
+              'jobConfig.churnDelay': true,
+              'jobConfig.churnDuration': true,
+              'jobConfig.churnPercent': true,
+              'jobConfig.cleanup': true,
+              'jobConfig.errorOnVerify': true,
+              'jobConfig.iterationsPerNamespace': true,
+              'jobConfig.jobIterationDelay': true,
+              'jobConfig.jobPause': true,
+              'jobConfig.jobType': true,
+              'jobConfig.maxWaitTimeout': true,
+              'jobConfig.namespace': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/audit': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/enforce': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/warn': true,
+              'jobConfig.namespaceLabels.security.openshift.io/scc.podSecurityLabelSync': true,
+              'jobConfig.namespaced': true,
+              'jobConfig.namespacedIterations': true,
+              'jobConfig.objects': true,
+              'jobConfig.podWait': true,
+              'jobConfig.preLoadImages': true,
+              'jobConfig.preLoadPeriod': true,
+              'jobConfig.verifyObjects': true,
+              'jobConfig.waitFor': true,
+              'jobConfig.waitForDeletion': true,
+              'jobConfig.waitWhenFinished': true,
+              k8sVersion: true,
+              ocpMajorVersion: true,
+              ocpVersion: true,
+              platform: true,
+              sdnType: true,
+              totalNodes: true,
+              metricName: true,
+              endTimestamp: true,
+              sort: true,
+            },
+            indexByName: {
+              _id: 2,
+              _index: 3,
+              _type: 4,
+              elapsedTime: 8,
+              highlight: 19,
+              'jobConfig.burst': 7,
+              'jobConfig.churnDelay': 20,
+              'jobConfig.churnDuration': 21,
+              'jobConfig.churnPercent': 22,
+              'jobConfig.cleanup': 11,
+              'jobConfig.errorOnVerify': 12,
+              'jobConfig.iterationsPerNamespace': 23,
+              'jobConfig.jobIterations': 9,
+              'jobConfig.jobType': 10,
+              'jobConfig.maxWaitTimeout': 13,
+              'jobConfig.name': 5,
+              'jobConfig.namespace': 14,
+              'jobConfig.preLoadImages': 24,
+              'jobConfig.preLoadPeriod': 25,
+              'jobConfig.qps': 6,
+              'jobConfig.verifyObjects': 15,
+              'jobConfig.waitForDeletion': 16,
+              'jobConfig.waitWhenFinished': 17,
+              k8sVersion: 26,
+              ocpMajorVersion: 27,
+              ocpVersion: 28,
+              platform: 29,
+              sdnType: 30,
+              totalNodes: 31,
+              metricName: 18,
+              sort: 32,
+              timestamp: 1,
+              uuid: 0,
+              version: 33,
+            },
+            renameByName: {
+              _type: '',
+              elapsedTime: 'Elapsed time',
+              endTimestamp: 'End date',
+              highlight: '',
+              'jobConfig.burst': 'Burst',
+              'jobConfig.churn': 'Churn',
+              'jobConfig.churnDelay': '',
+              'jobConfig.churnDeletionStrategy': 'Churn Deletion strategy',
+              'jobConfig.cleanup': '',
+              'jobConfig.errorOnVerify': 'errorOnVerify',
+              'jobConfig.iterationsPerNamespace': 'iterationsPerNs',
+              'jobConfig.jobIterationDelay': 'jobIterationDelay',
+              'jobConfig.jobIterations': 'Iterations',
+              'jobConfig.jobPause': 'jobPause',
+              'jobConfig.jobType': 'Job Type',
+              'jobConfig.maxWaitTimeout': 'maxWaitTImeout',
+              'jobConfig.name': 'Name',
+              'jobConfig.namespace': 'namespacePrefix',
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/audit': '',
+              'jobConfig.namespaced': '',
+              'jobConfig.namespacedIterations': 'Namespaced iterations',
+              'jobConfig.objects': '',
+              'jobConfig.podWait': 'podWait',
+              'jobConfig.preLoadImages': 'Preload Images',
+              'jobConfig.preLoadPeriod': '',
+              'jobConfig.qps': 'QPS',
+              'jobConfig.verifyObjects': '',
+              metricName: '',
+              timestamp: 'Date',
+              uuid: 'UUID',
+              version: 'Kube-burner version',
+            },
+          },
+        },
+      ])
+      + table.standardOptions.withOverrides([
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Elapsed time',
+          },
+          properties: [
+            {
+              id: 'unit',
+              value: 's',
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Elapsed Time',
+          },
+          properties: [
+            {
+              id: 'unit',
+              value: 'ns',
+            },
+          ],
+        },
+      ])
+      + table.standardOptions.thresholds.withSteps([
+        {
+          color: 'green',
+          value: null,
+        },
+        {
+          color: 'red',
+          value: 80,
+        },
+      ]),
   }
 }

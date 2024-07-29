@@ -541,7 +541,7 @@ local elasticsearch = g.query.elasticsearch;
          + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize("500")
          + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
         ])
-        + elasticsearch.withQuery("uuid.keyword: $uuid AND metricName.keyword: clusterMetadata")
+        + elasticsearch.withQuery("uuid.keyword: $uuid AND metricName.keyword: jobSummary")
         + elasticsearch.withTimeField('timestamp')
   },
   alerts: {
