@@ -10,15 +10,9 @@ ALLDIRS = $(BINDIR) $(OUTPUTDIR)
 SYNCER_IMG_TAG ?= quay.io/cloud-bulldozer/dittybopper-syncer:latest
 PLATFORM = linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
-ifeq ($(filter v2,$(MAKECMDGOALS)),v2)
-  	# Set variables and instructions for v2
-  	TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*-v2.jsonnet)
-	LIBRARY_PATH := $(TEMPLATESDIR)/vendor
-else
-	# Get all templates at $(TEMPLATESDIR)
-	TEMPLATES := $(filter-out %-v2.jsonnet, $(wildcard $(TEMPLATESDIR)/**/*.jsonnet))
-	LIBRARY_PATH := $(TEMPLATESDIR)/grafonnet-lib
-endif
+# Get all templates at $(TEMPLATESDIR)
+TEMPLATES := $(wildcard $(TEMPLATESDIR)/**/*.jsonnet)
+LIBRARY_PATH := $(TEMPLATESDIR)/vendor
 
 # Replace $(TEMPLATESDIR)/*.jsonnet by $(OUTPUTDIR)/*.json
 outputs := $(patsubst $(TEMPLATESDIR)/%.jsonnet, $(OUTPUTDIR)/%.json, $(TEMPLATES))
@@ -37,7 +31,7 @@ build: deps $(LIBRARY_PATH) $(outputs)
 
 clean:
 	@echo "Cleaning up"
-	rm -rf $(ALLDIRS) $(TEMPLATESDIR)/vendor $(TEMPLATESDIR)/grafonnet-lib
+	rm -rf $(ALLDIRS) $(TEMPLATESDIR)/vendor
 
 $(BINDIR)/jsonnet:
 	@echo "Downloading jsonnet binary"
@@ -45,9 +39,6 @@ $(BINDIR)/jsonnet:
 	@echo "Downloading jb binary"
 	curl -s -L $(JB) -o $(BINDIR)/jb
 	chmod +x $(BINDIR)/jb
-
-$(TEMPLATESDIR)/grafonnet-lib:
-	git clone --depth 1 https://github.com/grafana/grafonnet-lib.git $(TEMPLATESDIR)/grafonnet-lib
 
 $(TEMPLATESDIR)/vendor:
 	@echo "Downloading vendor files"
@@ -59,10 +50,7 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet
 	mkdir -p $(dir $@)
 	$(BINDIR)/jsonnet -J ./$(LIBRARY_PATH) $< > $@
 
-v2: all
-	@echo "Rendered the v2 dashboards with latest grafonnet library"
-
-build-syncer-image: v2
+build-syncer-image: build
 	podman build --platform=${PLATFORM} -f Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
 push-syncer-image:
