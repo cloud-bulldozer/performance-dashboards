@@ -18,25 +18,8 @@ Render a jsonnet file is as simple as executing `jsonnet <jsonnet_template>`. Th
 A makefile has been included to automate jsonnet formatting and rendering tasks. Executing `make` downloads the jsonnet binary and renders the templates at the *rendered* directory.
 
 i.e.
-
 ```
 $ make
-mkdir -p bin rendered tmp
-git clone --depth 1 https://github.com/grafana/grafonnet-lib.git templates/grafonnet-lib
-Cloning into 'templates/grafonnet-lib'...
-Downloading jsonnet binary
-curl -s -L https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz | tar xz -C bin
-Formating template templates/ocp-performance.jsonnet
-bin/jsonnetfmt templates/ocp-performance.jsonnet > tmp/ocp-performance.jsonnet
-mv tmp/ocp-performance.jsonnet templates/ocp-performance.jsonnet
-Building template templates/ocp-performance.jsonnet
-bin/jsonnet templates/ocp-performance.jsonnet > rendered/ocp-performance.json
-$ ls rendered
-ocp-ingress-controller.json ocp-performance.json
-```
-Similarly for V2, the dashboards that are built using latest grafonnet library, use 
-```
-$ make v2
 mkdir -p bin rendered
 Downloading jsonnet binary
 curl -s -L https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz | tar xz -C bin
@@ -53,10 +36,7 @@ bin/jsonnetfmt -i templates/General/ocp-performance-v2.jsonnet
 Building template templates/General/ocp-performance-v2.jsonnet
 mkdir -p rendered/General/
 bin/jsonnet -J ./templates/vendor templates/General/ocp-performance-v2.jsonnet > rendered/General/ocp-performance-v2.json
-Rendered the v2 dashboards with latest grafonnet library
 ```
-Rest all operations remain same as before.
-
 In order to clean up the environment execute `make clean`.
 
 In order to lint the templates using `jsonnetfmt`execute `make format`
@@ -73,6 +53,7 @@ Dashboards Available after Migration to Grafonnet v10.1.0(latest):
 - CPT
     - [x] Ingress Perf Dashboard.
     - [x] K8s Netperf Dashboard.
+    - [x] Kube-burner Report Mode Dashboard.
     - [x] Kube Burner Report OCP Wrapper dashboard.
 - General
     - [x] API Performance Dashboard.
@@ -80,7 +61,6 @@ Dashboards Available after Migration to Grafonnet v10.1.0(latest):
     - [x] Etcd Dashboard.
     - [x] Hypershift Performance Dashboard.
     - [x] K8s Performance Dashboard.
-    - [ ] Kube Burner Dashboard.
     - [x] OpenShift Performance Dashboard.
     - [x] OVN Dashboard.
     - [x] Pgbench Dashboard.
