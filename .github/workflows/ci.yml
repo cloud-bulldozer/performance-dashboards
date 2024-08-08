@@ -38,7 +38,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Compile dashboards
-      run: make build
+      run: make
 
     - name: Run grafana container
       run: sudo docker run -d -p 3000:3000 docker.io/grafana/grafana:9.4.3
