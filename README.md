@@ -17,7 +17,6 @@ Alternatively, you can render the jsonnet files manually by doing the following:
 Render a jsonnet file is as simple as executing `jsonnet <jsonnet_template>`. The jsonnet binary is not included in this repo, though binary builds can be found in its official [repository](https://github.com/google/jsonnet/releases).
 A makefile has been included to automate jsonnet formatting and rendering tasks. Executing `make` downloads the jsonnet binary and renders the templates at the *rendered* directory.
 
-i.e.
 ```
 $ make
 mkdir -p bin rendered
@@ -81,6 +80,4 @@ In addition, make sure to lint your modifications to jsonnet files if you don't 
 
 ## Tested versions
 
-The dashboards from this repository have been tested with the following versions:
-
-- Grafana 9.X
+The dashboards from this repository have been tested with Grafana 9.X
