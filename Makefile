@@ -26,7 +26,7 @@ $(ALLDIRS):
 	mkdir -p $(ALLDIRS)
 
 format: deps
-	$(BINDIR)/jsonnetfmt -i $(TEMPLATES)
+	$(BINDIR)/jsonnetfmt -i $(TEMPLATES) $(ASSETS)
 
 build: deps $(LIBRARY_PATH) $(outputs)
 
