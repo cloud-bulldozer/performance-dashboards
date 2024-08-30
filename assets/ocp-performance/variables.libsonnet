@@ -80,8 +80,8 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('Network device'),
-  
+
   interval:
-    var.interval.new('interval', ['2m','3m','4m','5m'],)
+    var.interval.new('interval', ['2m', '3m', '4m', '5m'],)
     + var.interval.generalOptions.withLabel('interval'),
 }
