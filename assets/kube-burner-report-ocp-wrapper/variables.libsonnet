@@ -8,7 +8,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('Datasource'),
 
   platform:
-    var.query.new('platform', '{"find": "terms", "field": "metadata.platform.keyword"}')
+    var.query.new('platform', '{"find": "terms", "field": "platform.keyword"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti()
@@ -16,23 +16,23 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('Platform'),
 
   sdn:
-    var.query.new('sdn', '{"find": "terms", "field": "metadata.sdnType.keyword", "query": "metadata.platform.keyword: $platform"}')
+    var.query.new('sdn', '{"find": "terms", "field": "sdnType.keyword", "query": "platform.keyword: $platform"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti()
     + var.query.selectionOptions.withIncludeAll(false)
     + var.query.generalOptions.withLabel('SDN type'),
 
-  workload:
-    var.query.new('workload', '{"find": "terms", "field": "jobConfig.name.keyword", "query": "metadata.platform.keyword: $platform AND metadata.sdnType.keyword: $sdn"}')
+  job:
+    var.query.new('job', '{"find": "terms", "field": "jobConfig.name.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(false)
-    + var.query.generalOptions.withLabel('Workload'),
+    + var.query.generalOptions.withLabel('Job'),
 
   nodes:
-    var.query.new('nodes', '{"find": "terms", "field": "metadata.totalNodes", "query": "metadata.platform.keyword: $platform AND metadata.sdnType.keyword: $sdn AND jobConfig.name.keyword: $workload"}')
+    var.query.new('nodes', '{"find": "terms", "field": "totalNodes", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND jobConfig.name.keyword: $job"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
@@ -40,7 +40,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('nodes'),
 
   uuid:
-    var.query.new('uuid', '{"find": "terms", "field": "uuid.keyword", "query": "metadata.platform.keyword: $platform AND metadata.sdnType.keyword: $sdn AND jobConfig.name.keyword: $workload AND metadata.totalNodes: $nodes"}')
+    var.query.new('uuid', '{"find": "terms", "field": "uuid.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND jobConfig.name.keyword: $job AND totalNodes: $nodes"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(false)
