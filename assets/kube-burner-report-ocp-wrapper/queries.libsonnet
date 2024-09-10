@@ -579,7 +579,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
     queries(metric): [
-      self.base('{{labels.pod.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-master.*/'),
+      self.base('{{labels.pod.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-node.*/'),
       self.base('{{labels.pod.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-control-plane.*/'),
     ],
   },
@@ -617,7 +617,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
     queries(metric): [
-      self.base('{{labels.pod.keyword}}-{{labels.container.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-master.*/'),
+      self.base('{{labels.pod.keyword}}-{{labels.container.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-node.*/'),
       self.base('{{labels.pod.keyword}}-{{labels.container.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-control-plane.*/'),
     ],
   },
@@ -722,7 +722,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
     queries(metric): [
-      self.base('', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-master.*/'),
+      self.base('', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-node.*/'),
       self.base('', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.pod.keyword: /ovnkube-control-plane.*/'),
     ],
   },
@@ -746,11 +746,11 @@ local elasticsearch = g.query.elasticsearch;
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0'),
       ])
       + elasticsearch.withMetrics([
-        elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
       ])
-      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-node.*/')
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  ')
       + elasticsearch.withTimeField('timestamp'),
   },
   etcd99thLatencies: {

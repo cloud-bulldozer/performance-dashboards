@@ -73,8 +73,8 @@ g.dashboard.new('Kube-burner Report - OCP wrapper')
     panels.timeSeries.sortByMax('ovn-controller Memory Usage', 'bytes', queries.ovnControllerStats.query('containerMemory'), { x: 12, y: 41, w: 12, h: 8 }, null),
     panels.timeSeries.withMeanMax('Aggregated OVNKube-master containers CPU', 'percent', queries.aggregatedOVNKubeMasterStats.queries('containerCPU'), { x: 0, y: 49, w: 12, h: 14 }, null),
     panels.timeSeries.withMeanMax('Aggregated OVNKube-master containers memory', 'bytes', queries.aggregatedOVNKubeMasterStats.queries('containerMemory'), { x: 12, y: 49, w: 12, h: 14 }, null),
-    panels.timeSeries.withMeanMax('Aggregated OVNKube-node containers CPU', 'percent', queries.aggregatedOVNKubeNodeStats.query('containerCPU'), { x: 0, y: 63, w: 12, h: 14 }, null),
-    panels.timeSeries.sortByMeanCommon('Aggregated OVNKube-node containers Memory', 'bytes', queries.aggregatedOVNKubeNodeStats.query('containerMemory'), { x: 12, y: 63, w: 12, h: 14 }, null),
+    panels.timeSeries.withMeanMax('Aggregated OVNKube-node containers CPU', 'percent', queries.aggregatedOVNKubeNodeStats.query('containerCPU-AggregatedWorkers'), { x: 0, y: 63, w: 12, h: 14 }, null),
+    panels.timeSeries.sortByMeanCommon('Aggregated OVNKube-node containers Memory', 'bytes', queries.aggregatedOVNKubeNodeStats.query('containerMemory-AggregatedWorkers'), { x: 12, y: 63, w: 12, h: 14 }, null),
   ]),
   g.panel.row.new('etcd')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
