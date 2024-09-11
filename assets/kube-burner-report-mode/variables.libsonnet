@@ -34,7 +34,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('Cluster Type'),
 
   job:
-    var.query.new('job', '{"find": "terms", "field": "jobConfig.name.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND clusterType.keyword: $clusterType"}')
+    var.query.new('job', '{"find": "terms", "field": "jobConfig.name.keyword", "query": "platform.keyword: $platform AND sdnType.keyword: $sdn AND clusterType.keyword: $clusterType AND NOT jobConfig.name.keyword: garbage-collection"}')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
