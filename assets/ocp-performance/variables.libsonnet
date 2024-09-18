@@ -3,8 +3,7 @@ local var = g.dashboard.variable;
 
 {
   datasource:
-    var.datasource.new('datasource', 'prometheus')
-    + var.datasource.withRegex('/^Cluster Prometheus$/'),
+    var.datasource.new('datasource', 'prometheus'),
 
   master_node:
     var.query.new('_master_node')
