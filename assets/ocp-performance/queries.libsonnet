@@ -13,6 +13,57 @@ local generateTimeSeriesQuery(query, legend) = [
 ];
 
 {
+  workersCPU: {
+    query():
+      generateTimeSeriesQuery('sum( rate( (node_cpu_seconds_total{ mode != "idle" } * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)") )[$interval:] ) ) by (instance) * 100', '{{instance}}'),
+  },
+  controlPlanesCPU: {
+    query():
+      generateTimeSeriesQuery('sum( rate( (node_cpu_seconds_total{ mode != "idle" } * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)") )[$interval:] ) ) by (instance) * 100', '{{instance}}'),
+  },
+  workersLoad1: {
+    query():
+      generateTimeSeriesQuery('node_load1 * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)") ', '{{instance}}'),
+  },
+  controlPlanesLoad1: {
+    query():
+      generateTimeSeriesQuery('node_load1 * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)") ', '{{instance}}'),
+  },
+  workersCGroupCpuRate: {
+    query():
+      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "worker" } )', '{{instance}}'),
+  },
+  controlPlaneCGroupCpuRate: {
+    query():
+      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{instance}}'),
+  },
+  workersMemoryAvailable: {
+    query():
+      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}'),
+  },
+  controlPlaneMemoryAvailable: {
+    query():
+      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}'),
+  },
+  workersContainerThreads: {
+    query():
+      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "worker" }', '{{instance}}'),
+  },
+  controlPlaneContainerThreads: {
+    query():
+      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "control-plane" }', '{{instance}}'),
+  },
+  workersIOPS: {
+    query():
+      generateTimeSeriesQuery('rate( (  node_disk_reads_completed_total *  on (instance) group_left label_replace( kube_node_role{ role = "worker" } , "instance" , "$1" , "node" ,"(.*)") )[$interval:])', '{{instance}} - {{ device }} - read') +
+      generateTimeSeriesQuery('rate( (  node_disk_writes_completed_total *  on (instance) group_left label_replace( kube_node_role{ role = "worker" } , "instance" , "$1" , "node" ,"(.*)") )[$interval:])', '{{instance}} - {{ device }} - write'),
+  },
+  controlPlaneIOPS: {
+    query():
+      generateTimeSeriesQuery('rate( (  node_disk_reads_completed_total *  on (instance) group_left label_replace( kube_node_role{ role = "control-plane" } , "instance" , "$1" , "node" ,"(.*)") )[$interval:])', '{{instance}} - {{ device }} - read') +
+      generateTimeSeriesQuery('rate( (  node_disk_writes_completed_total *  on (instance) group_left label_replace( kube_node_role{ role = "control-plane" } , "instance" , "$1" , "node" ,"(.*)") )[$interval:])', '{{instance}} - {{ device }} - write'),
+  },
+
   nodeMemory: {
     query(nodeName):
       generateTimeSeriesQuery('node_memory_Active_bytes{instance=~"' + nodeName + '"}', 'Active')
