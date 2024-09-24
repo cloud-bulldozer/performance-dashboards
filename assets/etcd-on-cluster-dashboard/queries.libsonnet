@@ -22,12 +22,36 @@ local generateTimeSeriesQuery(query, legend) = [
 
   diskWalSyncDuration: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(irate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))', '{{pod}} WAL fsync'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd"}[5m])) by (pod, le))', '{{pod}} WAL fsync'),
   },
 
-  diskBackendSyncDuration: {
+  diskWalSyncDurationSum: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(irate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))', '{{pod}} DB fsync'),
+      generateTimeSeriesQuery('irate(etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd"}[2m])', '2m irate WAL sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd"}', 'WAL sum {{instance}} '),
+  },
+
+  diskWalSyncDurationCount: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd"}[2m])', '2m irate WAL count {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd"}', 'WAL count {{instance}} '),
+  },
+
+  diskBackendCommitDuration: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd"}[5m])) by (pod, le))', '{{pod}} DB fsync'),
+  },
+
+  diskBackendCommitDurationSum: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd"}[2m])', '2m irate WAL sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd"}', 'WAL sum {{instance}} '),
+  },
+
+  diskBackendCommitDurationCount: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd"}[2m])', '2m irate WAL count {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd"}', 'WAL count {{instance}} '),
   },
 
   etcdContainerDiskWrites: {

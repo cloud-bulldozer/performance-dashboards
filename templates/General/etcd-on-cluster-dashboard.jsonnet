@@ -24,9 +24,27 @@ g.dashboard.new('etcd-cluster-info dashoard')
     panels.timeSeries.generalUsageAgg('CPU usage', 'percent', queries.CPUUsage.query(), { x: 0, y: 1, w: 12, h: 8 }),
     panels.timeSeries.generalUsageAgg('Memory usage', 'bytes', queries.memoryUsage.query(), { x: 12, y: 1, w: 12, h: 8 }),
     panels.timeSeries.generalUsageAgg('Disk WAL Sync Duration', 's', queries.diskWalSyncDuration.query(), { x: 0, y: 8, w: 12, h: 8 }),
-    panels.timeSeries.generalUsageAgg('Disk Backend Sync Duration', 's', queries.diskBackendSyncDuration.query(), { x: 12, y: 8, w: 12, h: 8 }),
+    panels.timeSeries.generalUsageAgg('Disk Backend Sync Duration', 's', queries.diskBackendCommitDuration.query(), { x: 12, y: 8, w: 12, h: 8 }),
     panels.timeSeries.generalUsageAgg('Etcd container disk writes', 'Bps', queries.etcdContainerDiskWrites.query(), { x: 0, y: 16, w: 12, h: 8 }),
     panels.timeSeries.generalUsageAgg('DB Size', 'bytes', queries.dbSize.query(), { x: 12, y: 16, w: 12, h: 8 }),
+  ]),
+
+  g.panel.row.new('WAL fsync Duration Detailed')
+  + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withPanels([
+    panels.timeSeries.generalUsageAgg('WAL fsync Duration p99', 's', queries.diskWalSyncDuration.query(), { x: 0, y: 0, w: 8, h: 8 }),
+    panels.timeSeries.rightHandOverride('WAL fsync Duration sum', 'none', queries.diskWalSyncDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
+    panels.timeSeries.rightHandOverride('WAL fsync Duration count', 'none', queries.diskWalSyncDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
+  ]),
+
+  g.panel.row.new('Backend Commit Duration Detailed')
+  + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withPanels([
+    panels.timeSeries.generalUsageAgg('Backend Commit Duration', 's', queries.diskBackendCommitDuration.query(), { x: 0, y: 0, w: 8, h: 8 }),
+    panels.timeSeries.rightHandOverride('Backend Commit Duration sum', 'none', queries.diskBackendCommitDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
+    panels.timeSeries.rightHandOverride('Backend Commit Duration count', 'none', queries.diskBackendCommitDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
   ]),
 
   g.panel.row.new('Network Usage')
