@@ -19,5 +19,5 @@ local var = g.dashboard.variable;
     )
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti()
-    + var.query.selectionOptions.withIncludeAll(false),
+    + var.query.selectionOptions.withIncludeAll(true),
 }
