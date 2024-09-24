@@ -43,15 +43,19 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.legend.withSortBy('Max')
       + options.legend.withSortDesc(true),
 
-    rightHandOverride(title, unit, targets, gridPos, leftAxis):
-      self.generalUsageAgg(title, unit, targets, gridPos)
-      + custom.withAxisLabel(leftAxis)
+    generalCounter(title, unit, targets, gridPos):
+      self.base(title, unit, targets, gridPos)
       + options.legend.withCalcs([
         'first',
         'min',
         'max',
         'last',
-      ])
+      ]),
+
+    histogramStatsRightHand(title, unit, targets, gridPos, leftAxis):
+      self.generalCounter(title, unit, targets, gridPos)
+      + custom.withAxisLabel(leftAxis)
+      + options.legend.withDisplayMode('table')
       + options.legend.withSortBy('Max')
       + standardOptions.withOverrides([
         byRegexp.new('.*irate.*')

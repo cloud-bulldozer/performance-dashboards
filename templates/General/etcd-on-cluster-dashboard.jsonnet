@@ -14,6 +14,7 @@ g.dashboard.new('etcd-cluster-info dashoard')
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.Datasource,
+  variables.etcd_pod,
 ])
 
 + g.dashboard.withPanels([
@@ -34,8 +35,8 @@ g.dashboard.new('etcd-cluster-info dashoard')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.timeSeries.generalUsageAgg('WAL fsync Duration p99', 's', queries.diskWalSyncDuration.query(), { x: 0, y: 0, w: 8, h: 8 }),
-    panels.timeSeries.rightHandOverride('WAL fsync Duration sum', 'none', queries.diskWalSyncDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
-    panels.timeSeries.rightHandOverride('WAL fsync Duration count', 'none', queries.diskWalSyncDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
+    panels.timeSeries.histogramStatsRightHand('WAL fsync Duration sum', 'none', queries.diskWalSyncDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
+    panels.timeSeries.histogramStatsRightHand('WAL fsync Duration count', 'none', queries.diskWalSyncDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
   ]),
 
   g.panel.row.new('Backend Commit Duration Detailed')
@@ -43,8 +44,8 @@ g.dashboard.new('etcd-cluster-info dashoard')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.timeSeries.generalUsageAgg('Backend Commit Duration', 's', queries.diskBackendCommitDuration.query(), { x: 0, y: 0, w: 8, h: 8 }),
-    panels.timeSeries.rightHandOverride('Backend Commit Duration sum', 'none', queries.diskBackendCommitDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
-    panels.timeSeries.rightHandOverride('Backend Commit Duration count', 'none', queries.diskBackendCommitDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
+    panels.timeSeries.histogramStatsRightHand('Backend Commit Duration sum', 'none', queries.diskBackendCommitDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'sum'),
+    panels.timeSeries.histogramStatsRightHand('Backend Commit Duration count', 'none', queries.diskBackendCommitDurationCount.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
   ]),
 
   g.panel.row.new('Network Usage')
@@ -80,7 +81,7 @@ g.dashboard.new('etcd-cluster-info dashoard')
     panels.timeSeries.GeneralInfo('Leader Elections Per Day', 'short', queries.leaderElectionsPerDay.query(), { x: 0, y: 12, w: 12, h: 6 }),
     panels.timeSeries.GeneralInfo('Slow Operations', 'ops', queries.slowOperations.query(), { x: 0, y: 20, w: 12, h: 8 }),
     panels.timeSeries.GeneralInfo('Key Operations', 'ops', queries.keyOperations.query(), { x: 12, y: 20, w: 12, h: 8 }),
-    panels.timeSeries.GeneralInfo('Heartbeat Failures', 'short', queries.heartBeatFailure.query(), { x: 0, y: 28, w: 12, h: 8 }),
+    panels.timeSeries.generalCounter('Heartbeat Failures', 'short', queries.heartBeatFailure.query(), { x: 0, y: 28, w: 12, h: 8 }),
     panels.timeSeries.GeneralInfo('Compacted Keys', 'short', queries.compactedKeys.query(), { x: 12, y: 28, w: 12, h: 8 }),
   ]),
 

@@ -9,4 +9,15 @@ local var = g.dashboard.variable;
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(false),
+
+  etcd_pod:
+    var.query.new('etcd_pod')
+    + var.query.withDatasourceFromVariable(self.Datasource)
+    + var.query.queryTypes.withLabelValues(
+      'pod',
+      'etcd_cluster_version',
+    )
+    + var.query.withRefresh(2)
+    + var.query.selectionOptions.withMulti()
+    + var.query.selectionOptions.withIncludeAll(false),
 }
