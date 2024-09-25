@@ -97,13 +97,13 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
       generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[$interval])) by (pod,le)) > 0', '{{ pod }}'),
   },
-  ovnKubeMasterCPU: {
+  ovnKubeControlPlaneCPU: {
     query():
-      generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100', '{{container}}-{{pod}}-{{node}}'),
   },
-  ovnKubeMasterMem: {
+  ovnKubeControlPlaneMem: {
     query():
-      generateTimeSeriesQuery('container_memory_rss{pod=~"ovnkube-master-.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{container}}-{{pod}}-{{node}}'),
   },
   topOvnControllerCPU: {
     query():

@@ -35,14 +35,14 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('count(ovn_controller_monitor_all) by (namespace)', ''),
   },
 
-  ovnKubeMasterCPU: {
+  ovnKubeControlPlaneCPU: {
     query():
-      generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{pod=~"ovnkube-master.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}[2m])*100', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[2m])*100','{{container}}-{{pod}}-{{node}}'),
   },
 
-  ovnKubeMasterMem: {
+  ovnKubeControlPlaneMem: {
     query():
-      generateTimeSeriesQuery('container_memory_rss{pod=~"ovnkube-master-.*",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}','{{container}}-{{pod}}-{{node}}'),
   },
 
   topOvnControllerCPU: {
