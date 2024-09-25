@@ -26,11 +26,9 @@ g.dashboard.new('OVN-Monitoring-dashboard')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withPanels([
-    panels.stat.genericstatThresoldPanel('OVNKube Master', 'none', queries.ovnMasterLeader.query(), { x: 0, y: 0, w: 4, h: 4 }),
-    panels.stat.genericstatThresoldPanel('OVN Northd Status', 'none', queries.ovnNorthd.query(), { x: 4, y: 0, w: 4, h: 4 }),
-    panels.stat.genericstatThresoldPanel('OVN NBDB leader', 'none', queries.ovnNbdbLeader.query(), { x: 8, y: 0, w: 4, h: 4 }),
-    panels.stat.genericstatThresoldPanel('OVN SBDB leader', 'none', queries.ovnSbdbLeader.query(), { x: 12, y: 0, w: 4, h: 4 }),
-    panels.stat.genericstatThresoldOVNControllerPanel('OVN controller', 'none', queries.numOnvController.query(), { x: 16, y: 0, w: 4, h: 4 }),
+    panels.stat.genericstatThresoldPanel('OVNKube Master', 'none', queries.ovnClusterManagerLeader.query(), { x: 0, y: 0, w: 8, h: 4 }),
+    panels.stat.genericstatThresoldPanel('OVN Northd Status', 'none', queries.ovnNorthd.query(), { x: 8, y: 0, w: 8, h: 4 }),
+    panels.stat.genericstatThresoldOVNControllerPanel('OVN controller', 'none', queries.numOnvController.query(), { x: 16, y: 0, w: 8, h: 4 }),
     panels.timeSeries.genericTimeSeriesLegendPanel('ovnkube-control-plane CPU Usage', 'percent', queries.ovnKubeControlPlaneCPU.query(), { x: 0, y: 4, w: 12, h: 10 }),
     panels.timeSeries.genericTimeSeriesLegendPanel('ovnkube-control-plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 4, w: 12, h: 10 }),
     panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 ovn-controller CPU Usage', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),

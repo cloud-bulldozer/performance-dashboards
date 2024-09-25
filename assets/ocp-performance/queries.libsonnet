@@ -150,19 +150,19 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   ovnKubeControlPlaneCPU: {
     query():
-      generateTimeSeriesQuery('irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('sum( irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100 ) by (pod, node)', '{{pod}} - {{node}}'),
   },
   ovnKubeControlPlaneMem: {
     query():
-      generateTimeSeriesQuery('container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{container}}-{{pod}}-{{node}}'),
+      generateTimeSeriesQuery('container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{pod}} - {{node}}'),
   },
   topOvnControllerCPU: {
     query():
-      generateTimeSeriesQuery('topk(10, irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)', '{{node}}'),
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
   },
   topOvnControllerMem: {
     query():
-      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (node))', '{{node}}'),
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node))', '{{pod}} - {{node}}'),
   },
   promReplCpuUsage: {
     query():

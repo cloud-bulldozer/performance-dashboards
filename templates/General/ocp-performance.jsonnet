@@ -55,9 +55,9 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.genericLegend('ovs-master Memory Usage', 'bytes', queries.OVSMemory.query('$_master_node'), { x: 12, y: 17, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('ovs-worker CPU Usage', 'percent', queries.OVSCPU.query('$_worker_node'), { x: 0, y: 25, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('ovs-worker Memory Usage', 'bytes', queries.OVSMemory.query('$_worker_node'), { x: 12, y: 25, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 33, w: 24, h: 8 }),
-    panels.timeSeries.genericLegend('99% CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 0, y: 41, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('99% CNI Request DEL Latency', 's', queries.ovnCNIDel.query(), { x: 12, y: 41, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 33, w: 8, h: 8 }),
+    panels.timeSeries.genericLegend('99% CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 8, y: 41, w: 8, h: 8 }),
+    panels.timeSeries.genericLegend('99% CNI Request DEL Latency', 's', queries.ovnCNIDel.query(), { x: 16, y: 41, w: 8, h: 8 }),
   ]),
   g.panel.row.new('Monitoring stack')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
