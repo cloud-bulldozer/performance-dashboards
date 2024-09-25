@@ -30,7 +30,7 @@ local prometheus = g.query.prometheus;
       + prometheus.withDatasource('$Datasource'),
   },
 
-  requestDurationBy99Quatile: {
+  requestRateByResource: {
     query():
       prometheus.withExpr('sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(resource)')
       + prometheus.withFormat('time_series')

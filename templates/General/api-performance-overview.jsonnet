@@ -31,7 +31,7 @@ g.dashboard.new('API Performance Dashboard')
   panels.timeSeries.legendRightPlacement('request duration - 99th quantile', 'short', queries.request_duration_99th_quantile.query(), { x: 0, y: 0, w: 12, h: 8 }),
   panels.timeSeries.legendRightPlacement('request rate - by instance', 'short', queries.requestRateByInstance.query(), { x: 12, y: 0, w: 12, h: 8 }),
   panels.timeSeries.legendRightPlacement('request duration - 99th quantile - by resource', 'short', queries.requestDuarationByResource.query(), { x: 0, y: 8, w: 12, h: 8 }),
-  panels.timeSeries.legendRightPlacement('request duration - 99th quantile', 'short', queries.requestDurationBy99Quatile.query(), { x: 12, y: 8, w: 12, h: 8 }),
+  panels.timeSeries.legendRightPlacement('request rate - by resource', 'short', queries.requestRateByResource.query(), { x: 12, y: 8, w: 12, h: 8 }),
   panels.timeSeries.legendBottomPlacement('request duration - read vs write', 'short', queries.requestDurationReadWrite.query(), { x: 0, y: 16, w: 12, h: 8 }),
   panels.timeSeries.legendBottomPlacement('request rate - read vs write', 'short', queries.requestRateReadWrite.query(), { x: 12, y: 16, w: 12, h: 8 }),
   panels.timeSeries.legendBottomPlacement('requests dropped rate', 'short', queries.requestRateDropped.query(), { x: 0, y: 24, w: 12, h: 8 }),
