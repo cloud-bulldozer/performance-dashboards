@@ -12,22 +12,46 @@ local generateTimeSeriesQuery(query, legend) = [
 {
   CPUUsage: {
     query():
-      generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{namespace="openshift-etcd", container="etcd"}[2m])) by (pod) * 100', '{{ pod }}'),
+      generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{namespace="openshift-etcd", container="etcd",pod=~"$etcd_pod"}[2m])) by (pod) * 100', '{{ pod }}'),
   },
 
   memoryUsage: {
     query():
-      generateTimeSeriesQuery('sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*"}[2m])) BY (pod, namespace)', '{{ pod }}'),
+      generateTimeSeriesQuery('sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*",pod=~"$etcd_pod"}[2m])) BY (pod, namespace)', '{{ pod }}'),
   },
 
   diskWalSyncDuration: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(irate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))', '{{pod}} WAL fsync'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[5m])) by (pod, le))', '{{pod}} WAL fsync'),
   },
 
-  diskBackendSyncDuration: {
+  diskWalSyncDurationSum: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(irate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd"}[2m])) by (pod, le))', '{{pod}} DB fsync'),
+      generateTimeSeriesQuery('irate(etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '2m irate WAL sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'WAL sum {{instance}} '),
+  },
+
+  diskWalSyncDurationCount: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '2m irate WAL count {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'WAL count {{instance}} '),
+  },
+
+  diskBackendCommitDuration: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[5m])) by (pod, le))', '{{pod}} DB fsync'),
+  },
+
+  diskBackendCommitDurationSum: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '2m irate WAL sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'WAL sum {{instance}} '),
+  },
+
+  diskBackendCommitDurationCount: {
+    query():
+      generateTimeSeriesQuery('irate(etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '2m irate WAL count {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'WAL count {{instance}} '),
   },
 
   etcdContainerDiskWrites: {
@@ -37,8 +61,8 @@ local generateTimeSeriesQuery(query, legend) = [
 
   dbSize: {
     query():
-      generateTimeSeriesQuery('etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}', '{{pod}} DB physical size')
-      + generateTimeSeriesQuery('etcd_mvcc_db_total_size_in_use_in_bytes{namespace="openshift-etcd"}', '{{pod}} DB logical size'),
+      generateTimeSeriesQuery('etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{pod}} DB physical size')
+      + generateTimeSeriesQuery('etcd_mvcc_db_total_size_in_use_in_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{pod}} DB logical size'),
   },
 
   containerNetworkTraffic: {
@@ -49,19 +73,19 @@ local generateTimeSeriesQuery(query, legend) = [
 
   p99PeerToPeerLatency: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket{namespace="openshift-etcd"}[2m]))', '{{pod}}'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m]))', '{{pod}}'),
   },
 
   peerNetworkTraffic: {
     query():
-      generateTimeSeriesQuery('rate(etcd_network_peer_received_bytes_total{namespace="openshift-etcd"}[2m])', 'rx {{pod}} Peer Traffic')
-      + generateTimeSeriesQuery('rate(etcd_network_peer_sent_bytes_total{namespace="openshift-etcd"}[2m])', 'tx {{pod}} Peer Traffic'),
+      generateTimeSeriesQuery('rate(etcd_network_peer_received_bytes_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', 'rx {{pod}} Peer Traffic')
+      + generateTimeSeriesQuery('rate(etcd_network_peer_sent_bytes_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', 'tx {{pod}} Peer Traffic'),
   },
 
   gRPCNetworkTraffic: {
     query():
-      generateTimeSeriesQuery('rate(etcd_network_client_grpc_received_bytes_total{namespace="openshift-etcd"}[2m])', 'rx {{pod}}')
-      + generateTimeSeriesQuery('rate(etcd_network_client_grpc_sent_bytes_total{namespace="openshift-etcd"}[2m])', 'tx {{pod}}'),
+      generateTimeSeriesQuery('rate(etcd_network_client_grpc_received_bytes_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', 'rx {{pod}}')
+      + generateTimeSeriesQuery('rate(etcd_network_client_grpc_sent_bytes_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', 'tx {{pod}}'),
   },
 
   activeStreams: {
@@ -77,17 +101,17 @@ local generateTimeSeriesQuery(query, legend) = [
 
   dbSpaceUsed: {
     query():
-      generateTimeSeriesQuery('(etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"} / etcd_server_quota_backend_bytes{namespace="openshift-etcd"})*100', '{{pod}}'),
+      generateTimeSeriesQuery('(etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"} / etcd_server_quota_backend_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"})*100', '{{pod}}'),
   },
 
   dbLeftCapacity: {
     query():
-      generateTimeSeriesQuery('etcd_server_quota_backend_bytes{namespace="openshift-etcd"} - etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}', '{{pod}}'),
+      generateTimeSeriesQuery('etcd_server_quota_backend_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"} - etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{pod}}'),
   },
 
   dbSizeLimit: {
     query():
-      generateTimeSeriesQuery('etcd_server_quota_backend_bytes{namespace="openshift-etcd"}', '{{ pod }} Quota Bytes'),
+      generateTimeSeriesQuery('etcd_server_quota_backend_bytes{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{ pod }} Quota Bytes'),
   },
 
   raftProposals: {
@@ -115,34 +139,34 @@ local generateTimeSeriesQuery(query, legend) = [
 
   keys: {
     query():
-      generateTimeSeriesQuery('etcd_debugging_mvcc_keys_total{namespace="openshift-etcd"}', '{{ pod }} Num keys'),
+      generateTimeSeriesQuery('etcd_debugging_mvcc_keys_total{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{ pod }} Num keys'),
   },
 
   leaderElectionsPerDay: {
     query():
-      generateTimeSeriesQuery('changes(etcd_server_leader_changes_seen_total{namespace="openshift-etcd"}[1d])', '{{instance}} Total Leader Elections Per Day'),
+      generateTimeSeriesQuery('changes(etcd_server_leader_changes_seen_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[1d])', '{{instance}} Total Leader Elections Per Day'),
   },
 
   slowOperations: {
     query():
-      generateTimeSeriesQuery('delta(etcd_server_slow_apply_total{namespace="openshift-etcd"}[2m])', '{{ pod }} slow applies')
-      + generateTimeSeriesQuery('delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd"}[2m])', '{{ pod }} slow read indexes'),
+      generateTimeSeriesQuery('delta(etcd_server_slow_apply_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '{{ pod }} slow applies')
+      + generateTimeSeriesQuery('delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '{{ pod }} slow read indexes'),
   },
 
   keyOperations: {
     query():
-      generateTimeSeriesQuery('rate(etcd_mvcc_put_total{namespace="openshift-etcd"}[2m])', '{{ pod }} puts/s')
-      + generateTimeSeriesQuery('rate(etcd_mvcc_delete_total{namespace="openshift-etcd"}[2m])', '{{ pod }} deletes/s'),
+      generateTimeSeriesQuery('rate(etcd_mvcc_put_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '{{ pod }} puts/s')
+      + generateTimeSeriesQuery('rate(etcd_mvcc_delete_total{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])', '{{ pod }} deletes/s'),
   },
 
   heartBeatFailure: {
     query():
-      generateTimeSeriesQuery('etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd"}', '{{ pod }} heartbeat failures')
-      + generateTimeSeriesQuery('etcd_server_health_failures{namespace="openshift-etcd"}', '{{ pod }} health failures'),
+      generateTimeSeriesQuery('etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{ pod }} heartbeat failures')
+      + generateTimeSeriesQuery('etcd_server_health_failures{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{ pod }} health failures'),
   },
 
   compactedKeys: {
     query():
-      generateTimeSeriesQuery('etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd"}', '{{ pod  }} keys compacted'),
+      generateTimeSeriesQuery('etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd",pod=~"$etcd_pod"}', '{{ pod  }} keys compacted'),
   },
 }
