@@ -26,21 +26,38 @@ g.dashboard.new('Openshift Performance')
   variables.interval,
 ])
 + g.dashboard.withPanels([
+  g.panel.row.new('Cluster-at-a-Glance')
+  + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withPanels([
+    panels.timeSeries.genericLegend('Workers CPU Usage', 'percent', queries.workersCPU.query(), { x: 0, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane CPU Usage', 'percent', queries.controlPlanesCPU.query(), { x: 12, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Workers Load1', 'short', queries.workersLoad1.query(), { x: 0, y: 9, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane Load1', 'short', queries.controlPlanesLoad1.query(), { x: 12, y: 9, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Workers CGroup CPU Rate', 'short', queries.workersCGroupCpuRate.query(), { x: 0, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane CGroup CPU Rate', 'short', queries.controlPlaneCGroupCpuRate.query(), { x: 12, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Workers Memory Available', 'bytes', queries.workersMemoryAvailable.query(), { x: 0, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Control Plane Memory Available', 'bytes', queries.controlPlaneMemoryAvailable.query(), { x: 12, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Workers Container Threads', 'short', queries.workersContainerThreads.query(), { x: 0, y: 33, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Control Plane Container Threads', 'short', queries.controlPlaneContainerThreads.query(), { x: 12, y: 33, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Workers Disk IOPS', 'short', queries.workersIOPS.query(), { x: 0, y: 41, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane Disk IOPS', 'short', queries.controlPlaneIOPS.query(), { x: 12, y: 41, w: 12, h: 8 }),
+  ]),
   g.panel.row.new('OVN')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
-    panels.timeSeries.genericLegend('ovs-master CPU Usage', 'percent', queries.OVSCPU.query('$_master_node'), { x: 0, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('ovs-master Memory Usage', 'bytes', queries.OVSMemory.query('$_master_node'), { x: 12, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('ovs-worker CPU Usage', 'percent', queries.OVSCPU.query('$_worker_node'), { x: 0, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('ovs-worker Memory Usage', 'bytes', queries.OVSMemory.query('$_worker_node'), { x: 12, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.generic('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 1, w: 24, h: 12 }),
-    panels.timeSeries.generic('99% CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 0, y: 13, w: 12, h: 8 }),
-    panels.timeSeries.generic('99% CNI Request DEL Latency', 's', queries.ovnCNIDel.query(), { x: 12, y: 13, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('ovnkube-control-plane CPU Usage', 'percent', queries.ovnKubeControlPlaneCPU.query(), { x: 0, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('ovnkube-control-plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 21, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 ovn-controller CPU Usage', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 28, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 ovn-controller Memory Usage', 'bytes', queries.topOvnControllerMem.query(), { x: 12, y: 28, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovnkube-control-plane CPU Usage', 'percent', queries.ovnKubeControlPlaneCPU.query(), { x: 0, y: 1, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovnkube-control-plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 1, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Top 10 ovn-controller CPU Usage', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 9, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Top 10 ovn-controller Memory Usage', 'bytes', queries.topOvnControllerMem.query(), { x: 12, y: 9, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovs-master CPU Usage', 'percent', queries.OVSCPU.query('$_master_node'), { x: 0, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovs-master Memory Usage', 'bytes', queries.OVSMemory.query('$_master_node'), { x: 12, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovs-worker CPU Usage', 'percent', queries.OVSCPU.query('$_worker_node'), { x: 0, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('ovs-worker Memory Usage', 'bytes', queries.OVSMemory.query('$_worker_node'), { x: 12, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('99% Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 33, w: 8, h: 8 }),
+    panels.timeSeries.genericLegend('99% CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 8, y: 41, w: 8, h: 8 }),
+    panels.timeSeries.genericLegend('99% CNI Request DEL Latency', 's', queries.ovnCNIDel.query(), { x: 16, y: 41, w: 8, h: 8 }),
   ]),
   g.panel.row.new('Monitoring stack')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })

@@ -26,8 +26,21 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.legend.withShowLegend(true)
       + options.legend.withCalcs([
         'mean',
-        'max',
         'min',
+        'max',
+      ])
+      + options.legend.withSortBy('Max')
+      + options.legend.withSortDesc(true)
+      + options.legend.withPlacement('bottom'),
+
+    genericLegendCounter(title, unit, targets, gridPos):
+      self.generic(title, unit, targets, gridPos)
+      + options.legend.withShowLegend(true)
+      + options.legend.withCalcs([
+        'first',
+        'min',
+        'max',
+        'last',
       ])
       + options.legend.withSortBy('Max')
       + options.legend.withSortDesc(true)

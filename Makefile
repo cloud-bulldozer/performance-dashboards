@@ -30,9 +30,13 @@ format: deps
 
 build: deps $(LIBRARY_PATH) $(outputs)
 
-clean:
+clean-all:
 	@echo "Cleaning up"
 	rm -rf $(ALLDIRS) $(TEMPLATESDIR)/vendor
+
+clean:
+	@echo "Cleaning up"
+	rm -rf $(OUTPUTDIR)
 
 $(BINDIR)/jsonnet:
 	@echo "Downloading jsonnet binary"
