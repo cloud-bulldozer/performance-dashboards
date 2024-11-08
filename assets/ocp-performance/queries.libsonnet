@@ -37,13 +37,23 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
       generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{instance}}'),
   },
+  workersCGroupMemoryRSS: {
+    query():
+      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "worker" } )', '{{instance}}'),
+  },
+  controlPlaneCGroupMemoryRSS: {
+    query():
+      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{instance}}'),
+  },
   workersMemoryAvailable: {
     query():
-      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}'),
+      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}') +
+      generateTimeSeriesQuery('sum( node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)") )', 'sum'),
   },
   controlPlaneMemoryAvailable: {
     query():
-      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}'),
+      generateTimeSeriesQuery('node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)")', '{{instance}}') +
+      generateTimeSeriesQuery('sum( node_memory_MemAvailable_bytes * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)") )', 'sum'),
   },
   workersContainerThreads: {
     query():
@@ -114,9 +124,23 @@ local generateTimeSeriesQuery(query, legend) = [
     query(nodeName):
       generateTimeSeriesQuery('topk(10, container_memory_rss{container!="POD",name!="",node=~"' + nodeName + '",namespace!="",namespace=~"$namespace"})', '{{ pod }}: {{ container }}'),
   },
-  containerWriteBytes: {
+  nodeCGroupCPU: {
     query(nodeName):
-      generateTimeSeriesQuery('sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", container!=""}[$interval])) by (device, container)', '{{ container }}: {{ device }}'),
+      generateTimeSeriesQuery('sum by (id) ( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"' + nodeName + '"}[$interval])) * 100', '{{ id }}'),
+  },
+  nodeCGroupRSS: {
+    query(nodeName):
+      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"' + nodeName + '"})', '{{ id }}'),
+  },
+  containerReadWriteBytesPod: {
+    query(nodeName):
+      generateTimeSeriesQuery('sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", pod!=""}[$interval])) by (device, pod)', '{{ pod }}: {{ device }} - write')
+      + generateTimeSeriesQuery('sum(rate(container_fs_reads_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", pod!=""}[$interval])) by (device, pod)', '{{ pod }}: {{ device }} - read'),
+  },
+  containerReadWriteBytesCGroup: {
+    query(nodeName):
+      generateTimeSeriesQuery('sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", id =~"/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) by (device, id)', '{{ id }}: {{ device }} - write')
+      + generateTimeSeriesQuery('sum(rate(container_fs_reads_bytes_total{device!~".+dm.+", node=~"' + nodeName + '", id =~"/system.slice/kubelet.service|/system.slice/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) by (device, id)', '{{ id }}: {{ device }} - read'),
   },
   stackroxCPU: {
     query():
@@ -186,23 +210,28 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   kubeletCPU: {
     query():
-      generateTimeSeriesQuery('topk(10,irate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[$interval])*100)', 'kubelet - {{node}}'),
+      generateTimeSeriesQuery('topk(10,irate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[$interval])*100 *  on (node) group_left kube_node_role{ role = "worker" })', 'kubelet - {{node}}'),
   },
   crioCPU: {
     query():
-      generateTimeSeriesQuery('topk(10,irate(process_cpu_seconds_total{service="kubelet",job="crio"}[$interval])*100)', 'crio - {{node}}'),
+      generateTimeSeriesQuery('topk(10,irate(process_cpu_seconds_total{service="kubelet",job="crio"}[$interval])*100 *  on (node) group_left kube_node_role{ role = "worker" })', 'crio - {{node}}'),
   },
   kubeletMemory: {
     query():
-      generateTimeSeriesQuery('topk(10,process_resident_memory_bytes{service="kubelet",job="kubelet"})', 'kubelet - {{node}}'),
+      generateTimeSeriesQuery('topk(10,process_resident_memory_bytes{service="kubelet",job="kubelet"} *  on (node) group_left kube_node_role{ role = "worker" })', 'kubelet - {{node}}'),
   },
   crioMemory: {
     query():
-      generateTimeSeriesQuery('topk(10,process_resident_memory_bytes{service="kubelet",job="crio"})', 'crio - {{node}}'),
+      generateTimeSeriesQuery('topk(10,process_resident_memory_bytes{service="kubelet",job="crio"} *  on (node) group_left kube_node_role{ role = "worker" })', 'crio - {{node}}'),
   },
   crioINodes: {
     query():
-      generateTimeSeriesQuery('(1 - node_filesystem_files_free{fstype!="",mountpoint="/run"} / node_filesystem_files{fstype!="",mountpoint="/run"}) * 100', '/var/run - {{instance}}'),
+      generateTimeSeriesQuery('(1 - node_filesystem_files_free{fstype!="",mountpoint="/run"} / node_filesystem_files{fstype!="",mountpoint="/run"}) * 100', '{{instance}}'),
+  },
+  crioINodesCount: {
+    query():
+      generateTimeSeriesQuery('node_filesystem_files{fstype!="",mountpoint="/run"} - node_filesystem_files_free{fstype!="",mountpoint="/run"}', '{{instance}}')
+      + generateTimeSeriesQuery('sum(node_filesystem_files{fstype!="",mountpoint="/run"} - node_filesystem_files_free{fstype!="",mountpoint="/run"})', 'sum'),
   },
   currentNodeCount: {
     query():
