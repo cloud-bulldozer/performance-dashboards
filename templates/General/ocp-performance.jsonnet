@@ -134,8 +134,8 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.genericLegendCounter('Top 10 container RSS: $_master_node', 'bytes', queries.top10ContainerRSS.query('$_master_node'), { x: 12, y: 24, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('cgroup CPU: $_master_node', 'percent', queries.nodeCGroupCPU.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
     panels.timeSeries.genericLegendCounter('cgroup RSS: $_master_node', 'bytes', queries.nodeCGroupRSS.query('$_master_node'), { x: 12, y: 32, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Pod fs write rate: $_master_node', 'Bps', queries.containerReadWriteBytesPod.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('cgroup fs write rate: $_master_node', 'Bps', queries.containerReadWriteBytesCGroup.query('$_master_node'), { x: 12, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Pod fs rw rate: $_master_node', 'Bps', queries.containerReadWriteBytesPod.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('cgroup fs rw rate: $_master_node', 'Bps', queries.containerReadWriteBytesCGroup.query('$_master_node'), { x: 12, y: 32, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Worker: $_worker_node')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 0, h: 8 })
