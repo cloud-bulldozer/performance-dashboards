@@ -188,6 +188,39 @@ local generateTimeSeriesQuery(query, legend) = [
     query():
       generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node))', '{{pod}} - {{node}}'),
   },
+  ovnKubeControllerCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}[$interval])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  ovnKubeControllerMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+  topNbdbCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}[$interval])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topNbdbMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+  topNorthdCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}[$interval])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topNorthdMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="northd"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+  topSbdbCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}[$interval])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topSbdbMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+
   promReplCpuUsage: {
     query():
       generateTimeSeriesQuery('sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-0",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container) * 100', '{{pod}}')
