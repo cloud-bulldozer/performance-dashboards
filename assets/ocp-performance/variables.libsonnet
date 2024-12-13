@@ -22,7 +22,7 @@ local var = g.dashboard.variable;
     + var.query.withDatasourceFromVariable(self.datasource)
     + var.query.queryTypes.withLabelValues(
       'node',
-      'kube_node_role{role=~"work.*"}',
+      'kube_node_role{role=~"worker"}',
     )
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti()

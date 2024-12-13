@@ -6,6 +6,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
     local fieldOverride = g.panel.timeSeries.fieldOverride,
     local custom = timeSeries.fieldConfig.defaults.custom,
     local options = timeSeries.options,
+    local standardOptions = timeSeries.standardOptions,
+    local byRegexp = timeSeries.standardOptions.override.byRegexp,
 
     generic(title, unit, targets, gridPos):
       timeSeries.new(title)
@@ -45,6 +47,16 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.legend.withSortBy('Max')
       + options.legend.withSortDesc(true)
       + options.legend.withPlacement('bottom'),
+
+    genericLegendCounterSumRightHand(title, unit, targets, gridPos):
+      self.genericLegendCounter(title, unit, targets, gridPos)
+      + options.legend.withDisplayMode('table')
+      + options.legend.withSortBy('Max')
+      + standardOptions.withOverrides([
+        byRegexp.new('sum')
+        + byRegexp.withProperty('custom.axisPlacement', 'right')
+        + byRegexp.withProperty('custom.axisLabel', 'sum'),
+      ]),
   },
   stat: {
     local stat = g.panel.stat,

@@ -34,14 +34,16 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.genericLegend('Control Plane CPU Usage', 'percent', queries.controlPlanesCPU.query(), { x: 12, y: 2, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Workers Load1', 'short', queries.workersLoad1.query(), { x: 0, y: 9, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Control Plane Load1', 'short', queries.controlPlanesLoad1.query(), { x: 12, y: 9, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Workers CGroup CPU Rate', 'short', queries.workersCGroupCpuRate.query(), { x: 0, y: 17, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Control Plane CGroup CPU Rate', 'short', queries.controlPlaneCGroupCpuRate.query(), { x: 12, y: 17, w: 12, h: 8 }),
-    panels.timeSeries.genericLegendCounter('Workers Memory Available', 'bytes', queries.workersMemoryAvailable.query(), { x: 0, y: 25, w: 12, h: 8 }),
-    panels.timeSeries.genericLegendCounter('Control Plane Memory Available', 'bytes', queries.controlPlaneMemoryAvailable.query(), { x: 12, y: 25, w: 12, h: 8 }),
-    panels.timeSeries.genericLegendCounter('Workers Container Threads', 'short', queries.workersContainerThreads.query(), { x: 0, y: 33, w: 12, h: 8 }),
-    panels.timeSeries.genericLegendCounter('Control Plane Container Threads', 'short', queries.controlPlaneContainerThreads.query(), { x: 12, y: 33, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Workers Disk IOPS', 'short', queries.workersIOPS.query(), { x: 0, y: 41, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Control Plane Disk IOPS', 'short', queries.controlPlaneIOPS.query(), { x: 12, y: 41, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounterSumRightHand('Workers Memory Available', 'bytes', queries.workersMemoryAvailable.query(), { x: 0, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounterSumRightHand('Control Plane Memory Available', 'bytes', queries.controlPlaneMemoryAvailable.query(), { x: 12, y: 17, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Workers CGroup CPU Rate', 'short', queries.workersCGroupCpuRate.query(), { x: 0, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane CGroup CPU Rate', 'short', queries.controlPlaneCGroupCpuRate.query(), { x: 12, y: 25, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Workers CGroup Memory RSS', 'bytes', queries.workersCGroupMemoryRSS.query(), { x: 0, y: 33, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Control Plane CGroup Memory RSS', 'bytes', queries.controlPlaneCGroupMemoryRSS.query(), { x: 12, y: 33, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Workers Container Threads', 'short', queries.workersContainerThreads.query(), { x: 0, y: 41, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Control Plane Container Threads', 'short', queries.controlPlaneContainerThreads.query(), { x: 12, y: 41, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Workers Disk IOPS', 'short', queries.workersIOPS.query(), { x: 0, y: 49, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Control Plane Disk IOPS', 'short', queries.controlPlaneIOPS.query(), { x: 12, y: 49, w: 12, h: 8 }),
   ]),
   g.panel.row.new('OVN')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
@@ -89,9 +91,10 @@ g.dashboard.new('Openshift Performance')
   + g.panel.row.withPanels([
     panels.timeSeries.genericLegend('Top 10 Kubelet CPU usage', 'percent', queries.kubeletCPU.query(), { x: 0, y: 3, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 crio CPU usage', 'percent', queries.crioCPU.query(), { x: 12, y: 3, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 Kubelet memory usage', 'bytes', queries.kubeletMemory.query(), { x: 0, y: 11, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 crio memory usage', 'bytes', queries.crioMemory.query(), { x: 12, y: 11, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('inodes usage in /var/run', 'percent', queries.crioINodes.query(), { x: 0, y: 19, w: 24, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Top 10 Kubelet memory usage', 'bytes', queries.kubeletMemory.query(), { x: 0, y: 11, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Top 10 crio memory usage', 'bytes', queries.crioMemory.query(), { x: 12, y: 11, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('inodes usage in /run', 'percent', queries.crioINodes.query(), { x: 0, y: 19, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounterSumRightHand('inodes count in /run', 'none', queries.crioINodesCount.query(), { x: 12, y: 19, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Cluster Details')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
@@ -128,16 +131,19 @@ g.dashboard.new('Openshift Performance')
   + g.panel.row.withRepeat('_master_node')
   + g.panel.row.withPanels([
     panels.timeSeries.genericLegend('CPU Basic: $_master_node', 'percent', queries.nodeCPU.query('$_master_node'), { x: 0, y: 0, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('System Memory: $_master_node', 'bytes', queries.nodeMemory.query('$_master_node'), { x: 12, y: 0, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('System Memory: $_master_node', 'bytes', queries.nodeMemory.query('$_master_node'), { x: 12, y: 0, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Disk throughput: $_master_node', 'Bps', queries.diskThroughput.query('$_master_node'), { x: 0, y: 8, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Disk IOPS: $_master_node', 'iops', queries.diskIOPS.query('$_master_node'), { x: 12, y: 8, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network Utilization: $_master_node', 'bps', queries.networkUtilization.query('$_master_node'), { x: 0, y: 16, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network Packets: $_master_node', 'pps', queries.networkPackets.query('$_master_node'), { x: 12, y: 16, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network packets drop: $_master_node', 'pps', queries.networkDrop.query('$_master_node'), { x: 0, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Conntrack stats: $_master_node', '', queries.conntrackStats.query('$_master_node'), { x: 12, y: 24, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Conntrack stats: $_master_node', '', queries.conntrackStats.query('$_master_node'), { x: 12, y: 24, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 container CPU: $_master_node', 'percent', queries.top10ContainerCPU.query('$_master_node'), { x: 0, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 container RSS: $_master_node', 'bytes', queries.top10ContainerRSS.query('$_master_node'), { x: 12, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Container fs write rate: $_master_node', 'Bps', queries.containerWriteBytes.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Top 10 container RSS: $_master_node', 'bytes', queries.top10ContainerRSS.query('$_master_node'), { x: 12, y: 24, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('cgroup CPU: $_master_node', 'percent', queries.nodeCGroupCPU.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('cgroup RSS: $_master_node', 'bytes', queries.nodeCGroupRSS.query('$_master_node'), { x: 12, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Pod fs rw rate: $_master_node', 'Bps', queries.containerReadWriteBytesPod.query('$_master_node'), { x: 0, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('cgroup fs rw rate: $_master_node', 'Bps', queries.containerReadWriteBytesCGroup.query('$_master_node'), { x: 12, y: 32, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Worker: $_worker_node')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 0, h: 8 })
@@ -145,15 +151,17 @@ g.dashboard.new('Openshift Performance')
   + g.panel.row.withRepeat('_worker_node')
   + g.panel.row.withPanels([
     panels.timeSeries.genericLegend('CPU Basic: $_worker_node', 'percent', queries.nodeCPU.query('$_worker_node'), { x: 0, y: 0, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('System Memory: $_worker_node', 'bytes', queries.nodeMemory.query('$_worker_node'), { x: 12, y: 0, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('System Memory: $_worker_node', 'bytes', queries.nodeMemory.query('$_worker_node'), { x: 12, y: 0, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Disk throughput: $_worker_node', 'Bps', queries.diskThroughput.query('$_worker_node'), { x: 0, y: 8, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Disk IOPS: $_worker_node', 'iops', queries.diskIOPS.query('$_worker_node'), { x: 12, y: 8, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network Utilization: $_worker_node', 'bps', queries.networkUtilization.query('$_worker_node'), { x: 0, y: 16, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network Packets: $_worker_node', 'pps', queries.networkPackets.query('$_worker_node'), { x: 12, y: 16, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Network packets drop: $_worker_node', 'pps', queries.networkDrop.query('$_worker_node'), { x: 0, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Conntrack stats: $_worker_node', '', queries.conntrackStats.query('$_worker_node'), { x: 12, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 container CPU: $_worker_node', 'percent', queries.top10ContainerCPU.query('$_worker_node'), { x: 0, y: 24, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 10 container RSS: $_worker_node', 'bytes', queries.top10ContainerRSS.query('$_worker_node'), { x: 12, y: 24, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Conntrack stats: $_worker_node', '', queries.conntrackStats.query('$_worker_node'), { x: 12, y: 24, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Top 10 container CPU: $_worker_node', 'percent', queries.top10ContainerCPU.query('$_worker_node'), { x: 0, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('Top 10 container RSS: $_worker_node', 'bytes', queries.top10ContainerRSS.query('$_worker_node'), { x: 12, y: 32, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('cgroup CPU: $_worker_node', 'percent', queries.nodeCGroupCPU.query('$_worker_node'), { x: 0, y: 40, w: 12, h: 8 }),
+    panels.timeSeries.genericLegendCounter('cgroup RSS: $_worker_node', 'bytes', queries.nodeCGroupRSS.query('$_worker_node'), { x: 12, y: 40, w: 12, h: 8 }),
   ]),
   g.panel.row.new('Infra: $_infra_node')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 0, h: 8 })
