@@ -58,7 +58,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.legend.withDisplayMode('table')
       + options.legend.withSortBy('Max')
       + standardOptions.withOverrides([
-        byRegexp.new('.*irate.*')
+        byRegexp.new('.*rate.*')
         + byRegexp.withProperty('custom.axisPlacement', 'right')
         + byRegexp.withProperty('custom.axisLabel', 'rate')
         + byRegexp.withProperty('unit', 'none'),
