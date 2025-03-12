@@ -15,6 +15,43 @@ spec:
   selector:
     app: dittybopper
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: renderer
+  namespace: $namespace
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: grafana-renderer
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-renderer
+  namespace: $namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-renderer
+  template:
+    metadata:
+      labels:
+        app: grafana-renderer
+    spec:
+      containers:
+      - name: renderer
+        image: ${GRAFANA_RENDERER_IMAGE}
+        ports:
+        - containerPort: 8081
+        env:
+        - name: RENDERING_TZ
+          value: "UTC"
+---
 #FIXME: This is OCP-specific
 apiVersion: route.openshift.io/v1
 kind: Route
@@ -57,6 +94,13 @@ spec:
           name: sc-grafana-config
         - mountPath: /etc/grafana/provisioning/datasources
           name: sc-ocp-prom
+        env:
+        - name: GF_RENDERING_SERVER_URL
+          value: "http://renderer.dittybopper.svc:8081/render"
+        - name: GF_RENDERING_CALLBACK_URL
+          value: "http://dittybopper.dittybopper.svc:3000/"
+        - name: GF_LOG_FILTERS
+          value: "rendering:debug"
       - name: dittybopper-syncer
         imagePullPolicy: Always
         env:
