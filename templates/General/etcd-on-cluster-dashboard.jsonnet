@@ -30,6 +30,15 @@ g.dashboard.new('etcd-cluster-info dashoard')
     panels.timeSeries.generalUsageAgg('DB Size', 'bytes', queries.dbSize.query(), { x: 12, y: 16, w: 12, h: 8 }),
   ]),
 
+  g.panel.row.new('Compact/Defrag Detailed')
+  + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withPanels([
+    panels.timeSeries.histogramStatsRightHand('Compaction Duration sum', 'none', queries.compactionDurationSum.query(), { x: 0, y: 0, w: 8, h: 8 }, 'sum'),
+    panels.timeSeries.histogramStatsRightHand('Defrag Duration sum', 'none', queries.defragDurationSum.query(), { x: 8, y: 0, w: 8, h: 8 }, 'count'),
+    panels.timeSeries.histogramStatsRightHand('vmstat major page faults', 'none', queries.nodeVmstatPgmajfault.query(), { x: 16, y: 0, w: 8, h: 8 }, 'count'),
+  ]),
+
   g.panel.row.new('WAL fsync Duration Detailed')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)

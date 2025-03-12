@@ -20,6 +20,24 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*",pod=~"$etcd_pod"}[2m])) BY (pod, namespace)', '{{ pod }}'),
   },
 
+  compactionDurationSum: {
+    query():
+      generateTimeSeriesQuery('delta(etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[1m:30s])/2', 'rate compact sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'compact sum {{instance}} '),
+  },
+
+  defragDurationSum: {
+    query():
+      generateTimeSeriesQuery('delta(etcd_disk_backend_defrag_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[1m:30s])/2', 'rate defrag sum {{instance}} ')
+      + generateTimeSeriesQuery('etcd_disk_backend_defrag_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}', 'defrag sum {{instance}} '),
+  },
+
+  nodeVmstatPgmajfault: {
+    query():
+      generateTimeSeriesQuery('rate(node_vmstat_pgmajfault[2m])* on (instance) group_left label_replace(kube_node_role{role="control-plane"},"instance","$1","node","(.*)")', 'rate pgmajfault {{instance}} ')
+      + generateTimeSeriesQuery('node_vmstat_pgmajfault * on (instance) group_left label_replace(kube_node_role{role="control-plane"},"instance","$1","node","(.*)")', 'pgmajfault {{instance}} '),
+  },
+
   diskWalSyncDuration: {
     query():
       generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[5m])) by (pod, le))', '{{pod}} WAL fsync'),
@@ -56,7 +74,7 @@ local generateTimeSeriesQuery(query, legend) = [
 
   etcdContainerDiskWrites: {
     query():
-      generateTimeSeriesQuery('rate(container_fs_writes_bytes_total{namespace="openshift-etcd",container="etcd",device!~".+dm.+"}[2m])', '{{ pod }}: {{ device }}'),
+      generateTimeSeriesQuery('rate(container_fs_writes_bytes_total{namespace="openshift-etcd",device!~".+dm.+"}[2m])', '{{ pod }}: {{ device }}'),
   },
 
   dbSize: {
@@ -67,8 +85,8 @@ local generateTimeSeriesQuery(query, legend) = [
 
   containerNetworkTraffic: {
     query():
-      generateTimeSeriesQuery('sum(rate(container_network_receive_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)', 'rx {{ pod }}')
-      + generateTimeSeriesQuery('sum(rate(container_network_transmit_bytes_total{ container="etcd", namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)', 'tx {{ pod }}'),
+      generateTimeSeriesQuery('sum(rate(container_network_receive_bytes_total{ namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)', 'rx {{ pod }}')
+      + generateTimeSeriesQuery('sum(rate(container_network_transmit_bytes_total{ namespace=~"openshift-etcd.*"}[2m])) BY (namespace, pod)', 'tx {{ pod }}'),
   },
 
   p99PeerToPeerLatency: {
