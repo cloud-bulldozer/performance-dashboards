@@ -4,7 +4,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 local generateTimeSeriesQuery(query, legend) = [
   local prometheusQuery = g.query.prometheus;
   prometheusQuery.new(
-    '$' + variables.datasource.name,
+    '$' + variables.Datasource.name,
     query
   )
   + prometheusQuery.withFormat('time_series')

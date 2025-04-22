@@ -16,7 +16,7 @@ g.dashboard.new('Openshift Performance')
 + g.dashboard.withEditable(true)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
-  variables.datasource,
+  variables.Datasource,
   variables.master_node,
   variables.worker_node,
   variables.infra_node,
