@@ -13,7 +13,7 @@ g.dashboard.new('k8s-netperf')
 + g.dashboard.withEditable(true)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
-  variables.datasource,
+  variables.Datasource,
   variables.platform,
   variables.workers,
   variables.uuid,

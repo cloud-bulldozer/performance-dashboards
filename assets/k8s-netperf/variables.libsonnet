@@ -2,17 +2,17 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 local var = g.dashboard.variable;
 
 {
-  datasource:
-    var.datasource.new('datasource', 'elasticsearch')
+  Datasource:
+    var.datasource.new('Datasource', 'elasticsearch')
     + var.datasource.withRegex('/(.*netperf.*)/')
-    + var.query.generalOptions.withLabel('datasource')
+    + var.query.generalOptions.withLabel('Datasource')
     + var.query.selectionOptions.withMulti(false)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withIncludeAll(false),
 
   platform:
     var.query.new('platform', '{"find": "terms", "field": "metadata.platform.keyword"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
@@ -20,7 +20,7 @@ local var = g.dashboard.variable;
 
   workers:
     var.query.new('workerNodesType', '{"find": "terms", "field": "metadata.workerNodesType.keyword", "query": "metadata.platform.keyword: $platform"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(true)
@@ -28,7 +28,7 @@ local var = g.dashboard.variable;
 
   uuid:
     var.query.new('uuid', '{"find": "terms", "field": "uuid.keyword", "query":"metadata.platform.keyword: $platform AND  metadata.workerNodesType.keyword: $workerNodesType"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
@@ -48,7 +48,7 @@ local var = g.dashboard.variable;
 
   streams:
     var.query.new('parallelism', '{"find": "terms", "field": "parallelism", "query":"uuid: $uuid"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
@@ -56,7 +56,7 @@ local var = g.dashboard.variable;
 
   throughput_profile:
     var.query.new('throughput_profile', '{"find": "terms", "field": "profile.keyword", "query":"uuid:$uuid"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRegex('.*STREAM.*')
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
@@ -65,7 +65,7 @@ local var = g.dashboard.variable;
 
   latency_profile:
     var.query.new('latency_profile', '{"find": "terms", "field": "profile.keyword", "query":"uuid:$uuid"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRegex('.*RR.*')
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
@@ -74,7 +74,7 @@ local var = g.dashboard.variable;
 
   messageSize:
     var.query.new('messageSize', '{"find": "terms", "field": "messageSize","query":"uuid:$uuid"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(2)
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
@@ -82,7 +82,7 @@ local var = g.dashboard.variable;
 
   driver:
     var.query.new('driver', '{"find": "terms", "field": "driver.keyword","query":"uuid:$uuid"}')
-    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.withRefresh(1)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(false)

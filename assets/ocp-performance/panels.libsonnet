@@ -12,7 +12,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
     generic(title, unit, targets, gridPos):
       timeSeries.new(title)
       + timeSeries.queryOptions.withTargets(targets)
-      + timeSeries.datasource.withUid('$datasource')
+      + timeSeries.datasource.withUid('$Datasource')
       + timeSeries.standardOptions.withUnit(unit)
       + timeSeries.gridPos.withX(gridPos.x)
       + timeSeries.gridPos.withY(gridPos.y)
@@ -64,7 +64,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 
     base(title, targets, gridPos):
       stat.new(title)
-      + stat.datasource.withUid('$datasource')
+      + stat.datasource.withUid('$Datasource')
       + stat.queryOptions.withTargets(targets)
       + stat.gridPos.withX(gridPos.x)
       + stat.gridPos.withY(gridPos.y)
