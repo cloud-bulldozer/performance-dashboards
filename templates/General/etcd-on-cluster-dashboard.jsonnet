@@ -3,7 +3,7 @@ local queries = import '../../assets/etcd-on-cluster-dashboard/queries.libsonnet
 local variables = import '../../assets/etcd-on-cluster-dashboard/variables.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
-g.dashboard.new('etcd-cluster-info dashoard')
+g.dashboard.new('etcd-cluster-info dashboard')
 + g.dashboard.time.withFrom('now-1h')
 + g.dashboard.time.withTo('now')
 + g.dashboard.withTimezone('utc')
