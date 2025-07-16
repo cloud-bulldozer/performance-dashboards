@@ -44,6 +44,70 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node))', '{{pod}} - {{node}}'),
   },
 
+  topNorthdCPU: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(irate(container_cpu_usage_seconds_total{container="northd", namespace="openshift-ovn-kubernetes"}[2m])*100) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topNorthdMem: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(container_memory_rss{container="northd", namespace="openshift-ovn-kubernetes"}) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topSbdbCPU: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(irate(container_cpu_usage_seconds_total{container="sbdb", namespace="openshift-ovn-kubernetes"}[2m])*100) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topSbdbMem: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(container_memory_rss{container="sbdb", namespace="openshift-ovn-kubernetes"}) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topNbdbCPU: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(irate(container_cpu_usage_seconds_total{container="nbdb", namespace="openshift-ovn-kubernetes"}[2m])*100) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topNbdbMem: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(container_memory_rss{container="nbdb", namespace="openshift-ovn-kubernetes"}) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topOvnkubeControllerCPU: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(irate(container_cpu_usage_seconds_total{container="ovnkube-controller", namespace="openshift-ovn-kubernetes"}[2m])*100) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topOvnkubeControllerMem: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(container_memory_rss{container="ovnkube-controller", namespace="openshift-ovn-kubernetes"}) by (pod, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
   ovnAnnotationLatency: {
     query():
       generateTimeSeriesQuery('histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m]))) > 0', '{{pod}} - Pod Annotation latency'),
