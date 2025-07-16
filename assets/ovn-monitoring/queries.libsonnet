@@ -44,6 +44,22 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node))', '{{pod}} - {{node}}'),
   },
 
+  topOvnkubenodePodCPU: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, (sum(irate(container_cpu_usage_seconds_total{name!="",container!~"POD|",namespace=~"openshift-ovn-kubernetes", node=~"$_worker_node"}[2m]) * 100) by (pod, namespace, node)) > 0)',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
+  topOvnkubenodePodMem: {
+    query():
+      generateTimeSeriesQuery(
+        'topk(10, sum(container_memory_rss{name!="",container!~"POD|",namespace=~"openshift-ovn-kubernetes", node=~"$_worker_node"}) by (pod, namespace, node))',
+        '{{pod}} - {{node}}'
+      ),
+  },
+
   topNorthdCPU: {
     query():
       generateTimeSeriesQuery(
@@ -108,9 +124,34 @@ local generateTimeSeriesQuery(query, legend) = [
       ),
   },
 
+  podSchedulingLatency: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, rate(scheduler_pod_scheduling_sli_duration_seconds_bucket[5m])) > 0', '{{pod}}'),
+  },
+
+  firstSeenToLSPCreated: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_controller_pod_first_seen_lsp_created_duration_seconds_bucket[2m])) by (pod, le)) > 0', '{{pod}}'),
+  },
+
   ovnAnnotationLatency: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m]))) > 0', '{{pod}} - Pod Annotation latency'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m]))) > 0', '{{pod}}'),
+  },
+
+  lspCreated: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_controller_pod_lsp_created_port_binding_duration_seconds_bucket[2m])) by (pod,le)) > 0', '{{pod}}'),
+  },
+
+  lspToChassis: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_controller_pod_port_binding_port_binding_chassis_duration_seconds_bucket[2m])) by (pod, le)) > 0', '{{pod}}'),
+  },
+
+  portMarkedAsUp: {
+    query():
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_controller_pod_port_binding_chassis_port_binding_up_duration_seconds_bucket[2m])) by (pod, le)) > 0', '{{pod}}'),
   },
 
   ovnCNIAdd: {
@@ -118,23 +159,14 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[2m])) by (pod,le)) > 0', '{{pod}}'),
   },
 
-  podLatency: {
+  networkProgrammingComplete: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_lsp_created_port_binding_duration_seconds_bucket[2m])) by (pod,le))', '{{pod}} - LSP created')
-      + generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_port_binding_chassis_duration_seconds_bucket[2m])) by (pod,le))', '{{pod}} - Port Binding')
-      + generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_port_binding_chassis_port_binding_up_duration_seconds_bucket[2m])) by (pod,le))', '{{pod}} - Port Binding Up')
-      + generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_pod_first_seen_lsp_created_duration_seconds_bucket[2m])) by (pod,le))', '{{pod}} - Pod First seen'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_controller_network_programming_duration_seconds_bucket[2m])) by (pod, le)) > 0', '{{pod}}'),
   },
 
   synclatency: {
     query():
       generateTimeSeriesQuery('rate(ovnkube_master_sync_service_latency_seconds_sum[2m])', '{{pod}} - Sync service latency'),
-  },
-
-  ovnLatencyCalculate: {
-    query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (pod, le))', '{{pod}} - Kind Pod')
-      + generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_master_network_programming_duration_seconds_bucket[2m])) by (service, le))', '{{service}} - Kind Service'),
   },
 
   ovnkubeNodeReadyLatency: {
