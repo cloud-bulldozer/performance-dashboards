@@ -75,6 +75,12 @@ g.dashboard.new('Kube-burner Report - OCP wrapper')
     panels.timeSeries.withMeanMax('Aggregated OVNKube-master containers memory', 'bytes', queries.aggregatedOVNKubeMasterStats.queries('containerMemory'), { x: 12, y: 49, w: 12, h: 14 }, null),
     panels.timeSeries.withMeanMax('Aggregated OVNKube-node containers CPU', 'percent', queries.aggregatedOVNKubeNodeStats.query('containerCPU-AggregatedWorkers'), { x: 0, y: 63, w: 12, h: 14 }, null),
     panels.timeSeries.sortByMeanCommon('Aggregated OVNKube-node containers Memory', 'bytes', queries.aggregatedOVNKubeNodeStats.query('containerMemory-AggregatedWorkers'), { x: 12, y: 63, w: 12, h: 14 }, null),
+    panels.stat.withMeanThresholds('Route latencies summary $latencyPercentile', 'ms', queries.bgpRouteLatenciesSummary.query(), { x: 12, y: 15, w: 12, h: 8 }),
+    panels.table.withLatencyTableOverrides('BGP Routes Export latency', 'ms', queries.bgpRouteExportLatency.query(), { x: 0, y: 23, w: 24, h: 10 }),
+    panels.table.withLatencyTableOverrides('BGP Routes Import latency', 'ms', queries.bgpRouteImportLatency.query(), { x: 0, y: 23, w: 24, h: 10 }),
+    panels.table.withLatencyTableOverrides('EgressIP latency', 'ms', queries.egressIPLatency.query(), { x: 0, y: 23, w: 24, h: 10 }),
+    panels.timeSeries.sortByMean('frr-k8s pods CPU Usage', 'percent', queries.frrk8sPodStats.queries('containerCPU'), { x: 0, y: 33, w: 12, h: 8 }, null),
+    panels.timeSeries.sortByMean('frr-k8s pods Memory Usage', 'bytes', queries.frrk8sPodStats.queries('containerMemory'), { x: 12, y: 33, w: 12, h: 8 }, null),
   ]),
   g.panel.row.new('etcd')
   + g.panel.row.withGridPos({ x: 0, y: 14, w: 24, h: 1 })
