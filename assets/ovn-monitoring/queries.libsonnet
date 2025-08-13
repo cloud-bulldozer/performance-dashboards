@@ -35,6 +35,33 @@ local generateTimeSeriesQuery(query, legend) = [
       generateTimeSeriesQuery('container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}', '{{pod}} - {{node}}'),
   },
 
+  topFrrContainerCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"frr-k8s.*",namespace="openshift-frr-k8s",container="frr"}[2m])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topFrrContainerMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"frr-k8s-.*",namespace="openshift-frr-k8s",container="frr"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+
+  topFrrControllerContainerCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"frr-k8s.*",namespace="openshift-frr-k8s",container="controller"}[2m])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topFrrControllerContainerMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"frr-k8s-.*",namespace="openshift-frr-k8s",container="controller"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+
+  topFrrReloaderContainerCPU: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"frr-k8s.*",namespace="openshift-frr-k8s",container="reloader"}[2m])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
+  },
+  topFrrReloaderContainerMem: {
+    query():
+      generateTimeSeriesQuery('topk(10, sum(container_memory_rss{pod=~"frr-k8s-.*",namespace="openshift-frr-k8s",container="reloader"}) by (pod,node))', '{{pod}} - {{node}}'),
+  },
+
   topOvnControllerCPU: {
     query():
       generateTimeSeriesQuery('topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[2m])*100)  by (pod,node) )', '{{pod}} - {{node}}'),
