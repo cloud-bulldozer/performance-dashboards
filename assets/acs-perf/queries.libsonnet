@@ -349,6 +349,18 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withTimeField('timestamp'),
   },
 
+  acsVersionInfo: {
+    query():
+      elasticsearch.withAlias('')
+      + elasticsearch.withBucketAggs([])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+      ])
+      + elasticsearch.withQuery('metricName.keyword: central_rox_central_info AND jobName.keyword: $job AND metadata.ocpMajorVersion.keyword: $ocpMajorVersion AND labels.central_version.keyword: $acs_version')
+      + elasticsearch.withTimeField('timestamp'),
+  },
+
   apiLatency: {
     readOnlyResource():
       elasticsearch.withAlias('Memory')

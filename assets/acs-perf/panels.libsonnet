@@ -215,6 +215,191 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
           ],
         },
       ]),
+
+    withACSVersionInfo(title, unit, targets, gridPos):
+      self.base(title, unit, targets, gridPos)
+      + table.queryOptions.withTransformations([
+        {
+          id: 'organize',
+          options: {
+            excludeByName: {
+              _id: true,
+              _index: true,
+              _type: true,
+              churnMetric: true,
+              highlight: true,
+              'jobConfig.churnDelay': true,
+              'jobConfig.churnDuration': true,
+              'jobConfig.churnPercent': true,
+              'jobConfig.cleanup': true,
+              'jobConfig.errorOnVerify': true,
+              'jobConfig.iterationsPerNamespace': true,
+              'jobConfig.jobIterationDelay': true,
+              'jobConfig.jobIterations': false,
+              'jobConfig.jobPause': true,
+              'jobConfig.jobType': true,
+              'jobConfig.maxWaitTimeout': true,
+              'jobConfig.name': false,
+              'jobConfig.namespace': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/audit': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/enforce': true,
+              'jobConfig.namespaceLabels.pod-security.kubernetes.io/warn': true,
+              'jobConfig.namespaceLabels.security.openshift.io/scc.podSecurityLabelSync': true,
+              'jobConfig.namespaced': true,
+              'jobConfig.namespacedIterations': true,
+              'jobConfig.objects': true,
+              'jobConfig.podWait': true,
+              'jobConfig.preLoadImages': true,
+              'jobConfig.preLoadPeriod': true,
+              'jobConfig.verifyObjects': true,
+              'jobConfig.waitFor': true,
+              'jobConfig.waitForDeletion': true,
+              'jobConfig.waitWhenFinished': true,
+              jobName: true,
+              'labels.central_id': true,
+              'labels.container': true,
+              'labels.endpoint': true,
+              'labels.hosting': true,
+              'labels.instance': true,
+              'labels.job': true,
+              'labels.namespace': true,
+              'labels.pod': true,
+              'labels.service': true,
+              'metadata.cloud-bulldozer': true,
+              'metadata.k8sVersion': true,
+              'metadata.ocpMajorVersion': true,
+              'metadata.ocpVersion': true,
+              'metadata.platform': true,
+              'metadata.sdnType': true,
+              'metadata.totalNodes': true,
+              metricName: true,
+              query: true,
+              sort: true,
+              timestamp: true,
+              uuid: false,
+              value: true,
+            },
+            indexByName: {
+              _id: 6,
+              _index: 7,
+              _type: 8,
+              churnMetric: 9,
+              highlight: 10,
+              jobName: 11,
+              'labels.branding': 2,
+              'labels.build': 3,
+              'labels.central_id': 12,
+              'labels.central_version': 1,
+              'labels.container': 13,
+              'labels.endpoint': 14,
+              'labels.hosting': 15,
+              'labels.install_method': 4,
+              'labels.instance': 16,
+              'labels.job': 17,
+              'labels.namespace': 18,
+              'labels.pod': 19,
+              'labels.service': 20,
+              'metadata.ocpMajorVersion': 21,
+              'metadata.ocpVersion': 22,
+              metricName: 23,
+              query: 24,
+              sort: 25,
+              timestamp: 5,
+              uuid: 0,
+              value: 26,
+            },
+            renameByName: {
+              'labels.branding': 'Branding',
+              'labels.build': 'Build',
+              'labels.central_version': 'ACS Version',
+              'labels.install_method': 'Install Method',
+              timestamp: 'Date',
+              uuid: 'UUID',
+            },
+          },
+        },
+        {
+          id: 'groupBy',
+          options: {
+            fields: {
+              'ACS Version': {
+                aggregations: [],
+                operation: 'groupby',
+              },
+              Branding: {
+                aggregations: [],
+                operation: 'groupby',
+              },
+              Build: {
+                aggregations: [],
+                operation: 'groupby',
+              },
+              Date: {
+                aggregations: [],
+                operation: 'groupby',
+              },
+              'Install Method': {
+                aggregations: [],
+                operation: 'groupby',
+              },
+              UUID: {
+                aggregations: [],
+                operation: 'groupby',
+              },
+            },
+          },
+        },
+      ])
+      + table.standardOptions.withOverrides([
+        {
+          matcher: {
+            id: 'byName',
+            options: 'UUID',
+          },
+          properties: [
+            {
+              id: 'custom.width',
+              value: 475,
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'ACS Version',
+          },
+          properties: [
+            {
+              id: 'custom.width',
+              value: 210,
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Branding',
+          },
+          properties: [
+            {
+              id: 'custom.width',
+              value: 161,
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Build',
+          },
+          properties: [
+            {
+              id: 'custom.width',
+              value: 164,
+            },
+          ],
+        },
+      ]),
   },
 
   barChart: {
@@ -240,7 +425,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + custom.withFillOpacity(80)
       + custom.scaleDistribution.withLog(2)
       + custom.scaleDistribution.withType('log')
-      + options.legend.withShowLegend(true)
+      + options.legend.withShowLegend(false)
       + options.legend.withDisplayMode('list')
       + options.legend.withPlacement('bottom')
       + options.withOrientation('horizontal')

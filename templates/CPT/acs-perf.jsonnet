@@ -37,30 +37,33 @@ g.dashboard.new('Kube-burner report for ACS')
 ])
 + g.dashboard.withPanels([
   // Job Summary Tables
-  panels.table.withJobSummary('Job Summary', '', [queries.jobSummary.query()], { x: 0, y: 0, w: 24, h: 6 }),
-  panels.table.withJobDetails('Job Details', '', [queries.jobSummary.query()], { x: 0, y: 6, w: 24, h: 5 }),
+  panels.table.withJobSummary('', '', [queries.jobSummary.query()], { x: 0, y: 0, w: 24, h: 6 }),
+  panels.table.withJobDetails('', '', [queries.jobSummary.query()], { x: 0, y: 6, w: 24, h: 5 }),
+
+  // ACS Version Information Table
+  panels.table.withACSVersionInfo('ACS Version Information', '', [queries.acsVersionInfo.query()], { x: 0, y: 11, w: 24, h: 5 }),
 
   // ACS Stats Row
   g.panel.row.new('ACS Stats')
-  + g.panel.row.withGridPos({ x: 0, y: 11, w: 24, h: 1 }),
+  + g.panel.row.withGridPos({ x: 0, y: 16, w: 24, h: 1 }),
   panels.barChart.withACSQueueDepth('Central Deployment Queue Depth', '', [
     queries.centralDeploymentQueueDepth.addOperations(),
     queries.centralDeploymentQueueDepth.removeOperations(),
-  ], { x: 0, y: 12, w: 10, h: 6 }),
-  panels.barChart.withSensorDrops('Sensor Process Enrichment Drops', '', [queries.sensorProcessEnrichmentDrops.query()], { x: 10, y: 12, w: 10, h: 6 }),
+  ], { x: 0, y: 17, w: 10, h: 6 }),
+  panels.barChart.withSensorDrops('Sensor Process Enrichment Drops', '', [queries.sensorProcessEnrichmentDrops.query()], { x: 10, y: 17, w: 10, h: 6 }),
 
   // ACS Component Performance (Repeating Row)
   g.panel.row.new('$acs_component')
-  + g.panel.row.withGridPos({ x: 0, y: 18, w: 24, h: 1 })
+  + g.panel.row.withGridPos({ x: 0, y: 23, w: 24, h: 1 })
   + g.panel.row.withRepeat('acs_component'),
-  panels.barChart.withACSMemoryUsage('Max WSS Usage $acs_component', 'bytes', [queries.acsComponentMemory.maxWSS()], { x: 0, y: 19, w: 10, h: 5 }),
-  panels.barChart.withACSCPUUsage('Max CPU Usage $acs_component', 'cores', [queries.acsComponentCPU.maxCPU()], { x: 10, y: 19, w: 10, h: 5 }),
-  panels.barChart.withP90Memory('p90 WSS Usage $acs_component', 'bytes', [queries.acsComponentMemory.p90WSS()], { x: 0, y: 24, w: 10, h: 5 }),
-  panels.barChart.withP90CPU('p90 CPU Usage $acs_component', 'cores', [queries.acsComponentCPU.p90CPU()], { x: 10, y: 24, w: 10, h: 5 }),
+  panels.barChart.withACSMemoryUsage('Max WSS Usage $acs_component', 'bytes', [queries.acsComponentMemory.maxWSS()], { x: 0, y: 24, w: 10, h: 5 }),
+  panels.barChart.withACSCPUUsage('Max CPU Usage $acs_component', 'cores', [queries.acsComponentCPU.maxCPU()], { x: 10, y: 24, w: 10, h: 5 }),
+  panels.barChart.withP90Memory('p90 WSS Usage $acs_component', 'bytes', [queries.acsComponentMemory.p90WSS()], { x: 0, y: 29, w: 10, h: 5 }),
+  panels.barChart.withP90CPU('p90 CPU Usage $acs_component', 'cores', [queries.acsComponentCPU.p90CPU()], { x: 10, y: 29, w: 10, h: 5 }),
 
   // Node Usage (Collapsed Row)
   g.panel.row.new('Node Usage')
-  + g.panel.row.withGridPos({ x: 0, y: 51, w: 24, h: 1 })
+  + g.panel.row.withGridPos({ x: 0, y: 56, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.barGauge.withNodeCPUUsage('$workerNodesCount nodes - CPU usage $node_roles', 'cores', [queries.nodeCPUUsage.query()], { x: 0, y: 29, w: 8, h: 4 }),
@@ -73,7 +76,7 @@ g.dashboard.new('Kube-burner report for ACS')
 
   // Pod & Service Latency (Collapsed Row)
   g.panel.row.new('Pod & Service ready latency')
-  + g.panel.row.withGridPos({ x: 0, y: 52, w: 24, h: 1 })
+  + g.panel.row.withGridPos({ x: 0, y: 57, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.barGauge.withPodLatency('$workerNodesCount nodes - P99 Pod ready latency', 'ms', [queries.podLatency.p99Ready()], { x: 0, y: 30, w: 12, h: 6 }),
@@ -82,7 +85,7 @@ g.dashboard.new('Kube-burner report for ACS')
 
   // API Latency (Collapsed Row)
   g.panel.row.new('API latency')
-  + g.panel.row.withGridPos({ x: 0, y: 53, w: 24, h: 1 })
+  + g.panel.row.withGridPos({ x: 0, y: 58, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withPanels([
     panels.barChart.withAPILatency('Read Only API request P99 latency - resource scoped', 's', [queries.apiLatency.readOnlyResource()], { x: 0, y: 31, w: 12, h: 6 }),
