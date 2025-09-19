@@ -12,7 +12,7 @@ local var = g.dashboard.variable;
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(true)
-    + var.query.generalOptions.withLabel('apisever')
+    + var.query.generalOptions.withLabel('apiserver')
     + var.query.withRefresh(2),
 
   instance:
@@ -47,16 +47,16 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.withLabel('verb')
     + var.query.withRefresh(2),
 
-  flowSchema:
-    var.query.new('flowSchema', 'label_values(flowSchema)')
+  flow_schema:
+    var.query.new('flow_schema', 'label_values(flow_schema)')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('flow-schema')
     + var.query.withRefresh(2),
 
-  priorityLevel:
-    var.query.new('priorityLevel', 'label_values(priorityLevel)')
+  priority_level:
+    var.query.new('priority_level', 'label_values(priority_level)')
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.selectionOptions.withMulti(false)
     + var.query.selectionOptions.withIncludeAll(true)

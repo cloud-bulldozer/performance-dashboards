@@ -31,6 +31,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.tooltip.withSort('desc')
       + timeSeries.queryOptions.withTimeFrom(null)
       + timeSeries.queryOptions.withTimeShift(null)
+      + options.legend.withSortBy('Max')
       + options.legend.withSortDesc(true),
 
     legendRightPlacement(title, unit, targets, gridPos):
