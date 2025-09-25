@@ -708,7 +708,7 @@ local prometheus = g.query.prometheus;
 
   requests_dropped_rate: {
     query():
-      prometheus.withExpr('sum(rate(apiserver_dropped_requests_total{namespace=~"$namespace"}[2m])) by (requestKind)')
+      prometheus.withExpr('sum(rate(apiserver_dropped_requests_total{namespace=~"$namespace"}[2m])) by (request_kind)')
       + prometheus.withFormat('time_series')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
@@ -742,9 +742,9 @@ local prometheus = g.query.prometheus;
 
   request_in_flight: {
     query():
-      prometheus.withExpr('sum(apiserver_current_inflight_requests{namespace=~"$namespace"}) by (instance,requestKind)')
+      prometheus.withExpr('sum(apiserver_current_inflight_requests{namespace=~"$namespace"}) by (instance,request_kind)')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{requestKind}}-{{instance}}')
+      + prometheus.withLegendFormat('{{request_kind}}-{{instance}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
@@ -768,54 +768,54 @@ local prometheus = g.query.prometheus;
 
   pf_request_queue_length: {
     query():
-      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))')
+      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{namespace=~"$namespace"}[2m])) by(flow_schema, priority_level, le))')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{flowSchema}}:{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{flow_schema}}:{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
 
   pf_request_wait_duration_99th_quartile: {
     query():
-      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))')
+      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{namespace=~"$namespace"}[2m])) by(flow_schema, priority_level, le))')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{flowSchema}}:{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{flow_schema}}:{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
 
   pf_request_execution_duration: {
     query():
-      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{namespace=~"$namespace"}[2m])) by(flowSchema, priorityLevel, le))')
+      prometheus.withExpr('histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{namespace=~"$namespace"}[2m])) by(flow_schema, priority_level, le))')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{flowSchema}}:{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{flow_schema}}:{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
 
   pf_request_dispatch_rate: {
     query():
-      prometheus.withExpr('sum(rate(apiserver_flowcontrol_dispatched_requests_total{namespace=~"$namespace"}[2m])) by(flowSchema,priorityLevel)')
+      prometheus.withExpr('sum(rate(apiserver_flowcontrol_dispatched_requests_total{namespace=~"$namespace"}[2m])) by(flow_schema,priority_level)')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{flowSchema}}:{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{flow_schema}}:{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
 
   pf_concurrency_limit: {
     query():
-      prometheus.withExpr('sum(apiserver_flowcontrol_request_concurrency_limit{namespace=~"$namespace"}) by (priorityLevel)')
+      prometheus.withExpr('sum(apiserver_flowcontrol_request_concurrency_limit{namespace=~"$namespace"}) by (priority_level)')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
 
   pf_pending_in_queue: {
     query():
-      prometheus.withExpr('sum(apiserver_flowcontrol_current_inqueue_requests{namespace=~"$namespace"}) by (flowSchema,priorityLevel)')
+      prometheus.withExpr('sum(apiserver_flowcontrol_current_inqueue_requests{namespace=~"$namespace"}) by (flow_schema,priority_level)')
       + prometheus.withFormat('time_series')
-      + prometheus.withLegendFormat('{{flowSchema}}:{{priorityLevel}}')
+      + prometheus.withLegendFormat('{{flow_schema}}:{{priority_level}}')
       + prometheus.withIntervalFactor(2)
       + prometheus.withDatasource('P1BA917A37525EDF3'),
   },
