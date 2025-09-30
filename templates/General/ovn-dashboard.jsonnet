@@ -3,7 +3,7 @@ local queries = import '../../assets/ovn-monitoring/queries.libsonnet';
 local variables = import '../../assets/ovn-monitoring/variables.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
-g.dashboard.new('OVN-Monitoring-dashboard')
+g.dashboard.new('Openshift Networking')
 + g.dashboard.time.withFrom('now-1h')
 + g.dashboard.time.withTo('now')
 + g.dashboard.withTimezone('utc')
@@ -26,24 +26,46 @@ g.dashboard.new('OVN-Monitoring-dashboard')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withPanels([
-    panels.stat.genericstatThresoldPanel('OVNKube Master', 'none', queries.ovnClusterManagerLeader.query(), { x: 0, y: 0, w: 8, h: 4 }),
+    panels.stat.genericstatThresoldPanel('OVNKube Cluster Manager Leader', 'none', queries.ovnClusterManagerLeader.query(), { x: 0, y: 0, w: 8, h: 4 }),
     panels.stat.genericstatThresoldPanel('OVN Northd Status', 'none', queries.ovnNorthd.query(), { x: 8, y: 0, w: 8, h: 4 }),
-    panels.stat.genericstatThresoldOVNControllerPanel('OVN controller', 'none', queries.numOnvController.query(), { x: 16, y: 0, w: 8, h: 4 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('ovnkube-control-plane CPU Usage', 'percent', queries.ovnKubeControlPlaneCPU.query(), { x: 0, y: 4, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('ovnkube-control-plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 4, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 ovn-controller CPU Usage', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10  ovn-controller Memory Usage', 'bytes', queries.topOvnControllerMem.query(), { x: 12, y: 12, w: 12, h: 10 }),
+    panels.stat.genericstatThresoldOVNControllerPanel('OVN Controller Count', 'none', queries.numOnvController.query(), { x: 16, y: 0, w: 8, h: 4 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Control Plane CPU Usage', 'percent', queries.ovnKubeControlPlaneCPU.query(), { x: 0, y: 4, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Control Plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 4, w: 12, h: 10 }),
   ]),
-  g.panel.row.new('Latency Monitoring')
+  g.panel.row.new('Pod Startup Latency Breakdown')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withPanels([
-    panels.timeSeries.genericTimeSeriesLegendPanel('Pod Annotation Latency', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 0, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('CNI Request ADD Latency', 's', queries.ovnCNIAdd.query(), { x: 12, y: 0, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('Pod creation Latency', 's', queries.podLatency.query(), { x: 0, y: 8, w: 24, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('Sync Service Latency', 's', queries.synclatency.query(), { x: 0, y: 16, w: 24, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('Duration for OVN to apply network configuration', 's', queries.ovnLatencyCalculate.query(), { x: 0, y: 24, w: 24, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Node Ready Latency', 's', queries.ovnkubeNodeReadyLatency.query(), { x: 0, y: 32, w: 24, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Scheduler Pod Scheduling Duration (P99)', 's', queries.podSchedulingLatency.query(), { x: 0, y: 0, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Pod First Seen to LSP Created Latency (P99)', 's', queries.firstSeenToLSPCreated.query(), { x: 12, y: 0, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Pod Annotation Latency (P99)', 's', queries.ovnAnnotationLatency.query(), { x: 0, y: 10, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Port Binding After LSP Creation Latency (P99)', 's', queries.lspCreated.query(), { x: 12, y: 10, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Port Binding to Chassis Assignment Latency (P99)', 's', queries.lspToChassis.query(), { x: 0, y: 20, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Port Marked As Up (P99)', 's', queries.portMarkedAsUp.query(), { x: 12, y: 20, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('CNI Request ADD Latency (P99)', 's', queries.ovnCNIAdd.query(), { x: 0, y: 30, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Network Programming Complete (P99)', 's', queries.networkProgrammingComplete.query(), { x: 12, y: 30, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Sync Service Latency', 's', queries.synclatency.query(), { x: 0, y: 40, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Node Ready Latency', 's', queries.ovnkubeNodeReadyLatency.query(), { x: 12, y: 40, w: 12, h: 10 }),
+  ]),
+  g.panel.row.new('OVN Component Resource Usage')
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
+  + g.panel.row.withPanels([
+    // Worker node pod resource usage
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Node Pods CPU Usage (Top 10)', 'percent', queries.topOvnkubenodePodCPU.query(), { x: 0, y: 0, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Node Pods Memory Usage (Top 10)', 'bytes', queries.topOvnkubenodePodMem.query(), { x: 12, y: 0, w: 12, h: 10 }),
+
+    // Component resource usage
+    panels.timeSeries.genericTimeSeriesLegendPanel('Northd CPU Usage (Top 10)', 'percent', queries.topNorthdCPU.query(), { x: 0, y: 8, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Northd Memory Usage (Top 10)', 'bytes', queries.topNorthdMem.query(), { x: 12, y: 8, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Sbdb CPU Usage (Top 10)', 'percent', queries.topSbdbCPU.query(), { x: 0, y: 16, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Sbdb Memory Usage (Top 10)', 'bytes', queries.topSbdbMem.query(), { x: 12, y: 16, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Nbdb CPU Usage (Top 10)', 'percent', queries.topNbdbCPU.query(), { x: 0, y: 24, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Nbdb Memory Usage (Top 10)', 'bytes', queries.topNbdbMem.query(), { x: 12, y: 24, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller CPU Usage (Top 10)', 'percent', queries.topOvnkubeControllerCPU.query(), { x: 0, y: 32, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller Memory Usage (Top 10)', 'bytes', queries.topOvnkubeControllerMem.query(), { x: 12, y: 32, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVN Controller CPU Usage (Top 10)', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 40, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVN Controller Memory Usage (Top 10)', 'bytes', queries.topOvnControllerMem.query(), { x: 12, y: 40, w: 12, h: 10 }),
   ]),
   g.panel.row.new('WorkQueue Monitoring')
   + g.panel.row.withCollapsed(true)

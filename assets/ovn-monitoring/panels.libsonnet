@@ -93,7 +93,15 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         'mean',
         'max',
       ])
-      + options.legend.withDisplayMode('table'),
+      + options.legend.withDisplayMode('table')
+      + {
+        options+: {
+          legend+: {
+            sortBy: 'Max',
+            sortDesc: true,
+          },
+        },
+      },
 
 
   },
