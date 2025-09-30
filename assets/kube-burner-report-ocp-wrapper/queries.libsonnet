@@ -126,6 +126,123 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: containerNetworkSetupLatency')
       + elasticsearch.withTimeField('timestamp'),
   },
+  bgpRouteLatenciesSummary: {
+    query():
+      elasticsearch.withAlias('$latencyPercentile {{term quantileName.keyword}}')
+      + elasticsearch.withBucketAggs([
+        elasticsearch.bucketAggs.Terms.withField('quantileName.keyword')
+        + elasticsearch.bucketAggs.Terms.withId('3')
+        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+        + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
+        + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
+        elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+        + elasticsearch.bucketAggs.DateHistogram.withId('2')
+        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(0)
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('$latencyPercentile')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+      ])
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: raLatencyQuantilesMeasurement')
+      + elasticsearch.withTimeField('timestamp'),
+  },
+  bgpRouteExportLatency: {
+    query():
+      elasticsearch.withBucketAggs([])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+      ])
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: raLatencyMeasurement AND scenario.keyword: ExportRoutes')
+      + elasticsearch.withQueryType('randomWalk')
+      + elasticsearch.withTimeField('timestamp'),
+  },
+  bgpRouteImportLatency: {
+    query():
+      elasticsearch.withBucketAggs([])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+      ])
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: raLatencyMeasurement AND scenario.keyword: ImportRoutes')
+      + elasticsearch.withQueryType('randomWalk')
+      + elasticsearch.withTimeField('timestamp'),
+  },
+  egressIPLatency: {
+    query():
+      elasticsearch.withAlias('')
+      + elasticsearch.withBucketAggs([
+        elasticsearch.bucketAggs.Terms.withField('metricName.keyword')
+        + elasticsearch.bucketAggs.Terms.withId('2')
+        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+        + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
+        + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('value')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+      ])
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: eipStartupLatencyTotal')
+      + elasticsearch.withTimeField('timestamp'),
+  },
+  frrk8sPodStats: {
+    base(alias, query):
+      elasticsearch.withAlias(alias)
+      + elasticsearch.withBucketAggs([
+        elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
+        + elasticsearch.bucketAggs.Terms.withId('3')
+        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+        + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
+        + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
+        elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+        + elasticsearch.bucketAggs.DateHistogram.withId('2')
+        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0'),
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+      ])
+      + elasticsearch.withQuery(query)
+      + elasticsearch.withTimeField('timestamp'),
+    queries(metric): [
+      self.base('{{labels.pod.keyword}}', 'uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-frr-k8s" AND labels.pod.keyword: /frr-k8s.*/'),
+      elasticsearch.withAlias('Aggregated')
+      + elasticsearch.withBucketAggs([
+        elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+        + elasticsearch.bucketAggs.DateHistogram.withId('2')
+        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+        + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0'),
+      ])
+      + elasticsearch.withMetrics([
+        elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+      ])
+      + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-frr-k8s" AND labels.pod.keyword: /frr-k8s.*/')
+      + elasticsearch.withTimeField('timestamp'),
+    ],
+  },
   schedulingThroughput: {
     query():
       elasticsearch.withAlias('')

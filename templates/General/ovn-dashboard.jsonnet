@@ -33,6 +33,12 @@ g.dashboard.new('OVN-Monitoring-dashboard')
     panels.timeSeries.genericTimeSeriesLegendPanel('ovnkube-control-plane Memory Usage', 'bytes', queries.ovnKubeControlPlaneMem.query(), { x: 12, y: 4, w: 12, h: 10 }),
     panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 ovn-controller CPU Usage', 'percent', queries.topOvnControllerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),
     panels.timeSeries.genericTimeSeriesLegendPanel('Top 10  ovn-controller Memory Usage', 'bytes', queries.topOvnControllerMem.query(), { x: 12, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 frr container CPU Usage', 'percent', queries.topFrrContainerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10  frr container Memory Usage', 'bytes', queries.topFrrContainerMem.query(), { x: 12, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 frr controller container CPU Usage', 'percent', queries.topFrrControllerContainerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10  frr controller container Memory Usage', 'bytes', queries.topFrrControllerContainerMem.query(), { x: 12, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10 frr reloader container CPU Usage', 'percent', queries.topFrrReloaderContainerCPU.query(), { x: 0, y: 12, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('Top 10  frr reloader container Memory Usage', 'bytes', queries.topFrrReloaderContainerMem.query(), { x: 12, y: 12, w: 12, h: 10 }),
   ]),
   g.panel.row.new('Latency Monitoring')
   + g.panel.row.withCollapsed(true)
