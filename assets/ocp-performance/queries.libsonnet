@@ -162,15 +162,15 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   ovnAnnotationLatency: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum by (pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[$interval]))) > 0', '{{ pod }}'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum by (instance, pod, le) (rate(ovnkube_controller_pod_creation_latency_seconds_bucket[$interval]))) > 0', '{{ pod }} - {{ instance }}'),
   },
   ovnCNIAdd: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[$interval])) by (pod,le)) > 0', '{{ pod }}'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[$interval])) by (instance,pod,le)) > 0', '{{ pod }} - {{ instance }}'),
   },
   ovnCNIDel: {
     query():
-      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[$interval])) by (pod,le)) > 0', '{{ pod }}'),
+      generateTimeSeriesQuery('histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[$interval])) by (instance,pod,le)) > 0', '{{ pod }} - {{ instance }}'),
   },
   ovnKubeControlPlaneCPU: {
     query():
