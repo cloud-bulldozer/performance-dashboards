@@ -18,7 +18,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + timeSeries.gridPos.withY(gridPos.y)
       + timeSeries.gridPos.withH(gridPos.h)
       + timeSeries.gridPos.withW(gridPos.w)
-      + custom.withSpanNulls('false')
+      + custom.withSpanNulls(false)
       + options.tooltip.withMode('multi')
       + options.tooltip.withSort('desc')
       + options.legend.withDisplayMode('table'),
