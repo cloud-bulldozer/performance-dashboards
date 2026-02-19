@@ -120,7 +120,7 @@ fi
 #FIXME: This is OCP-Specific; needs updating to support k8s
 echo ""
 echo -e "\033[32mGetting environment vars...\033[0m"
-export PROMETHEUS_URL="https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
+export PROMETHEUS_URL="https://prometheus-k8s.openshift-monitoring:9091"
 export PROMETHEUS_BEARER=$($k8s_cmd create token -n openshift-monitoring prometheus-k8s --duration 240h || $k8s_cmd sa get-token -n openshift-monitoring prometheus-k8s || $k8s_cmd sa new-token -n openshift-monitoring prometheus-k8s)
 echo "Prometheus URL is: ${PROMETHEUS_URL}"
 if [[ -n ${PROMETHEUS_BEARER} ]]; then
@@ -134,7 +134,7 @@ fi
 if [ $($k8s_cmd get crd hostedclusters.hypershift.openshift.io 2>/dev/null | wc -l) -ne 0 ] ; then
   echo "Detected Hypershift Management Cluster"
   export HYPERSHIFT_MANAGEMENT_CLUSTER="yes"
-  export OBO_URL="http://hypershift-monitoring-stack-prometheus.openshift-observability-operator.svc.cluster.local:9090"
+  export OBO_URL="http://hypershift-monitoring-stack-prometheus.openshift-observability-operator:9090"
 fi
 
 function namespace() {
