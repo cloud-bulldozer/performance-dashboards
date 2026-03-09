@@ -79,13 +79,6 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.genericLegend('metrics-server/prom-adapter CPU', 'percent', queries.metricsServerCpuUsage.query(), { x: 0, y: 10, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('metrics-server/prom-adapter RSS', 'bytes', queries.metricsServerMemUsage.query(), { x: 12, y: 10, w: 12, h: 8 }),
   ]),
-  g.panel.row.new('Stackrox')
-  + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
-  + g.panel.row.withCollapsed(true)
-  + g.panel.row.withPanels([
-    panels.timeSeries.genericLegend('Top 25 stackrox container RSS bytes', 'bytes', queries.stackroxMem.query(), { x: 0, y: 2, w: 12, h: 8 }),
-    panels.timeSeries.genericLegend('Top 25 stackrox container CPU percent', 'percent', queries.stackroxCPU.query(), { x: 12, y: 2, w: 12, h: 8 }),
-  ]),
   g.panel.row.new('Cluster Kubelet')
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withCollapsed(true)
@@ -179,5 +172,12 @@ g.dashboard.new('Openshift Performance')
     panels.timeSeries.genericLegend('Conntrack stats: $_infra_node', '', queries.conntrackStats.query('$_infra_node'), { x: 12, y: 24, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 container CPU: $_infra_node', 'percent', queries.top10ContainerCPU.query('$_infra_node'), { x: 0, y: 24, w: 12, h: 8 }),
     panels.timeSeries.genericLegend('Top 10 container RSS: $_infra_node', 'bytes', queries.top10ContainerRSS.query('$_infra_node'), { x: 12, y: 24, w: 12, h: 8 }),
+  ]),
+  g.panel.row.new('Stackrox')
+  + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
+  + g.panel.row.withCollapsed(true)
+  + g.panel.row.withPanels([
+    panels.timeSeries.genericLegend('Top 25 stackrox container RSS bytes', 'bytes', queries.stackroxMem.query(), { x: 0, y: 2, w: 12, h: 8 }),
+    panels.timeSeries.genericLegend('Top 25 stackrox container CPU percent', 'percent', queries.stackroxCPU.query(), { x: 12, y: 2, w: 12, h: 8 }),
   ]),
 ])
