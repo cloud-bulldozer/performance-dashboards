@@ -294,7 +294,7 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   deployCount: {
     query():
-      generateTimeSeriesQuery('count(kube_deployment_labels{})', 'Deployments'),
+      generateTimeSeriesQuery('count(kube_deployment_spec_paused{})', 'Deployments'),
   },
   servicesCount: {
     query():
