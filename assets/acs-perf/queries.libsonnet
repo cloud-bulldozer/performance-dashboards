@@ -55,7 +55,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "sensor_rox_sensor_process_enrichment_drops"')
       + elasticsearch.withTimeField('timestamp'),
@@ -76,7 +76,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "stackrox_container_memory_working_set_bytes" AND labels.container.keyword: $acs_component')
       + elasticsearch.withTimeField('timestamp'),
@@ -167,7 +167,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: cpu-$node_roles')
       + elasticsearch.withTimeField('timestamp'),
@@ -193,7 +193,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-cpu-$node_roles')
       + elasticsearch.withTimeField('timestamp'),
@@ -221,7 +221,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: memory-$node_roles')
       + elasticsearch.withTimeField('timestamp'),
@@ -247,7 +247,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-memory-sum-$node_roles')
       + elasticsearch.withTimeField('timestamp'),
@@ -268,7 +268,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-cpu-cluster-usage-ratio')
       + elasticsearch.withTimeField('timestamp'),
@@ -287,7 +287,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-memory-cluster-usage-ratio')
       + elasticsearch.withTimeField('timestamp'),
@@ -315,7 +315,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('P99')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: podLatencyQuantilesMeasurement AND quantileName.keyword: Ready')
       + elasticsearch.withTimeField('timestamp'),
@@ -343,7 +343,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('P99')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: svcLatencyQuantilesMeasurement AND quantileName.keyword: Ready')
       + elasticsearch.withTimeField('timestamp'),
@@ -355,7 +355,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
-        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType()
       ])
       + elasticsearch.withQuery('metricName.keyword: central_rox_central_info AND jobName.keyword: $job AND metadata.ocpMajorVersion.keyword: $ocpMajorVersion AND labels.central_version.keyword: $acs_version')
       + elasticsearch.withTimeField('timestamp'),
@@ -376,7 +376,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: avg-ro-apicalls-latency  AND labels.scope.keyword: resource')
       + elasticsearch.withTimeField('timestamp'),
@@ -395,7 +395,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-ro-apicalls-latency AND labels.scope.keyword: resource')
       + elasticsearch.withTimeField('timestamp'),
@@ -414,7 +414,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: avg-ro-apicalls-latency AND labels.scope.keyword: namespace')
       + elasticsearch.withTimeField('timestamp'),
@@ -433,7 +433,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-ro-apicalls-latency AND labels.scope.keyword: namespace')
       + elasticsearch.withTimeField('timestamp'),
@@ -452,7 +452,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: avg-ro-apicalls-latency ')
       + elasticsearch.withTimeField('timestamp'),
@@ -471,7 +471,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-ro-apicalls-latency AND labels.scope.keyword: cluster')
       + elasticsearch.withTimeField('timestamp'),
@@ -490,7 +490,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: avg-mutating-apicalls-latency')
       + elasticsearch.withTimeField('timestamp'),
@@ -509,7 +509,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType()
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: max-mutating-apicalls-latency')
       + elasticsearch.withTimeField('timestamp'),

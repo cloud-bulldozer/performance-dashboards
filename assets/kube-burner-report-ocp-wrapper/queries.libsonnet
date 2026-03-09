@@ -9,7 +9,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('5')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(1)
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -17,16 +17,16 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('podReadyLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('4')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('schedulingLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('3')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('initializedLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('2')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('containersReadyLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: podLatencyMeasurement')
       + elasticsearch.withTimeField('timestamp'),
@@ -37,14 +37,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('quantileName.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount(0)
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -52,7 +52,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('$latencyPercentile')
         + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: podLatencyQuantilesMeasurement')
       + elasticsearch.withTimeField('timestamp'),
@@ -62,21 +62,21 @@ local elasticsearch = g.query.elasticsearch;
       elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('namespace.keyword')
         + elasticsearch.bucketAggs.Terms.withId('7')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('100'),
         elasticsearch.bucketAggs.Terms.withField('nodeName.keyword')
         + elasticsearch.bucketAggs.Terms.withId('6')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('100'),
         elasticsearch.bucketAggs.Terms.withField('podName.keyword')
         + elasticsearch.bucketAggs.Terms.withId('5')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -85,16 +85,16 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('schedulingLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('4')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('initializedLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('3')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('containersReadyLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('2')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('podReadyLatency')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: podLatencyMeasurement')
       + elasticsearch.withQueryType('randomWalk')
@@ -106,14 +106,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.node.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -121,7 +121,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: containerNetworkSetupLatency')
       + elasticsearch.withTimeField('timestamp'),
@@ -132,7 +132,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -140,7 +140,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: schedulingThroughput')
       + elasticsearch.withTimeField('timestamp'),
@@ -152,14 +152,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.instance.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -168,7 +168,7 @@ local elasticsearch = g.query.elasticsearch;
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.settings.withScript('_value * 100')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Masters" AND NOT labels.mode.keyword: idle AND NOT labels.mode.keyword: steal')
       + elasticsearch.withTimeField('timestamp'),
@@ -177,7 +177,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
@@ -185,7 +185,7 @@ local elasticsearch = g.query.elasticsearch;
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.settings.withScript('_value * 100')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: nodeCPU-Masters AND NOT labels.mode.keyword: idle AND NOT labels.mode.keyword: steal')
       + elasticsearch.withTimeField('timestamp'),
@@ -198,21 +198,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.instance.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -224,14 +224,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: nodeMemoryUtilization-Masters')
       + elasticsearch.withTimeField('timestamp'),
@@ -243,14 +243,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.condition.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -258,7 +258,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeStatus"')
       + elasticsearch.withTimeField('timestamp'),
@@ -269,14 +269,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.phase.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -284,7 +284,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "podStatusCount"')
       + elasticsearch.withTimeField('timestamp'),
@@ -295,28 +295,28 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('5')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.namespace.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -324,7 +324,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -341,20 +341,20 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -369,28 +369,28 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('5')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('3'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.namespace.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -398,7 +398,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -415,28 +415,28 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('5')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.namespace.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -444,7 +444,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -461,21 +461,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.role.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.Count.withId('1')
-        + elasticsearch.metrics.Count.withType('count'),
+        + elasticsearch.metrics.Count.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeRoles"')
       + elasticsearch.withTimeField('timestamp'),
@@ -486,7 +486,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('30s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -494,7 +494,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -513,7 +513,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId('1')
         + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
-        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: jobSummary')
       + elasticsearch.withTimeField('timestamp'),
@@ -524,7 +524,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
-        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: jobSummary')
       + elasticsearch.withTimeField('timestamp'),
@@ -535,7 +535,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
-        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: jobSummary')
       + elasticsearch.withTimeField('timestamp'),
@@ -547,7 +547,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.RawData.withId('1')
         + elasticsearch.metrics.MetricAggregationWithSettings.RawData.settings.withSize('500')
-        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType('raw_data'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.RawData.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: alert')
       + elasticsearch.withTimeField('timestamp'),
@@ -558,14 +558,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -574,7 +574,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -589,21 +589,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -612,7 +612,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -627,14 +627,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -643,7 +643,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -653,7 +653,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -662,7 +662,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-ovn-kubernetes" AND labels.pod.keyword: /ovnkube-node.*/')
       + elasticsearch.withTimeField('timestamp'),
@@ -674,14 +674,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -690,7 +690,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  AND labels.pod.keyword: /ovnkube-node.*/ AND labels.container.keyword: "ovn-controller"')
       + elasticsearch.withTimeField('timestamp'),
@@ -701,14 +701,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -717,7 +717,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Sum.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType('sum'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Sum.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -732,14 +732,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
@@ -748,7 +748,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.namespace.keyword: "openshift-ovn-kubernetes"  ')
       + elasticsearch.withTimeField('timestamp'),
@@ -759,14 +759,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0'),
@@ -774,7 +774,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "' + metric + '"')
       + elasticsearch.withTimeField('timestamp'),
@@ -785,7 +785,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -793,7 +793,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: etcdLeaderChangesRate')
       + elasticsearch.withTimeField('timestamp'),
@@ -804,21 +804,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.To.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -826,7 +826,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: 99thEtcdRoundTripTimeSeconds')
       + elasticsearch.withTimeField('timestamp'),
@@ -837,14 +837,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0'),
@@ -852,7 +852,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -867,21 +867,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.verb.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.resource.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -889,7 +889,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: resource')
       + elasticsearch.withTimeField('timestamp'),
@@ -900,14 +900,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.verb.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -915,7 +915,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: namespace')
       + elasticsearch.withTimeField('timestamp'),
@@ -926,14 +926,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.verb.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -941,7 +941,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: readOnlyAPICallsLatency AND labels.scope.keyword: cluster')
       + elasticsearch.withTimeField('timestamp'),
@@ -952,14 +952,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.verb.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount(0)
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -967,7 +967,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: mutatingAPICallsLatency')
       + elasticsearch.withTimeField('timestamp'),
@@ -978,7 +978,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -986,7 +986,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: serviceSyncLatency')
       + elasticsearch.withTimeField('timestamp'),
@@ -997,21 +997,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.resource.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.verb.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1019,7 +1019,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: APIRequestRate')
       + elasticsearch.withTimeField('timestamp'),
@@ -1029,14 +1029,14 @@ local elasticsearch = g.query.elasticsearch;
       elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.node.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1044,7 +1044,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: kubeletCPU')
       + elasticsearch.withTimeField('timestamp'),
@@ -1052,7 +1052,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1060,7 +1060,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: kubeletCPU')
       + elasticsearch.withTimeField('timestamp'),
@@ -1071,14 +1071,14 @@ local elasticsearch = g.query.elasticsearch;
       elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.node.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1086,7 +1086,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: crioCPU')
       + elasticsearch.withTimeField('timestamp'),
@@ -1094,7 +1094,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1102,7 +1102,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: crioCPU')
       + elasticsearch.withTimeField('timestamp'),
@@ -1114,21 +1114,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.node.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: kubeletMemory')
       + elasticsearch.withTimeField('timestamp'),
@@ -1136,14 +1136,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: kubeletMemory')
       + elasticsearch.withTimeField('timestamp'),
@@ -1154,14 +1154,14 @@ local elasticsearch = g.query.elasticsearch;
       elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.node.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('5'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1169,7 +1169,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: crioMemory')
       + elasticsearch.withTimeField('timestamp'),
@@ -1177,7 +1177,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1185,7 +1185,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: crioMemory')
       + elasticsearch.withTimeField('timestamp'),
@@ -1197,27 +1197,27 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.node.keyword: $master')
       + elasticsearch.withTimeField('timestamp'),
@@ -1228,14 +1228,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.mode.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1248,7 +1248,7 @@ local elasticsearch = g.query.elasticsearch;
             inline: '_value*100',
           },
         })
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Masters" AND labels.instance.keyword: $master')
       + elasticsearch.withTimeField('timestamp'),
@@ -1259,7 +1259,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1267,7 +1267,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -1281,27 +1281,27 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: ' + metric + ' AND labels.node.keyword: $worker')
       + elasticsearch.withTimeField('timestamp'),
@@ -1312,14 +1312,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.mode.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1332,7 +1332,7 @@ local elasticsearch = g.query.elasticsearch;
             inline: '_value*100',
           },
         })
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Workers" AND labels.instance.keyword: "$worker"')
       + elasticsearch.withTimeField('timestamp'),
@@ -1343,7 +1343,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1351,7 +1351,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -1365,21 +1365,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1387,7 +1387,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName: "' + metric + '" AND labels.node.keyword: "$infra" AND labels.namespace.keyword: $namespace')
       + elasticsearch.withTimeField('timestamp'),
@@ -1395,27 +1395,27 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('4')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.Terms.withField('labels.container.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: ' + metric + '-Infra AND labels.node.keyword: $infra')
       + elasticsearch.withTimeField('timestamp'),
@@ -1427,14 +1427,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.mode.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1447,7 +1447,7 @@ local elasticsearch = g.query.elasticsearch;
             inline: '_value*100',
           },
         })
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-Infra" AND labels.instance.keyword: $infra')
       + elasticsearch.withTimeField('timestamp'),
@@ -1458,7 +1458,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1466,7 +1466,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -1481,14 +1481,14 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.mode.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('1')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1501,7 +1501,7 @@ local elasticsearch = g.query.elasticsearch;
             inline: '_value*100',
           },
         })
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: "nodeCPU-AggregatedWorkers"')
       + elasticsearch.withTimeField('timestamp'),
@@ -1512,7 +1512,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges(0),
@@ -1520,7 +1520,7 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery(query)
       + elasticsearch.withTimeField('timestamp'),
@@ -1534,21 +1534,21 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('10'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s')
         + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('1'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: containerCPU-AggregatedWorkers')
       + elasticsearch.withTimeField('timestamp'),
@@ -1559,20 +1559,20 @@ local elasticsearch = g.query.elasticsearch;
       + elasticsearch.withBucketAggs([
         elasticsearch.bucketAggs.Terms.withField('labels.pod.keyword')
         + elasticsearch.bucketAggs.Terms.withId('3')
-        + elasticsearch.bucketAggs.Terms.withType('terms')
+        + elasticsearch.bucketAggs.Terms.withType()
         + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
         + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
         + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
         + elasticsearch.bucketAggs.Terms.settings.withSize('0'),
         elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
         + elasticsearch.bucketAggs.DateHistogram.withId('2')
-        + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+        + elasticsearch.bucketAggs.DateHistogram.withType()
         + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('10s'),
       ])
       + elasticsearch.withMetrics([
         elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('value')
         + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg'),
+        + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType(),
       ])
       + elasticsearch.withQuery('uuid.keyword: $uuid AND metricName.keyword: containerMemory-AggregatedWorkers')
       + elasticsearch.withTimeField('timestamp'),

@@ -477,7 +477,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 
     withPagination(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
-      + options.footer.TableFooterOptions.withEnablePagination(true),
+      + options.footer.withEnablePagination(true),
 
     withAlerts(title, unit, targets, gridPos):
       self.base(title, unit, targets, gridPos)
