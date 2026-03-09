@@ -216,11 +216,11 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
       + options.withFrameIndex(0)
       + options.sortBy.withDesc(false)
       + options.sortBy.withDisplayName('ocpVersion')
-      + options.footer.TableFooterOptions.withShow(false)
-      + options.footer.TableFooterOptions.withReducer(['sum'])
-      + options.footer.TableFooterOptions.withCountRows(false)
-      + options.footer.TableFooterOptions.withFields('')
-      + options.footer.TableFooterOptions.withEnablePagination(false)
+      + options.footer.withShow(false)
+      + options.footer.withReducer(['sum'])
+      + options.footer.withCountRows(false)
+      + options.footer.withFields('')
+      + options.footer.withEnablePagination(false)
       + table.standardOptions.withFilterable(true)
       + table.standardOptions.withOverrides([
         {
