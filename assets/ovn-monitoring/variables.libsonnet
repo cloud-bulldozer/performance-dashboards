@@ -26,10 +26,10 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withIncludeAll(false)
     + var.query.refresh.onTime(),
 
-  master_pod:
-    var.query.new('master_pod', 'label_values({pod=~"ovnkube-master.*", namespace=~"openshift-ovn-kubernetes"}, pod)')
+  controlplane_pod:
+    var.query.new('controlplane_pod', 'label_values({pod=~"ovnkube-control-plane.*", namespace=~"openshift-ovn-kubernetes"}, pod)')
     + var.query.withDatasourceFromVariable(self.Datasource)
-    + var.query.generalOptions.withLabel('OVNKube-Master')
+    + var.query.generalOptions.withLabel('OVNKube-Controlplane')
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(false)
     + var.query.refresh.onTime(),
