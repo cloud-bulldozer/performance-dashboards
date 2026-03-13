@@ -4,7 +4,7 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal
 WORKDIR /performance-dashboards
 
 # Install necessary libraries for subsequent commands
-RUN microdnf install -y podman python3 python3-pip && \
+RUN microdnf install -y podman python3.12 python3.12-pip && \
     microdnf clean all && \
     rm -rf /var/cache/yum
 

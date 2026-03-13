@@ -78,10 +78,13 @@ spec:
         - name: sc-grafana-http
           containerPort: 3000
         volumeMounts:
-        - mountPath: /etc/grafana
+        - mountPath: /etc/grafana/grafana.ini
           name: sc-grafana-config
+          subPath: grafana.ini
         - mountPath: /etc/grafana/provisioning/datasources
           name: sc-ocp-prom
+        - mountPath: /var/lib/grafana
+          name: grafana-data
         env:
         - name: GF_RENDERING_SERVER_URL
           value: "http://renderer.dittybopper.svc:8081/render"
@@ -104,6 +107,8 @@ spec:
       - name: sc-ocp-prom
         configMap:
           name: sc-ocp-prom
+      - name: grafana-data
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -118,7 +123,7 @@ data:
       type: prometheus
       access: proxy
       orgId: 1
-      url: ${PROMETHEUS_URL}
+      url: "${PROMETHEUS_URL}"
       basicAuth: false
       withCredentials: false
       isDefault: true
