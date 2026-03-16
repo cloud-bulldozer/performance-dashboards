@@ -4,9 +4,22 @@ import os
 import requests
 import uuid
 import time
+import hashlib
 from collections import defaultdict
 
 logging.basicConfig(level=logging.INFO)
+
+
+def generate_deterministic_uid(name, prefix=""):
+    """
+    Generate a deterministic UID based on the name.
+    Uses SHA-256 hash to create a consistent 8-character UID.
+    """
+    # Create a hash of the name with optional prefix
+    hash_input = f"{prefix}{name}".encode('utf-8')
+    hash_digest = hashlib.sha256(hash_input).hexdigest()
+    # Take first 8 characters to create a valid Grafana UID
+    return hash_digest[:8]
 
 
 class GrafanaOperations:
@@ -62,7 +75,8 @@ class GrafanaOperations:
         This method creates a folder in grafana
         :return:
         """
-        uid = str(uuid.uuid4())
+        # Generate deterministic UID based on folder name
+        uid = generate_deterministic_uid(folder_name, "folder-")
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -77,11 +91,12 @@ class GrafanaOperations:
                 },
             )
             response_json = response.json()
-            self.folder_map[folder_name] = id
+            # Fix: use response ID instead of Python's id() function
+            self.folder_map[folder_name] = response_json['id']
             return response_json['id']
 
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Error creating folder with name:'{self.folder_name}' and uid:'{uid}'. Message: {e}")
+            raise Exception(f"Error creating folder with name:'{folder_name}' and uid:'{uid}'. Message: {e}")
 
     def read_dashboard_json(self, json_file):
         """
@@ -103,6 +118,9 @@ class GrafanaOperations:
         for folder_id, files in self.dashboards.items():
             for json_file in set(files):
                 dashboard_json = self.read_dashboard_json(json_file)
+                uid = generate_deterministic_uid(dashboard_json["title"], "dashboard-")
+                dashboard_json["uid"] = uid
+                self.logger.info(f"Dashboard '{dashboard_json['title']}' uid decided '{uid}'")
                 if "tags" in dashboard_json.keys():
                     dashboard_json["tags"].append(self.git_commit_hash)
                 else:
