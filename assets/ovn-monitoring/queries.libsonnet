@@ -166,7 +166,7 @@ local generateTimeSeriesQuery(query, legend) = [
 
   synclatency: {
     query():
-      generateTimeSeriesQuery('rate(ovnkube_master_sync_service_latency_seconds_sum[2m])', '{{pod}} - Sync service latency'),
+      generateTimeSeriesQuery('rate(ovnkube_controller_sync_service_latency_seconds_sum[2m])', '{{pod}} - Sync service latency'),
   },
 
   ovnkubeNodeReadyLatency: {
@@ -176,21 +176,21 @@ local generateTimeSeriesQuery(query, legend) = [
 
   workQueue: {
     query():
-      generateTimeSeriesQuery('rate(ovnkube_master_workqueue_adds_total[2m])', '{{pod}} - Rate of handled adds'),
+      generateTimeSeriesQuery('rate(ovnkube_controller_workqueue_adds_total[2m])', '{{pod}} - Rate of handled adds'),
   },
 
   workQueueDepth: {
     query():
-      generateTimeSeriesQuery('ovnkube_master_workqueue_depth', '{{pod}} - Depth of workqueue'),
+      generateTimeSeriesQuery('ovnkube_controller_workqueue_depth', '{{pod}} - Depth of workqueue'),
   },
 
   workQueueLatency: {
     query():
-      generateTimeSeriesQuery('ovnkube_master_workqueue_longest_running_processor_seconds', '{{pod}} - Longest processor duration'),
+      generateTimeSeriesQuery('ovnkube_controller_workqueue_longest_running_processor_seconds', '{{pod}} - Longest processor duration'),
   },
 
   workQueueUnfinishedLatency: {
     query():
-      generateTimeSeriesQuery('ovnkube_master_workqueue_unfinished_work_seconds', '{{pod}} - Unfinished work duration'),
+      generateTimeSeriesQuery('ovnkube_controller_workqueue_unfinished_work_seconds', '{{pod}} - Unfinished work duration'),
   },
 }

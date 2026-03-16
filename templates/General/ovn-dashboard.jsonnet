@@ -16,7 +16,7 @@ g.dashboard.new('Openshift Networking')
   variables.Datasource,
   variables._master_node,
   variables._worker_node,
-  variables.master_pod,
+  variables.controlplane_pod,
   variables.kubenode_pod,
 ])
 
@@ -71,9 +71,9 @@ g.dashboard.new('Openshift Networking')
   + g.panel.row.withCollapsed(true)
   + g.panel.row.withGridPos({ x: 0, y: 0, w: 24, h: 1 })
   + g.panel.row.withPanels([
-    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Master workqueue', 'short', queries.workQueue.query(), { x: 0, y: 0, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Master workqueue Depth', 'short', queries.workQueueDepth.query(), { x: 12, y: 0, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Master workqueue duration', 's', queries.workQueueLatency.query(), { x: 0, y: 8, w: 12, h: 10 }),
-    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Master workqueue - Unfinished', 's', queries.workQueueUnfinishedLatency.query(), { x: 12, y: 8, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller workqueue', 'short', queries.workQueue.query(), { x: 0, y: 0, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller workqueue Depth', 'short', queries.workQueueDepth.query(), { x: 12, y: 0, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller workqueue duration', 's', queries.workQueueLatency.query(), { x: 0, y: 8, w: 12, h: 10 }),
+    panels.timeSeries.genericTimeSeriesLegendPanel('OVNKube Controller workqueue - Unfinished', 's', queries.workQueueUnfinishedLatency.query(), { x: 12, y: 8, w: 12, h: 10 }),
   ]),
 ])
