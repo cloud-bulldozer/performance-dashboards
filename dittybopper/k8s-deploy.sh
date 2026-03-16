@@ -41,7 +41,8 @@ export GRAFANA_ADMIN_PASSWORD=admin
 export GRAFANA_URL="http://admin:${GRAFANA_ADMIN_PASSWORD}@localhost:3000"
 export DASHBOARDS="k8s-performance.json"
 export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/cloud-bulldozer/dittybopper-syncer:latest"} # Syncer image
-export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:9.4.3"} # Syncer image
+export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"docker.io/grafana/grafana:12.3.5"} # Grafana image
+export GRAFANA_RENDERER_IMAGE=${GRAFANA_RENDERER_IMAGE:-"docker.io/grafana/grafana-image-renderer:v5.7.1"} # Grafana renderer image
 
 
 # Set defaults for command options
