@@ -55,6 +55,12 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet $(ASSETS)
 	mkdir -p $(dir $@)
 	$(BINDIR)/jsonnet -J ./$(LIBRARY_PATH) $< > $@
 
+build-go:
+	cd go && go build -o ../bin/deployer .
+
+deploy: build-go
+	bin/deployer --deploy
+
 build-syncer-image: build
 	podman build --platform=${PLATFORM} -f Dockerfile --manifest=${SYNCER_IMG_TAG} .
 
