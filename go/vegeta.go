@@ -21,11 +21,40 @@ func buildVegetaDashboard() *dashboard.DashboardBuilder {
 		Refresh("").
 		Readonly().
 		Tooltip(dashboard.DashboardCursorSyncCrosshair).
-		WithVariable(vegetaDatasourceVar()).
-		WithVariable(vegetaQueryVar("uuid", "uuid.keyword", "UUID")).
-		WithVariable(vegetaQueryVar("hostname", "hostname.keyword", "")).
-		WithVariable(vegetaQueryVar("targets", "targets.keyword", "")).
-		WithVariable(vegetaQueryVar("iteration", "iteration", "")).
+		WithVariable(dashboard.NewDatasourceVariableBuilder("Datasource").
+			Type("elasticsearch").
+			Regex("/(.*vegeta.*)/").
+			Label("vegeta-results datasource"),
+		).
+		WithVariable(dashboard.NewQueryVariableBuilder("uuid").
+			Label("UUID").
+			Query(dashboard.StringOrMap{String: cog.ToPtr(`{"find": "terms", "field": "uuid.keyword"}`)}).
+			Datasource(esDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(false).
+			IncludeAll(true),
+		).
+		WithVariable(dashboard.NewQueryVariableBuilder("hostname").
+			Query(dashboard.StringOrMap{String: cog.ToPtr(`{"find": "terms", "field": "hostname.keyword"}`)}).
+			Datasource(esDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(false).
+			IncludeAll(true),
+		).
+		WithVariable(dashboard.NewQueryVariableBuilder("targets").
+			Query(dashboard.StringOrMap{String: cog.ToPtr(`{"find": "terms", "field": "targets.keyword"}`)}).
+			Datasource(esDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(false).
+			IncludeAll(true),
+		).
+		WithVariable(dashboard.NewQueryVariableBuilder("iteration").
+			Query(dashboard.StringOrMap{String: cog.ToPtr(`{"find": "terms", "field": "iteration"}`)}).
+			Datasource(esDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(false).
+			IncludeAll(true),
+		).
 		WithPanel(vegetaTimeSeries(
 			"RPS (rate of sent requests per second)", "reqps",
 			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 9},
@@ -45,71 +74,18 @@ func buildVegetaDashboard() *dashboard.DashboardBuilder {
 		WithPanel(vegetaResultSummaryTable())
 }
 
-func vegetaDatasourceVar() *dashboard.DatasourceVariableBuilder {
-	return dashboard.NewDatasourceVariableBuilder("Datasource").
-		Type("elasticsearch").
-		Regex("/(.*vegeta.*)/").
-		Label("vegeta-results datasource")
-}
-
-func vegetaQueryVar(name, field, label string) *dashboard.QueryVariableBuilder {
-	b := dashboard.NewQueryVariableBuilder(name).
-		Query(dashboard.StringOrMap{String: cog.ToPtr(`{"find": "terms", "field": "` + field + `"}`)}).
-		Datasource(common.DataSourceRef{
-			Type: cog.ToPtr("elasticsearch"),
-			Uid:  cog.ToPtr("${Datasource}"),
-		}).
-		Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
-		Multi(false).
-		IncludeAll(true)
-	if label != "" {
-		b = b.Label(label)
-	}
-	return b
-}
-
-func vegetaESLuceneQuery() string {
-	return `uuid: $uuid AND hostname: $hostname AND iteration: $iteration AND targets: "$targets"`
-}
-
-func vegetaDateHistogramBucketAgg() elasticsearch.BucketAggregation {
-	dh, _ := elasticsearch.NewDateHistogramBuilder().
-		Field("timestamp").
-		Id("2").
-		Settings(elasticsearch.NewElasticsearchDateHistogramSettingsBuilder().
-			Interval("auto").
-			MinDocCount("0").
-			TimeZone("utc"),
-		).
-		Build()
-	return elasticsearch.BucketAggregation{DateHistogram: &dh}
-}
-
-func vegetaAvgMetric(field, id string) elasticsearch.MetricAggregation {
-	avg, _ := elasticsearch.NewAverageBuilder().
-		Field(field).
-		Id(id).
-		Build()
-	return elasticsearch.MetricAggregation{Average: &avg}
-}
+const vegetaLuceneQuery = `uuid: $uuid AND hostname: $hostname AND iteration: $iteration AND targets: "$targets"`
 
 func vegetaESAvgQuery(field, metricID string) *elasticsearch.DataqueryBuilder {
 	return elasticsearch.NewDataqueryBuilder().
-		Query(vegetaESLuceneQuery()).
+		Query(vegetaLuceneQuery).
 		TimeField("timestamp").
 		BucketAggs([]elasticsearch.BucketAggregation{
-			vegetaDateHistogramBucketAgg(),
+			dateHistogramBucketAgg("timestamp", "2"),
 		}).
 		Metrics([]elasticsearch.MetricAggregation{
-			vegetaAvgMetric(field, metricID),
+			avgMetric(field, metricID),
 		})
-}
-
-func esDatasourceRef() common.DataSourceRef {
-	return common.DataSourceRef{
-		Type: cog.ToPtr("elasticsearch"),
-		Uid:  cog.ToPtr("${Datasource}"),
-	}
 }
 
 func vegetaTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*elasticsearch.DataqueryBuilder) *timeseries.PanelBuilder {
@@ -134,26 +110,10 @@ func vegetaTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderNone),
 		)
-
 	for _, t := range targets {
 		p = p.WithTarget(t)
 	}
-
 	return p
-}
-
-func vegetaTermsBucketAgg(field, id string) elasticsearch.BucketAggregation {
-	t, _ := elasticsearch.NewTermsBuilder().
-		Field(field).
-		Id(id).
-		Settings(elasticsearch.NewElasticsearchTermsSettingsBuilder().
-			Order(elasticsearch.TermsOrderDesc).
-			OrderBy("_term").
-			MinDocCount("1").
-			Size("10"),
-		).
-		Build()
-	return elasticsearch.BucketAggregation{Terms: &t}
 }
 
 func vegetaResultSummaryTable() *table.PanelBuilder {
@@ -168,19 +128,19 @@ func vegetaResultSummaryTable() *table.PanelBuilder {
 		).
 		WithTarget(
 			elasticsearch.NewDataqueryBuilder().
-				Query(vegetaESLuceneQuery()).
+				Query(vegetaLuceneQuery).
 				TimeField("timestamp").
 				BucketAggs([]elasticsearch.BucketAggregation{
-					vegetaTermsBucketAgg("uuid.keyword", "2"),
-					vegetaTermsBucketAgg("targets.keyword", "1"),
+					termsBucketAgg("uuid.keyword", "2"),
+					termsBucketAgg("targets.keyword", "1"),
 				}).
 				Metrics([]elasticsearch.MetricAggregation{
-					vegetaAvgMetric("rps", "3"),
-					vegetaAvgMetric("throughput", "4"),
-					vegetaAvgMetric("p99_latency", "5"),
-					vegetaAvgMetric("req_latency", "6"),
-					vegetaAvgMetric("bytes_in", "7"),
-					vegetaAvgMetric("bytes_out", "8"),
+					avgMetric("rps", "3"),
+					avgMetric("throughput", "4"),
+					avgMetric("p99_latency", "5"),
+					avgMetric("req_latency", "6"),
+					avgMetric("bytes_in", "7"),
+					avgMetric("bytes_out", "8"),
 				}),
 		).
 		WithTransformation(dashboard.DataTransformerConfig{

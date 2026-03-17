@@ -17,6 +17,7 @@ type dashboardDef struct {
 
 var dashboards = []dashboardDef{
 	{"vegeta-wrapper", "General", buildVegetaDashboard},
+	{"uperf-perf", "General", buildUperfDashboard},
 }
 
 func main() {
