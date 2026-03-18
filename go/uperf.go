@@ -136,7 +136,7 @@ func uperfTimeSeries(title, unit string, gridPos dashboard.GridPos, target *elas
 		Unit(unit).
 		GridPos(gridPos).
 		Transparent(true).
-		SpanNulls(common.BoolOrFloat64{Bool: cog.ToPtr(true)}).
+		SpanNulls(boolPtr(true)).
 		ShowPoints(common.VisibilityModeNever).
 		LineWidth(1).
 		FillOpacity(10).

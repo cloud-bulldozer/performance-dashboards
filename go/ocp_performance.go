@@ -137,7 +137,7 @@ func ocpGeneric(title, unit string, gridPos dashboard.GridPos, targets ...*prome
 		Datasource(promDatasourceRef()).
 		Unit(unit).
 		GridPos(gridPos).
-		SpanNulls(common.BoolOrFloat64{Bool: cog.ToPtr(false)}).
+		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderDescending),
@@ -159,7 +159,7 @@ func ocpGenericLegend(title, unit string, gridPos dashboard.GridPos, targets ...
 		Datasource(promDatasourceRef()).
 		Unit(unit).
 		GridPos(gridPos).
-		SpanNulls(common.BoolOrFloat64{Bool: cog.ToPtr(false)}).
+		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderDescending),
@@ -185,7 +185,7 @@ func ocpGenericLegendCounter(title, unit string, gridPos dashboard.GridPos, targ
 		Datasource(promDatasourceRef()).
 		Unit(unit).
 		GridPos(gridPos).
-		SpanNulls(common.BoolOrFloat64{Bool: cog.ToPtr(false)}).
+		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderDescending),

@@ -6,6 +6,10 @@ import (
 	"github.com/grafana/grafana-foundation-sdk/go/elasticsearch"
 )
 
+func boolPtr(v bool) common.BoolOrFloat64 {
+	return common.BoolOrFloat64{Bool: cog.ToPtr(v)}
+}
+
 func esDatasourceRef() common.DataSourceRef {
 	return common.DataSourceRef{
 		Type: cog.ToPtr("elasticsearch"),

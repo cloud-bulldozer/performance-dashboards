@@ -19,6 +19,7 @@ var dashboards = []dashboardDef{
 	{"vegeta-wrapper", "General", buildVegetaDashboard},
 	{"uperf-perf", "General", buildUperfDashboard},
 	{"ocp-performance", "General", buildOCPPerformanceDashboard},
+	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard},
 }
 
 func main() {
