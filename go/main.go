@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
 )
@@ -24,9 +27,61 @@ var dashboards = []dashboardDef{
 	{"api-performance-overview", "General", buildAPIPerformanceDashboard},
 }
 
-func main() {
-	outputDir := "rendered"
+func envDefault(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
 
+func main() {
+	deployFlag := flag.Bool("deploy", false, "Deploy rendered dashboards to Grafana")
+	loopFlag := flag.Bool("loop", false, "Run deploy in a loop (sidecar mode)")
+	loopInterval := flag.Duration("loop-interval", 60*time.Second, "Interval between deploy loops")
+	grafanaURL := flag.String("grafana-url", envDefault("GRAFANA_URL", ""), "Grafana URL (e.g. http://admin:pass@localhost:3000)")
+	inputDir := flag.String("input-dir", envDefault("INPUT_DIR", ""), "Directory with pre-rendered JSON (skips rendering)")
+	gitCommitHash := flag.String("git-commit-hash", envDefault("GIT_COMMIT_HASH", ""), "Git commit hash to append to dashboard tags")
+	flag.Parse()
+
+	renderDir := "rendered"
+
+	// If --input-dir is set, skip rendering and deploy from that directory
+	if *inputDir == "" {
+		renderDashboards(renderDir)
+	}
+
+	if !*deployFlag {
+		return
+	}
+
+	deployDir := renderDir
+	if *inputDir != "" {
+		deployDir = *inputDir
+	}
+
+	if *grafanaURL == "" {
+		fmt.Fprintln(os.Stderr, "error: --grafana-url or GRAFANA_URL is required for deploy")
+		os.Exit(1)
+	}
+
+	d := newDeployer(*grafanaURL, deployDir, *gitCommitHash)
+
+	for {
+		if err := d.deploy(); err != nil {
+			log.Printf("deploy error: %v", err)
+		} else {
+			log.Println("deploy complete")
+		}
+
+		if !*loopFlag {
+			break
+		}
+		log.Printf("sleeping %s before next sync...", *loopInterval)
+		time.Sleep(*loopInterval)
+	}
+}
+
+func renderDashboards(outputDir string) {
 	for _, d := range dashboards {
 		built, err := d.builder().Build()
 		if err != nil {

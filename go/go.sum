@@ -1,0 +1,4 @@
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/grafana/grafana-foundation-sdk/go v0.0.12 h1:ggGWIJ3ylX16/xtAYlVi1TtUdv+mybYPusOmi1x35kg=
+github.com/grafana/grafana-foundation-sdk/go v0.0.12/go.mod h1:48EA8jF85SrReYflLa39Sk34b6NpxwJPBwjF3TJgRpE=

@@ -106,11 +106,12 @@ spec:
           value: "rendering:debug"
       - name: dittybopper-syncer
         imagePullPolicy: Always
+        command: ["deployer", "--deploy", "--loop", "--input-dir", "/dashboards/rendered"]
         env:
         - name: GRAFANA_URL
           value: ${GRAFANA_URL}
-        - name: INPUT_DIR
-          value: "/performance-dashboards/rendered/"
+        - name: GIT_COMMIT_HASH
+          value: "${GIT_COMMIT_HASH}"
         image: ${SYNCER_IMAGE}
       volumes:
       - name: sc-grafana-config
