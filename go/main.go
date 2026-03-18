@@ -20,6 +20,8 @@ var dashboards = []dashboardDef{
 	{"uperf-perf", "General", buildUperfDashboard},
 	{"ocp-performance", "General", buildOCPPerformanceDashboard},
 	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard},
+	{"ovn-dashboard", "General", buildOVNDashboard},
+	{"api-performance-overview", "General", buildAPIPerformanceDashboard},
 }
 
 func main() {
