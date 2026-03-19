@@ -92,8 +92,6 @@ func buildOCPPerformanceDashboard() *dashboard.DashboardBuilder {
 		WithRow(ocpOVNRow()).
 		// Row: Monitoring stack
 		WithRow(ocpMonitoringStackRow()).
-		// Row: Stackrox
-		WithRow(ocpStackroxRow()).
 		// Row: Cluster Kubelet
 		WithRow(ocpClusterKubeletRow()).
 		// Row: Cluster Details
@@ -105,7 +103,9 @@ func buildOCPPerformanceDashboard() *dashboard.DashboardBuilder {
 		// Row: Worker
 		WithRow(ocpWorkerRow()).
 		// Row: Infra
-		WithRow(ocpInfraRow())
+		WithRow(ocpInfraRow()).
+		// Row: Stackrox
+		WithRow(ocpStackroxRow())
 }
 
 func intervalOption(val string) dashboard.VariableOption {
