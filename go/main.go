@@ -40,21 +40,20 @@ func main() {
 	loopInterval := flag.Duration("loop-interval", 60*time.Second, "Interval between deploy loops")
 	grafanaURL := flag.String("grafana-url", envDefault("GRAFANA_URL", ""), "Grafana URL (e.g. http://admin:pass@localhost:3000)")
 	inputDir := flag.String("input-dir", envDefault("INPUT_DIR", ""), "Directory with pre-rendered JSON (skips rendering)")
+	outputDir := flag.String("output-dir", envDefault("OUTPUT_DIR", "rendered"), "Directory to write rendered dashboard JSON")
 	gitCommitHash := flag.String("git-commit-hash", envDefault("GIT_COMMIT_HASH", ""), "Git commit hash to append to dashboard tags")
 	flag.Parse()
 
-	renderDir := "rendered"
-
 	// If --input-dir is set, skip rendering and deploy from that directory
 	if *inputDir == "" {
-		renderDashboards(renderDir)
+		renderDashboards(*outputDir)
 	}
 
 	if !*deployFlag {
 		return
 	}
 
-	deployDir := renderDir
+	deployDir := *outputDir
 	if *inputDir != "" {
 		deployDir = *inputDir
 	}
@@ -68,13 +67,15 @@ func main() {
 
 	for {
 		if err := d.deploy(); err != nil {
+			if !*loopFlag {
+				log.Fatalf("deploy error: %v", err)
+			}
 			log.Printf("deploy error: %v", err)
 		} else {
 			log.Println("deploy complete")
-		}
-
-		if !*loopFlag {
-			break
+			if !*loopFlag {
+				break
+			}
 		}
 		log.Printf("sleeping %s before next sync...", *loopInterval)
 		time.Sleep(*loopInterval)

@@ -104,15 +104,6 @@ spec:
           value: "http://dittybopper.dittybopper.svc:3000/"
         - name: GF_LOG_FILTERS
           value: "rendering:debug"
-      - name: dittybopper-syncer
-        imagePullPolicy: Always
-        command: ["deployer", "--deploy", "--input-dir", "/dashboards/rendered"]
-        env:
-        - name: GRAFANA_URL
-          value: ${GRAFANA_URL}
-        - name: GIT_COMMIT_HASH
-          value: "${GIT_COMMIT_HASH}"
-        image: ${SYNCER_IMAGE}
       volumes:
       - name: sc-grafana-config
         configMap:
@@ -122,6 +113,29 @@ spec:
           name: sc-ocp-prom
       - name: grafana-data
         emptyDir: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dittybopper-deploy
+  namespace: $namespace
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: dittybopper-deploy
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: deployer
+        image: ${SYNCER_IMAGE}
+        args: ["--deploy"]
+        env:
+        - name: GRAFANA_URL
+          value: ${GRAFANA_URL}
+        - name: GIT_COMMIT_HASH
+          value: "${GIT_COMMIT_HASH}"
 ---
 apiVersion: v1
 kind: ConfigMap
