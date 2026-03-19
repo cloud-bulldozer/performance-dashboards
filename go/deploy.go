@@ -161,7 +161,7 @@ func (d *deployer) uploadDashboard(jsonPath string, folderID int) error {
 	payload, _ := json.Marshal(map[string]interface{}{
 		"dashboard": dash,
 		"folderId":  folderID,
-		"overwrite": true,
+		"overwrite": false,
 	})
 
 	resp, err := http.Post(d.grafanaURL+"/api/dashboards/db", "application/json", bytes.NewReader(payload))
@@ -170,12 +170,17 @@ func (d *deployer) uploadDashboard(jsonPath string, folderID int) error {
 	}
 	defer resp.Body.Close()
 
+	title, _ := dash["title"].(string)
+
+	if resp.StatusCode == http.StatusPreconditionFailed {
+		log.Printf("skipped %q (already exists)", title)
+		return nil
+	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("status %d: %s", resp.StatusCode, string(body))
 	}
 
-	title, _ := dash["title"].(string)
 	log.Printf("deployed %q to folder %d", title, folderID)
 	return nil
 }

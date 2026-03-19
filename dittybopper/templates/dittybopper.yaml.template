@@ -106,7 +106,7 @@ spec:
           value: "rendering:debug"
       - name: dittybopper-syncer
         imagePullPolicy: Always
-        command: ["deployer", "--deploy", "--loop", "--input-dir", "/dashboards/rendered"]
+        command: ["deployer", "--deploy", "--input-dir", "/dashboards/rendered"]
         env:
         - name: GRAFANA_URL
           value: ${GRAFANA_URL}
