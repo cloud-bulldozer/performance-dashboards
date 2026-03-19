@@ -146,8 +146,12 @@ func (d *deployer) uploadDashboard(jsonPath string, folderID int) error {
 		return fmt.Errorf("parsing %s: %w", jsonPath, err)
 	}
 
-	// Remove id so Grafana treats it as new/upsert
+	// Remove id and set a stable uid derived from the title so Grafana
+	// upserts instead of creating duplicates on each sync.
 	delete(dash, "id")
+	if title, ok := dash["title"].(string); ok && title != "" {
+		dash["uid"] = uuid.NewSHA1(uuid.NameSpaceDNS, []byte(title)).String()
+	}
 
 	if d.gitCommitHash != "" {
 		tags, _ := dash["tags"].([]interface{})
