@@ -301,11 +301,11 @@ func ocpOVNRow() *dashboard.RowBuilder {
 		Collapsed(true).
 		GridPos(dashboard.GridPos{X: 0, Y: 0, W: 24, H: 1}).
 		WithPanel(ocpGenericLegend("Top 10 ovnkube-controller CPU Usage", "percent",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(ocpGenericLegend("Top 10 ovnkube-controller Memory Usage", "bytes",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}) by (pod,node))`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(ocpGenericLegend("Top 10 ovn-controller CPU Usage", "percent",
@@ -556,11 +556,11 @@ func ocpMasterRow() *dashboard.RowBuilder {
 		GridPos(dashboard.GridPos{X: 0, Y: 0, W: 24, H: 8}).
 		Repeat("_master_node").
 		WithPanel(ocpGenericLegend("CPU Basic: $_master_node", "percent",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_master_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
 		)).
 		WithPanel(ocpGenericLegendCounter("System Memory: $_master_node", "bytes",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
 			promQuery(`node_memory_Active_bytes{instance=~"$_master_node"}`, "Active"),
 			promQuery(`node_memory_MemTotal_bytes{instance=~"$_master_node"}`, "Total"),
 			promQuery(`node_memory_Cached_bytes{instance=~"$_master_node"} + node_memory_Buffers_bytes{instance=~"$_master_node"}`, "Cached + Buffers"),
@@ -632,11 +632,11 @@ func ocpWorkerRow() *dashboard.RowBuilder {
 		GridPos(dashboard.GridPos{X: 0, Y: 0, W: 24, H: 8}).
 		Repeat("_worker_node").
 		WithPanel(ocpGenericLegend("CPU Basic: $_worker_node", "percent",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_worker_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
 		)).
 		WithPanel(ocpGenericLegendCounter("System Memory: $_worker_node", "bytes",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
 			promQuery(`node_memory_Active_bytes{instance=~"$_worker_node"}`, "Active"),
 			promQuery(`node_memory_MemTotal_bytes{instance=~"$_worker_node"}`, "Total"),
 			promQuery(`node_memory_Cached_bytes{instance=~"$_worker_node"} + node_memory_Buffers_bytes{instance=~"$_worker_node"}`, "Cached + Buffers"),
@@ -698,11 +698,11 @@ func ocpInfraRow() *dashboard.RowBuilder {
 		GridPos(dashboard.GridPos{X: 0, Y: 0, W: 24, H: 8}).
 		Repeat("_infra_node").
 		WithPanel(ocpGenericLegend("CPU Basic: $_infra_node", "percent",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_infra_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
 		)).
 		WithPanel(ocpGenericLegend("System Memory: $_infra_node", "bytes",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 8},
+			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
 			promQuery(`node_memory_Active_bytes{instance=~"$_infra_node"}`, "Active"),
 			promQuery(`node_memory_MemTotal_bytes{instance=~"$_infra_node"}`, "Total"),
 			promQuery(`node_memory_Cached_bytes{instance=~"$_infra_node"} + node_memory_Buffers_bytes{instance=~"$_infra_node"}`, "Cached + Buffers"),
