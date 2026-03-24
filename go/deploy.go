@@ -55,7 +55,11 @@ func (d *deployer) fetchFolders() error {
 	if err != nil {
 		return fmt.Errorf("GET /api/folders: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("error closing response body: %v", err)
+		}
+	}()
 
 	var folders []struct {
 		ID    int    `json:"id"`
@@ -122,7 +126,11 @@ func (d *deployer) createFolder(name string) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("POST /api/folders: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("error closing response body: %v", err)
+		}
+	}()
 
 	var result struct {
 		ID int `json:"id"`
@@ -168,7 +176,11 @@ func (d *deployer) uploadDashboard(jsonPath string, folderID int) error {
 	if err != nil {
 		return fmt.Errorf("POST /api/dashboards/db: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("error closing response body: %v", err)
+		}
+	}()
 
 	title, _ := dash["title"].(string)
 
