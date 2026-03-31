@@ -25,6 +25,7 @@ var dashboards = []dashboardDef{
 	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard},
 	{"ovn-dashboard", "General", buildOVNDashboard},
 	{"api-performance-overview", "General", buildAPIPerformanceDashboard},
+	{"node", "General", buildNodeDashboard},
 }
 
 func envDefault(key, fallback string) string {
