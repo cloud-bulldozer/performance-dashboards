@@ -371,7 +371,7 @@ func ocpClusterDetailsRow() *dashboard.RowBuilder {
 		)).
 		WithPanel(genericTimeSeries("Deployment count", "none",
 			dashboard.GridPos{X: 8, Y: 20, W: 8, H: 8},
-			promQuery(`count(kube_deployment_labels{})`, "Deployments"),
+			promQuery(`count(kube_deployment_spec_replicas{})`, "Deployments"),
 		)).
 		WithPanel(genericTimeSeries("Services count", "none",
 			dashboard.GridPos{X: 16, Y: 20, W: 8, H: 8},
