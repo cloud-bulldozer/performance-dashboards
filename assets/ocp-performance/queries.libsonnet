@@ -31,19 +31,19 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   workersCGroupCpuRate: {
     query():
-      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "worker" } )', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "worker" } )', '{{node}}'),
   },
   controlPlaneCGroupCpuRate: {
     query():
-      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{node}}'),
   },
   workersCGroupMemoryRSS: {
     query():
-      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "worker" } )', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "worker" } )', '{{id}}'),
   },
   controlPlaneCGroupMemoryRSS: {
     query():
-      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "control-plane" } )', '{{id}}'),
   },
   workersMemoryAvailable: {
     query():
@@ -57,11 +57,11 @@ local generateTimeSeriesQuery(query, legend) = [
   },
   workersContainerThreads: {
     query():
-      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "worker" }', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "worker" }', '{{node}}'),
   },
   controlPlaneContainerThreads: {
     query():
-      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "control-plane" }', '{{instance}}'),
+      generateTimeSeriesQuery('sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "control-plane" }', '{{node}}'),
   },
   workersIOPS: {
     query():

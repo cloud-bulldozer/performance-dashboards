@@ -47,11 +47,11 @@ local var = g.dashboard.variable;
     + var.query.withDatasourceFromVariable(self.Datasource)
     + var.query.queryTypes.withLabelValues(
       'namespace',
-      'kube_pod_info{namespace!="(cluster-density.*|node-density-.*)"}',
+      'kube_pod_info{namespace!~"(cluster-density.*|node-density-.*)"}',
     )
     + var.query.withRefresh(2)
     + var.query.withRegex('')
-    + var.query.selectionOptions.withMulti(false)
+    + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(true)
     + var.query.generalOptions.withLabel('Namespace'),
 
