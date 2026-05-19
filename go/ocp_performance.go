@@ -46,11 +46,11 @@ func buildOCPPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("namespace").
 			Label("Namespace").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(kube_pod_info{namespace!="(cluster-density.*|node-density-.*)"},namespace)`)}).
+			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{namespace!~"(cluster-density.*|node-density-.*)"},namespace)`)}).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Regex("").
-			Multi(false).
+			Multi(true).
 			IncludeAll(true),
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("block_device").
@@ -113,10 +113,12 @@ func ocpClusterAtAGlanceRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Workers CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 2, W: 12, H: 8},
 			promQuery(`sum( rate( (node_cpu_seconds_total{ mode != "idle" } * on (instance) group_left label_replace( kube_node_role{ role = "worker"} , "instance" , "$1" , "node" ,"(.*)") )[$interval:] ) ) by (instance) * 100`, "{{instance}}"),
+			promQuery("node_cpu_seconds_sum_rate_2m_30s_worker", "{{instance}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Control Plane CPU Usage", "percent",
 			dashboard.GridPos{X: 12, Y: 2, W: 12, H: 8},
 			promQuery(`sum( rate( (node_cpu_seconds_total{ mode != "idle" } * on (instance) group_left label_replace( kube_node_role{ role = "control-plane"} , "instance" , "$1" , "node" ,"(.*)") )[$interval:] ) ) by (instance) * 100`, "{{instance}}"),
+			promQuery("node_cpu_seconds_sum_rate_2m_30s_master", "{{instance}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Workers Load1", "short",
 			dashboard.GridPos{X: 0, Y: 9, W: 12, H: 8},
@@ -138,27 +140,33 @@ func ocpClusterAtAGlanceRow() *dashboard.RowBuilder {
 		)).
 		WithPanel(genericLegendTimeSeries("Workers CGroup CPU Rate", "percent",
 			dashboard.GridPos{X: 0, Y: 25, W: 12, H: 8},
-			promQuery(`sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "worker" } )`, "{{instance}}"),
+			promQuery(`sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "worker" } )`, "{{id}}"),
+			promQuery(`sum by (id) (container_cpu_usage_seconds_total_cgroup_sum_rate_id_node * on (node) group_left kube_node_role{ role = "worker" })`, "{{id}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Control Plane CGroup CPU Rate", "percent",
 			dashboard.GridPos{X: 12, Y: 25, W: 12, H: 8},
-			promQuery(`sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )`, "{{instance}}"),
+			promQuery(`sum by (id) (( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) * 100 * on (node) group_left kube_node_role{ role = "control-plane" } )`, "{{id}}"),
+			promQuery(`sum by (id) (container_cpu_usage_seconds_total_cgroup_sum_rate_id_node * on (node) group_left kube_node_role{ role = "control-plane" })`, "{{id}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Workers CGroup Memory RSS", "bytes",
 			dashboard.GridPos{X: 0, Y: 33, W: 12, H: 8},
-			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "worker" } )`, "{{instance}}"),
+			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "worker" } )`, "{{id}}"),
+			promQuery(`sum by (id) (container_memory_working_set_bytes_cgroup * on (node) group_left kube_node_role{ role = "worker" })`, "{{id}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Control Plane CGroup Memory RSS", "bytes",
 			dashboard.GridPos{X: 12, Y: 33, W: 12, H: 8},
-			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "control-plane" } )`, "{{instance}}"),
+			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"} * on (node) group_left kube_node_role{ role = "control-plane" } )`, "{{id}}"),
+			promQuery(`sum by (id) (container_memory_working_set_bytes_cgroup * on (node) group_left kube_node_role{ role = "control-plane" })`, "{{id}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Workers Container Threads", "short",
 			dashboard.GridPos{X: 0, Y: 41, W: 12, H: 8},
-			promQuery(`sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "worker" }`, "{{instance}}"),
+			promQuery(`sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "worker" }`, "{{node}}"),
+			promQuery("container_threads_sum_by_node_worker", "{{node}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Control Plane Container Threads", "short",
 			dashboard.GridPos{X: 12, Y: 41, W: 12, H: 8},
-			promQuery(`sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "control-plane" }`, "{{instance}}"),
+			promQuery(`sum by (node) (container_threads{ container!=""})  * on (node) group_left kube_node_role{ role = "control-plane" }`, "{{node}}"),
+			promQuery("container_threads_sum_by_node_master", "{{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Workers Disk IOPS", "short",
 			dashboard.GridPos{X: 0, Y: 49, W: 12, H: 8},
@@ -180,62 +188,80 @@ func ocpOVNRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Top 10 ovnkube-controller CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 ovnkube-controller Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}) by (pod,node))`, "{{pod}} - {{node}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 ovn-controller CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 8, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 ovn-controller Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 8, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node))`, "{{pod}} - {{node}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 nbdb CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 16, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 nbdb Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 16, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}) by (pod,node))`, "{{pod}} - {{node}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 northd CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 northd Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="northd"}) by (pod,node))`, "{{pod}} - {{node}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 sbdb CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 32, W: 12, H: 8},
 			promQuery(`topk(10, sum( irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}[$interval])*100)  by (pod,node) )`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 sbdb Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 32, W: 12, H: 8},
 			promQuery(`topk(10, sum(container_memory_rss{pod=~"ovnkube-node-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}) by (pod,node))`, "{{pod}} - {{node}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("ovs-master CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 40, W: 12, H: 8},
 			promQuery(`irate(container_cpu_usage_seconds_total{id=~"/.*/ovs-vswitchd.service", node=~"$_master_node"}[$interval])*100`, "OVS CPU - {{ node }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{id=~"/.*/ovs-vswitchd.service", node=~"$_master_node"}`, "OVS CPU - {{ node }}"),
 			promQuery(`irate(container_cpu_usage_seconds_total{id=~"/.*/ovsdb-server.service", node=~"$_master_node"}[$interval])*100`, "OVS DB CPU - {{ node }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{id=~"/.*/ovsdb-server.service", node=~"$_master_node"}`, "OVS DB CPU - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("ovs-master Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 40, W: 12, H: 8},
 			promQuery(`container_memory_rss{id=~"/.*/ovs-vswitchd.service", node=~"$_master_node"}`, "OVS Memory - {{ node }}"),
+			promQuery(`container_memory_rss_cgroup{id=~"/.*/ovs-vswitchd.service", node=~"$_master_node"}`, "OVS Memory - {{ node }}"),
 			promQuery(`container_memory_rss{id=~"/.*/ovsdb-server.service", node=~"$_master_node"}`, "OVS DB Memory - {{ node }}"),
+			promQuery(`container_memory_rss_cgroup{id=~"/.*/ovsdb-server.service", node=~"$_master_node"}`, "OVS DB Memory - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("ovs-worker CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 48, W: 12, H: 8},
 			promQuery(`irate(container_cpu_usage_seconds_total{id=~"/.*/ovs-vswitchd.service", node=~"$_worker_node"}[$interval])*100`, "OVS CPU - {{ node }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{id=~"/.*/ovs-vswitchd.service", node=~"$_worker_node"}`, "OVS CPU - {{ node }}"),
 			promQuery(`irate(container_cpu_usage_seconds_total{id=~"/.*/ovsdb-server.service", node=~"$_worker_node"}[$interval])*100`, "OVS DB CPU - {{ node }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{id=~"/.*/ovsdb-server.service", node=~"$_worker_node"}`, "OVS DB CPU - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("ovs-worker Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 48, W: 12, H: 8},
 			promQuery(`container_memory_rss{id=~"/.*/ovs-vswitchd.service", node=~"$_worker_node"}`, "OVS Memory - {{ node }}"),
+			promQuery(`container_memory_rss_cgroup{id=~"/.*/ovs-vswitchd.service", node=~"$_worker_node"}`, "OVS Memory - {{ node }}"),
 			promQuery(`container_memory_rss{id=~"/.*/ovsdb-server.service", node=~"$_worker_node"}`, "OVS DB Memory - {{ node }}"),
+			promQuery(`container_memory_rss_cgroup{id=~"/.*/ovsdb-server.service", node=~"$_worker_node"}`, "OVS DB Memory - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("99% Pod Annotation Latency", "s",
 			dashboard.GridPos{X: 0, Y: 56, W: 8, H: 8},
@@ -252,10 +278,12 @@ func ocpOVNRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("ovnkube-control-plane CPU Usage", "percent",
 			dashboard.GridPos{X: 0, Y: 64, W: 12, H: 8},
 			promQuery(`sum( irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[$interval])*100 ) by (pod, node)`, "{{pod}} - {{node}}"),
+			promQuery(`sum(container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes"}) by (pod, node)`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("ovnkube-control-plane Memory Usage", "bytes",
 			dashboard.GridPos{X: 12, Y: 64, W: 12, H: 8},
-			promQuery(`container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}`, "{{pod}} - {{node}}"),
+			promQuery(`sum(container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}) by (pod,node)`, "{{pod}} - {{node}}"),
+			promQuery(`sum(container_memory_working_set_bytes_container{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes"}) by (pod,node)`, "{{pod}} - {{node}}"),
 		))
 }
 
@@ -266,23 +294,27 @@ func ocpMonitoringStackRow() *dashboard.RowBuilder {
 		GridPos(dashboard.GridPos{X: 0, Y: 0, W: 24, H: 1}).
 		WithPanel(genericLegendTimeSeries("Prometheus Replica CPU", "percent",
 			dashboard.GridPos{X: 0, Y: 2, W: 12, H: 8},
-			promQuery(`sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-0",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container,node) * 100`, "{{pod}} - {{node}}"),
-			promQuery(`sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-1",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container,node) * 100`, "{{pod}} - {{node}}"),
+			promQuery(`sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}[$interval])) by (pod,container,node) * 100`, "{{pod}} - {{node}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Prometheus Replica RSS", "bytes",
 			dashboard.GridPos{X: 12, Y: 2, W: 12, H: 8},
-			promQuery(`sum(container_memory_rss{pod="prometheus-k8s-1",namespace!="",name!="",container="prometheus"}) by (pod)`, "{{pod}}"),
-			promQuery(`sum(container_memory_rss{pod="prometheus-k8s-0",namespace!="",name!="",container="prometheus"}) by (pod)`, "{{pod}}"),
+			promQuery(`sum(container_memory_rss{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}) by (pod)`, "{{pod}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}`, "{{pod}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("metrics-server/prom-adapter CPU", "percent",
 			dashboard.GridPos{X: 0, Y: 10, W: 12, H: 8},
 			promQuery(`sum(irate(container_cpu_usage_seconds_total{pod=~"metrics-server-.*",namespace!="",name!=""}[$interval])) by (pod,container) * 100`, "{{pod}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"metrics-server-.*",namespace!="",name!=""}`, "{{pod}}"),
 			promQuery(`sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}[$interval])) by (pod,container) * 100`, "{{pod}}"),
+			promQuery(`container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}`, "{{pod}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("metrics-server/prom-adapter RSS", "bytes",
 			dashboard.GridPos{X: 12, Y: 10, W: 12, H: 8},
 			promQuery(`sum(container_memory_rss{pod=~"metrics-server-.*",namespace!="",name!=""}) by (pod)`, "{{pod}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"metrics-server-.*",namespace!="",name!=""}`, "{{pod}}"),
 			promQuery(`sum(container_memory_rss{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}) by (pod)`, "{{pod}}"),
+			promQuery(`container_memory_working_set_bytes_container{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}`, "{{pod}}"),
 		))
 }
 
@@ -346,10 +378,12 @@ func ocpClusterDetailsRow() *dashboard.RowBuilder {
 		WithPanel(genericStat("Current Namespace Count",
 			dashboard.GridPos{X: 8, Y: 4, W: 8, H: 3},
 			promQuery(`sum(kube_namespace_status_phase) by (phase)`, "{{ phase }}"),
+			promQuery(`kube_namespace_status_phase_sum_by_phase`, "{{ phase }}"),
 		)).
 		WithPanel(genericStat("Current Pod Count",
 			dashboard.GridPos{X: 16, Y: 4, W: 8, H: 3},
 			promQuery(`sum(kube_pod_status_phase{}) by (phase) > 0`, "{{ phase}} Pods"),
+			promQuery(`sum(kube_pod_info_by_node)`, "{{ phase}} Pods"),
 		)).
 		WithPanel(genericTimeSeries("Number of nodes", "none",
 			dashboard.GridPos{X: 0, Y: 12, W: 8, H: 8},
@@ -359,27 +393,38 @@ func ocpClusterDetailsRow() *dashboard.RowBuilder {
 		WithPanel(genericTimeSeries("Namespace count", "none",
 			dashboard.GridPos{X: 8, Y: 12, W: 8, H: 8},
 			promQuery(`sum(kube_namespace_status_phase) by (phase) > 0`, "{{ phase }} namespaces"),
+			promQuery(`kube_namespace_status_phase_sum_by_phase > 0`, "{{ phase }} namespaces"),
 		)).
 		WithPanel(genericTimeSeries("Pod count", "none",
 			dashboard.GridPos{X: 16, Y: 12, W: 8, H: 8},
 			promQuery(`sum(kube_pod_status_phase{}) by (phase)`, "{{phase}} pods"),
+			promQuery(`kube_pod_status_phase_sum_by_failed`, "Failed pods"),
+			promQuery(`kube_pod_status_phase_sum_by_pending`, "Pending pods"),
+			promQuery(`kube_pod_status_phase_sum_by_running`, "Running pods"),
+			promQuery(`kube_pod_status_phase_sum_by_succeeded`, "Succeeded pods"),
+			promQuery(`kube_pod_status_phase_sum_by_unknown`, "Unknown pods"),
 		)).
 		WithPanel(genericTimeSeries("Secret & configmap count", "none",
 			dashboard.GridPos{X: 0, Y: 20, W: 8, H: 8},
 			promQuery(`count(kube_secret_info{})`, "secrets"),
+			promQuery(`kube_secret_info_count`, "secrets"),
 			promQuery(`count(kube_configmap_info{})`, "Configmaps"),
+			promQuery(`kube_configmap_info_count`, "Configmaps"),
 		)).
 		WithPanel(genericTimeSeries("Deployment count", "none",
 			dashboard.GridPos{X: 8, Y: 20, W: 8, H: 8},
 			promQuery(`count(kube_deployment_spec_replicas{})`, "Deployments"),
+			promQuery(`kube_deployment_spec_paused_count`, "Deployments"),
 		)).
 		WithPanel(genericTimeSeries("Services count", "none",
 			dashboard.GridPos{X: 16, Y: 20, W: 8, H: 8},
 			promQuery(`count(kube_service_info{})`, "Services"),
+			promQuery(`kube_service_info_count`, "Services"),
 		)).
 		WithPanel(genericTimeSeries("Routes count", "none",
 			dashboard.GridPos{X: 0, Y: 20, W: 8, H: 8},
 			promQuery(`count(openshift_route_info{})`, "Routes"),
+			promQuery(`openshift_route_info_count`, "Routes"),
 		)).
 		WithPanel(genericTimeSeries("Alerts", "none",
 			dashboard.GridPos{X: 8, Y: 20, W: 8, H: 8},
@@ -388,18 +433,22 @@ func ocpClusterDetailsRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Pod Distribution", "none",
 			dashboard.GridPos{X: 16, Y: 20, W: 8, H: 8},
 			promQuery(`count(kube_pod_info{}) by (node)`, "{{ node }}"),
+			promQuery(`kube_pod_info_by_node`, "{{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 container CPU", "percent",
 			dashboard.GridPos{X: 0, Y: 28, W: 12, H: 8},
-			promQuery(`topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[$interval])*100)`, "{{ namespace }} - {{ name }} - {{ node }}"),
+			promQuery(`topk(10,irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[$interval])*100)`, "{{ namespace }} - {{ pod }} - {{ node }}"),
+			promQuery(`topk(10,container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{namespace!="",container!="POD",name!=""})`, "{{ namespace }} - {{ pod }} - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 container RSS", "bytes",
 			dashboard.GridPos{X: 12, Y: 28, W: 12, H: 8},
-			promQuery(`topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})`, "{{ namespace }} - {{ name }} - {{ node }}"),
+			promQuery(`topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})`, "{{ namespace }} - {{ pod }} - {{ node }}"),
+			promQuery(`topk(10, container_memory_working_set_bytes_container{namespace!="",container!="POD",name!=""})`, "{{ namespace }} - {{ pod }} - {{ node }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("container RSS system.slice", "bytes",
 			dashboard.GridPos{X: 12, Y: 36, W: 12, H: 8},
 			promQuery(`sum by (node)(container_memory_rss{id="/system.slice"})`, "system.slice - {{ node }}"),
+			promQuery(`container_memory_working_set_bytes_cgroup{id="/system.slice"}`, "system.slice - {{ node }}"),
 		)).
 		WithPanel(genericTimeSeries("Goroutines count", "none",
 			dashboard.GridPos{X: 0, Y: 36, W: 12, H: 8},
@@ -435,6 +484,7 @@ func ocpMasterRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("CPU Basic: $_master_node", "percent",
 			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_master_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
+			promQuery(`node_cpu_seconds_sum_rate_2m_30s_instance_mode_node_panel{instance=~"$_master_node"}`, "Busy {{mode}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("System Memory: $_master_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
@@ -477,28 +527,36 @@ func ocpMasterRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Top 10 container CPU: $_master_node", "percent",
 			dashboard.GridPos{X: 0, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"$_master_node",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{node=~"$_master_node",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Top 10 container RSS: $_master_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, container_memory_rss{container!="POD",name!="",node=~"$_master_node",namespace!="",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_memory_working_set_bytes_container{node=~"$_master_node",namespace=~"$namespace"})`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("cgroup CPU: $_master_node", "percent",
 			dashboard.GridPos{X: 0, Y: 32, W: 12, H: 8},
 			promQuery(`sum by (id) ( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"$_master_node"}[$interval])) * 100`, "{{ id }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{node=~"$_master_node"}`, "{{ id }}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("cgroup RSS: $_master_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 32, W: 12, H: 8},
 			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/.*.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"$_master_node"})`, "{{ id }}"),
+			promQuery(`container_memory_working_set_bytes_cgroup{node=~"$_master_node"}`, "{{ id }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Pod fs rw rate: $_master_node", "Bps",
 			dashboard.GridPos{X: 0, Y: 32, W: 12, H: 8},
 			promQuery(`sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"$_master_node", pod!=""}[$interval])) by (device, pod)`, "{{ pod }}: {{ device }} - write"),
+			promQuery(`container_fs_writes_bytes_total_container_sum_rate_pod_node_device{node=~"$_master_node"}`, "{{ pod }}: {{ device }} - write"),
 			promQuery(`sum(rate(container_fs_reads_bytes_total{device!~".+dm.+", node=~"$_master_node", pod!=""}[$interval])) by (device, pod)`, "{{ pod }}: {{ device }} - read"),
+			promQuery(`container_fs_reads_bytes_total_container_sum_rate_pod_node_device{node=~"$_master_node"}`, "{{ pod }}: {{ device }} - read"),
 		)).
 		WithPanel(genericLegendTimeSeries("cgroup fs rw rate: $_master_node", "Bps",
 			dashboard.GridPos{X: 12, Y: 32, W: 12, H: 8},
 			promQuery(`sum(rate(container_fs_writes_bytes_total{device!~".+dm.+", node=~"$_master_node", id =~"/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) by (device, id)`, "{{ id }}: {{ device }} - write"),
+			promQuery(`container_fs_writes_bytes_total_cgroup_sum_rate_id_node_device{node=~"$_master_node"}`, "{{ id }}: {{ device }} - write"),
 			promQuery(`sum(rate(container_fs_reads_bytes_total{device!~".+dm.+", node=~"$_master_node", id =~"/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice"}[$interval])) by (device, id)`, "{{ id }}: {{ device }} - read"),
+			promQuery(`container_fs_reads_bytes_total_cgroup_sum_rate_id_node_device{node=~"$_master_node"}`, "{{ id }}: {{ device }} - read"),
 		))
 }
 
@@ -511,6 +569,7 @@ func ocpWorkerRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("CPU Basic: $_worker_node", "percent",
 			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_worker_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
+			promQuery(`node_cpu_seconds_sum_rate_2m_30s_instance_mode_node_panel{instance=~"$_worker_node",job=~".*"}`, "Busy {{mode}}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("System Memory: $_worker_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
@@ -553,18 +612,22 @@ func ocpWorkerRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Top 10 container CPU: $_worker_node", "percent",
 			dashboard.GridPos{X: 0, Y: 32, W: 12, H: 8},
 			promQuery(`topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"$_worker_node",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{node=~"$_worker_node",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("Top 10 container RSS: $_worker_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 32, W: 12, H: 8},
 			promQuery(`topk(10, container_memory_rss{container!="POD",name!="",node=~"$_worker_node",namespace!="",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_memory_working_set_bytes_container{node=~"$_worker_node",namespace=~"$namespace"})`, "{{pod}} - {{node}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("cgroup CPU: $_worker_node", "percent",
 			dashboard.GridPos{X: 0, Y: 40, W: 12, H: 8},
 			promQuery(`sum by (id) ( rate(container_cpu_usage_seconds_total{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/.*/ovsdb-server.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"$_worker_node"}[$interval])) * 100`, "{{ id }}"),
+			promQuery(`container_cpu_usage_seconds_total_cgroup_sum_rate_id_node{node=~"$_worker_node"}`, "{{ id }}"),
 		)).
 		WithPanel(genericLegendCounterTimeSeries("cgroup RSS: $_worker_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 40, W: 12, H: 8},
 			promQuery(`sum by (id) ( container_memory_rss{ job=~".*", id =~"/system.slice|/system.slice/kubelet.service|/.*/ovs-vswitchd.service|/system.slice/crio.service|/system.slice/systemd-journald.service|/system.slice/.*.service|/system.slice/systemd-udevd.service|/kubepods.slice", node=~"$_worker_node"})`, "{{ id }}"),
+			promQuery(`container_memory_working_set_bytes_cgroup{node=~"$_worker_node"}`, "{{ id }}"),
 		))
 }
 
@@ -577,6 +640,7 @@ func ocpInfraRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("CPU Basic: $_infra_node", "percent",
 			dashboard.GridPos{X: 0, Y: 1, W: 12, H: 8},
 			promQuery(`sum by (instance, mode)(irate(node_cpu_seconds_total{instance=~"$_infra_node",job=~".*"}[$interval])) * 100`, "Busy {{mode}}"),
+			promQuery(`node_cpu_seconds_sum_rate_2m_30s_instance_mode_node_panel{instance=~"$_infra_node",job=~".*"}`, "Busy {{mode}}"),
 		)).
 		WithPanel(genericLegendTimeSeries("System Memory: $_infra_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 1, W: 12, H: 8},
@@ -619,9 +683,11 @@ func ocpInfraRow() *dashboard.RowBuilder {
 		WithPanel(genericLegendTimeSeries("Top 10 container CPU: $_infra_node", "percent",
 			dashboard.GridPos{X: 0, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",node=~"$_infra_node",namespace!="",namespace=~"$namespace"}[$interval])) by (pod,container,namespace,name,service) * 100)`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{node=~"$_infra_node",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Top 10 container RSS: $_infra_node", "bytes",
 			dashboard.GridPos{X: 12, Y: 24, W: 12, H: 8},
 			promQuery(`topk(10, container_memory_rss{container!="POD",name!="",node=~"$_infra_node",namespace!="",namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
+			promQuery(`topk(10, container_memory_working_set_bytes_container{node=~"$_infra_node",namespace=~"$namespace"})`, "{{pod}} - {{node}}"),
 		))
 }
