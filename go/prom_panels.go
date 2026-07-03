@@ -32,12 +32,12 @@ func intervalOption(val string) dashboard.VariableOption {
 }
 
 // Panel type: generic - base timeseries with tooltip multi/desc, legend table mode
-func genericTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+func genericTimeSeries(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(promDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
@@ -54,12 +54,12 @@ func genericTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ..
 }
 
 // Panel type: genericLegend - extends generic with calcs [mean, min, max], sortBy Max desc, placement bottom
-func genericLegendTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+func genericLegendTimeSeries(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(promDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
@@ -80,12 +80,12 @@ func genericLegendTimeSeries(title, unit string, gridPos dashboard.GridPos, targ
 }
 
 // Panel type: genericLegendCounter - extends generic with calcs [first, min, max, last], sortBy Max desc, placement bottom
-func genericLegendCounterTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+func genericLegendCounterTimeSeries(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(promDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		SpanNulls(boolPtr(false)).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
@@ -106,8 +106,8 @@ func genericLegendCounterTimeSeries(title, unit string, gridPos dashboard.GridPo
 }
 
 // Panel type: genericLegendCounterSumRightHand - extends genericLegendCounter with override for 'sum' series on right axis
-func genericLegendCounterSumRightHandTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
-	p := genericLegendCounterTimeSeries(title, unit, gridPos, targets...)
+func genericLegendCounterSumRightHandTimeSeries(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+	p := genericLegendCounterTimeSeries(title, unit, span, height, targets...)
 	return p.OverrideByRegexp("sum", []dashboard.DynamicConfigValue{
 		{Id: "custom.axisPlacement", Value: "right"},
 		{Id: "custom.axisLabel", Value: "sum"},
@@ -115,11 +115,11 @@ func genericLegendCounterSumRightHandTimeSeries(title, unit string, gridPos dash
 }
 
 // Stat panel
-func genericStat(title string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *stat.PanelBuilder {
+func genericStat(title string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *stat.PanelBuilder {
 	p := stat.NewPanelBuilder().
 		Title(title).
 		Datasource(promDatasourceRef()).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		ReduceOptions(common.NewReduceDataOptionsBuilder().
 			Calcs([]string{"last"}),
 		)

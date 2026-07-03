@@ -90,12 +90,12 @@ func buildUperfDashboard() *dashboard.DashboardBuilder {
 		).
 		WithPanel(uperfTimeSeries(
 			"UPerf Performance : Throughput per-second", "bps",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 9},
+			12, 9,
 			uperfThroughputQuery(),
 		)).
 		WithPanel(uperfTimeSeries(
 			"UPerf Performance : Operations per-second", "pps",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 9},
+			12, 9,
 			uperfOperationsQuery(),
 		)).
 		WithPanel(uperfResultSummaryTable())
@@ -129,12 +129,12 @@ func uperfOperationsQuery() *elasticsearch.DataqueryBuilder {
 		})
 }
 
-func uperfTimeSeries(title, unit string, gridPos dashboard.GridPos, target *elasticsearch.DataqueryBuilder) *timeseries.PanelBuilder {
+func uperfTimeSeries(title, unit string, span, height uint32, target *elasticsearch.DataqueryBuilder) *timeseries.PanelBuilder {
 	return timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(esDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		Transparent(true).
 		SpanNulls(boolPtr(true)).
 		ShowPoints(common.VisibilityModeNever).
@@ -158,7 +158,7 @@ func uperfResultSummaryTable() *table.PanelBuilder {
 	return table.NewPanelBuilder().
 		Title("UPerf Result Summary").
 		Datasource(esDatasourceRef()).
-		GridPos(dashboard.GridPos{X: 0, Y: 20, W: 24, H: 18}).
+		Span(24).Height(18).
 		Transparent(true).
 		ShowHeader(true).
 		ColorScheme(dashboard.NewFieldColorBuilder().

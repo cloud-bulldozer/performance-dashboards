@@ -57,17 +57,17 @@ func buildVegetaDashboard() *dashboard.DashboardBuilder {
 		).
 		WithPanel(vegetaTimeSeries(
 			"RPS (rate of sent requests per second)", "reqps",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 9},
+			12, 9,
 			vegetaESAvgQuery("rps", "1"),
 		)).
 		WithPanel(vegetaTimeSeries(
 			"Throughput (rate of successful requests per second)", "reqps",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 9},
+			12, 9,
 			vegetaESAvgQuery("throughput", "1"),
 		)).
 		WithPanel(vegetaTimeSeries(
 			"Request Latency (observed over given interval)", "µs",
-			dashboard.GridPos{X: 0, Y: 12, W: 12, H: 9},
+			12, 9,
 			vegetaESAvgQuery("req_latency", "1"),
 			vegetaESAvgQuery("p99_latency", "1"),
 		)).
@@ -88,12 +88,12 @@ func vegetaESAvgQuery(field, metricID string) *elasticsearch.DataqueryBuilder {
 		})
 }
 
-func vegetaTimeSeries(title, unit string, gridPos dashboard.GridPos, targets ...*elasticsearch.DataqueryBuilder) *timeseries.PanelBuilder {
+func vegetaTimeSeries(title, unit string, span, height uint32, targets ...*elasticsearch.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(esDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		Transparent(true).
 		SpanNulls(boolPtr(true)).
 		ShowPoints(common.VisibilityModeNever).
@@ -120,7 +120,7 @@ func vegetaResultSummaryTable() *table.PanelBuilder {
 	return table.NewPanelBuilder().
 		Title("Vegeta Result Summary").
 		Datasource(esDatasourceRef()).
-		GridPos(dashboard.GridPos{X: 0, Y: 24, W: 24, H: 9}).
+		Span(24).Height(9).
 		Transparent(true).
 		ShowHeader(true).
 		ColorScheme(dashboard.NewFieldColorBuilder().

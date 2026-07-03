@@ -91,87 +91,87 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 			}),
 		).
 		WithPanel(apiLegendRight("request duration - 99th quantile", "s",
-			dashboard.GridPos{X: 0, Y: 0, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(verb,le))`, "{{verb}}"),
 		)).
 		WithPanel(apiLegendRight("request rate - by instance", "short",
-			dashboard.GridPos{X: 12, Y: 0, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(instance)`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("request duration - 99th quantile - by resource", "s",
-			dashboard.GridPos{X: 0, Y: 8, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(resource,le))`, "{{resource}}"),
 		)).
 		WithPanel(apiLegendRight("request rate - by resource", "short",
-			dashboard.GridPos{X: 12, Y: 8, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(resource)`, "{{resource}}"),
 		)).
 		WithPanel(apiLegendBottom("request duration - read vs write", "s",
-			dashboard.GridPos{X: 0, Y: 16, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval])) by(le))`, "read"),
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval])) by(le))`, "write"),
 		)).
 		WithPanel(apiLegendBottom("request rate - read vs write", "short",
-			dashboard.GridPos{X: 12, Y: 16, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval]))`, "read"),
 			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval]))`, "write"),
 		)).
 		WithPanel(apiLegendBottom("requests dropped rate", "short",
-			dashboard.GridPos{X: 0, Y: 24, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_terminations_total{instance=~"$instance"}[$interval])) by (verb)`, ""),
 		)).
 		WithPanel(apiLegendBottom("requests terminated rate", "short",
-			dashboard.GridPos{X: 12, Y: 24, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_terminations_total{instance=~"$instance",resource=~"$resource",code=~"$code"}[$interval])) by(component)`, ""),
 		)).
 		WithPanel(apiLegendRight("requests status rate", "short",
-			dashboard.GridPos{X: 0, Y: 32, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"$verb",code=~"$code"}[$interval])) by(code)`, "{{code}}"),
 		)).
 		WithPanel(apiLegendRight("long running requests", "short",
-			dashboard.GridPos{X: 12, Y: 32, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(apiserver_longrunning_requests{instance=~"$instance",resource=~"$resource",verb=~"$verb"}) by(instance)`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("request in flight", "short",
-			dashboard.GridPos{X: 0, Y: 40, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(apiserver_current_inflight_requests{instance=~"$instance"}) by (instance,request_kind)`, "{{request_kind}}-{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("response size - 99th quantile", "bytes",
-			dashboard.GridPos{X: 12, Y: 40, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket{instance=~"$instance",resource=~"$resource",verb=~"$verb"}[$interval])) by(instance,le))`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request queue length", "short",
-			dashboard.GridPos{X: 0, Y: 48, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiWaitDuration("p&f - request wait duration - 99th quantile", "s",
-			dashboard.GridPos{X: 12, Y: 48, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[5m])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request dispatch rate", "short",
-			dashboard.GridPos{X: 0, Y: 64, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(rate(apiserver_flowcontrol_dispatched_requests_total{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request execution duration", "s",
-			dashboard.GridPos{X: 12, Y: 64, W: 12, H: 8},
+			12, 8,
 			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - pending in queue", "short",
-			dashboard.GridPos{X: 0, Y: 72, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(apiserver_flowcontrol_current_inqueue_requests{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}) by (flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - concurrency limit by kube-apiserver", "short",
-			dashboard.GridPos{X: 12, Y: 72, W: 12, H: 8},
+			12, 8,
 			promQuery(`sum(apiserver_flowcontrol_request_concurrency_in_use{instance=~".*:6443",priority_level=~"$priority_level"}) by (instance,flow_schema)`, "{{instance}}:{{flow_schema}}"),
 		))
 }
 
-func apiBase(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+func apiBase(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := timeseries.NewPanelBuilder().
 		Title(title).
 		Datasource(promDatasourceRef()).
 		Unit(unit).
-		GridPos(gridPos).
+		Span(span).Height(height).
 		DrawStyle(common.GraphDrawStyleLine).
 		LineInterpolation(common.LineInterpolationLinear).
 		BarAlignment(common.BarAlignmentCenter).
@@ -199,8 +199,8 @@ func apiBase(title, unit string, gridPos dashboard.GridPos, targets ...*promethe
 	return p
 }
 
-func apiLegendRight(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
-	return apiBase(title, unit, gridPos, targets...).
+func apiLegendRight(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+	return apiBase(title, unit, span, height, targets...).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderDescending),
@@ -215,8 +215,8 @@ func apiLegendRight(title, unit string, gridPos dashboard.GridPos, targets ...*p
 		)
 }
 
-func apiLegendBottom(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
-	return apiBase(title, unit, gridPos, targets...).
+func apiLegendBottom(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+	return apiBase(title, unit, span, height, targets...).
 		Tooltip(common.NewVizTooltipOptionsBuilder().
 			Mode(common.TooltipDisplayModeMulti).
 			Sort(common.SortOrderDescending),
@@ -230,8 +230,8 @@ func apiLegendBottom(title, unit string, gridPos dashboard.GridPos, targets ...*
 		)
 }
 
-func apiWaitDuration(title, unit string, gridPos dashboard.GridPos, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
-	return apiLegendRight(title, unit, gridPos, targets...).
+func apiWaitDuration(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+	return apiLegendRight(title, unit, span, height, targets...).
 		Legend(common.NewVizLegendOptionsBuilder().
 			ShowLegend(true).
 			DisplayMode(common.LegendDisplayModeTable).
