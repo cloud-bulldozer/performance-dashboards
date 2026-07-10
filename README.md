@@ -78,6 +78,47 @@ Dashboards Available after Migration to Grafonnet v10.1.0(latest):
     - [x] Vegeta Dashboard.
     - [x] YCSB Dashboard.
 
+## Go Builder (`go/` directory)
+
+A parallel implementation using the [grafana-foundation-sdk](https://github.com/grafana/grafana-foundation-sdk) Go builders. The Go builder is the single source of truth for both dashboard JSON **and** kube-burner metrics-profile YAML — profiles are generated as a by-product of building the dashboard, with no separate query list to maintain.
+
+```bash
+cd go && go run .
+# Writes to go/rendered/<category>/<name>.json
+# Writes metrics profiles to go/rendered/<category>/<name>-metrics.yaml / <name>-raw-metrics.yaml
+```
+
+### Outputs
+
+| File | Description |
+|------|-------------|
+| `<name>.json` | Rendered Grafana dashboard |
+| `<name>-metrics.yaml` | Aggregated PromQL metrics profile (kube-burner collection) |
+| `<name>-raw-metrics.yaml` | 1:1 raw Prometheus metric names profile |
+| `ocp-performance-collected.json` | OCP dashboard with metric-name queries (for collected data) |
+
+Dashboards with metrics profiles: `ocp-performance`, `etcd-on-cluster-dashboard`.
+
+### Merging profiles
+
+Combine and deduplicate raw-metrics profiles from multiple dashboards:
+
+```bash
+cd go && go run . --merge combined-raw.yaml \
+  rendered/General/ocp-performance-raw-metrics.yaml \
+  rendered/General/etcd-on-cluster-dashboard-raw-metrics.yaml
+```
+
+Output is sorted alphabetically by `metricName`.
+
+### Tests
+
+```bash
+cd go && go test ./...
+```
+
+Tests enforce: no garbage tokens in raw profiles, no Grafana variables in aggregated profiles, merge deduplication and sort order.
+
 ## Dittybopper
 
 Dittybopper is a tool meant to deploy a grafana instance with certain dashboards on top of a running OpenShift 4.X cluster. Find more info [here](./dittybopper/README.md)

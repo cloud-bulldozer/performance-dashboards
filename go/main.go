@@ -13,19 +13,21 @@ import (
 )
 
 type dashboardDef struct {
-	name     string
-	category string
-	builder  func() *dashboard.DashboardBuilder
+	name           string
+	category       string
+	builder        func() *dashboard.DashboardBuilder
+	metricsProfiles func() []namedProfile
 }
 
 var dashboards = []dashboardDef{
-	{"vegeta-wrapper", "General", buildVegetaDashboard},
-	{"uperf-perf", "General", buildUperfDashboard},
-	{"ocp-performance", "General", buildOCPPerformanceDashboard},
-	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard},
-	{"ovn-dashboard", "General", buildOVNDashboard},
-	{"api-performance-overview", "General", buildAPIPerformanceDashboard},
-	{"node", "General", buildNodeDashboard},
+	{"vegeta-wrapper", "General", buildVegetaDashboard, nil},
+	{"uperf-perf", "General", buildUperfDashboard, nil},
+	{"ocp-performance", "General", buildOCPPerformanceDashboard, buildOCPProfiles},
+	{"ocp-performance-collected", "General", buildOCPCollectedDashboard, nil},
+	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard, buildEtcdProfiles},
+	{"ovn-dashboard", "General", buildOVNDashboard, nil},
+	{"api-performance-overview", "General", buildAPIPerformanceDashboard, nil},
+	{"node", "General", buildNodeDashboard, nil},
 }
 
 func envDefault(key, fallback string) string {
@@ -36,6 +38,7 @@ func envDefault(key, fallback string) string {
 }
 
 func main() {
+	mergeOutput := flag.String("merge", "", "Merge input profile YAML files into this output path (positional args are inputs)")
 	deployFlag := flag.Bool("deploy", false, "Deploy rendered dashboards to Grafana")
 	loopFlag := flag.Bool("loop", false, "Run deploy in a loop (sidecar mode)")
 	loopInterval := flag.Duration("loop-interval", 60*time.Second, "Interval between deploy loops")
@@ -45,7 +48,14 @@ func main() {
 	gitCommitHash := flag.String("git-commit-hash", envDefault("GIT_COMMIT_HASH", ""), "Git commit hash to append to dashboard tags")
 	flag.Parse()
 
-	// If --input-dir is set, skip rendering and deploy from that directory
+	if *mergeOutput != "" {
+		if err := mergeProfileFiles(flag.Args(), *mergeOutput); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if *inputDir == "" {
 		renderDashboards(*outputDir)
 	}
@@ -108,7 +118,22 @@ func renderDashboards(outputDir string) {
 			fmt.Fprintf(os.Stderr, "error writing %s: %v\n", outPath, err)
 			os.Exit(1)
 		}
-
 		fmt.Printf("wrote %s\n", outPath)
+
+		if d.metricsProfiles != nil {
+			for _, p := range d.metricsProfiles() {
+				yamlBytes, err := p.g.Generate()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error generating metrics profile %s for %s/%s: %v\n", p.suffix, d.category, d.name, err)
+					os.Exit(1)
+				}
+				profilePath := filepath.Join(dir, d.name+p.suffix+".yaml")
+				if err := os.WriteFile(profilePath, yamlBytes, 0o644); err != nil {
+					fmt.Fprintf(os.Stderr, "error writing %s: %v\n", profilePath, err)
+					os.Exit(1)
+				}
+				fmt.Printf("wrote %s\n", profilePath)
+			}
+		}
 	}
 }
