@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/grafana/grafana-foundation-sdk/go/cog"
 	"github.com/grafana/grafana-foundation-sdk/go/common"
 	"github.com/grafana/grafana-foundation-sdk/go/elasticsearch"
@@ -95,4 +98,19 @@ func countMetric(id string) elasticsearch.MetricAggregation {
 		Id(id).
 		Build()
 	return elasticsearch.MetricAggregation{Count: &c}
+}
+
+func createDir(dir string) {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		fmt.Fprintf(os.Stderr, "error creating directory %s: %v\n", dir, err)
+		os.Exit(1)
+	}
+}
+
+func writeFile(name string, data []byte) {
+	if err := os.WriteFile(name, data, 0o644); err != nil {
+		fmt.Fprintf(os.Stderr, "error writing %s: %v\n", name, err)
+		os.Exit(1)
+	}
+	fmt.Printf("wrote %s\n", name)
 }

@@ -1,3 +1,5 @@
+github.com/afcollins/metrics-generator v0.0.1 h1:UtV5ZbkmladTsQPOXz3cuoWyKmsfquOmVDZ/qnvLJLI=
+github.com/afcollins/metrics-generator v0.0.1/go.mod h1:CvjhllzhqloYsuSSFaBZwt4VwFJmQg8gc+6j59V2CWQ=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grafana/grafana-foundation-sdk/go v0.0.12 h1:ggGWIJ3ylX16/xtAYlVi1TtUdv+mybYPusOmi1x35kg=

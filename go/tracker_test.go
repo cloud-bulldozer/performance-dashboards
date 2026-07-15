@@ -15,10 +15,7 @@ type metricDef struct {
 
 func parseProfile(t *testing.T, g *mg.Generator) []metricDef {
 	t.Helper()
-	b, err := g.Generate()
-	if err != nil {
-		t.Fatalf("Generate: %v", err)
-	}
+	b := g.Generate()
 	var defs []metricDef
 	if err := yaml.Unmarshal(b, &defs); err != nil {
 		t.Fatalf("yaml.Unmarshal: %v", err)

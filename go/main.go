@@ -96,63 +96,37 @@ func main() {
 
 func renderDashboards(outputDir string) {
 	for _, d := range dashboards {
-		built, err := d.builder().Build()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error building dashboard %s/%s: %v\n", d.category, d.name, err)
-			os.Exit(1)
-		}
-
-		jsonBytes, err := json.MarshalIndent(built, "", "  ")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error marshaling dashboard %s/%s: %v\n", d.category, d.name, err)
-			os.Exit(1)
-		}
+		jsonBytes := buildDashboardToJson(d)
 
 		dir := filepath.Join(outputDir, d.category)
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			fmt.Fprintf(os.Stderr, "error creating directory %s: %v\n", dir, err)
-			os.Exit(1)
-		}
-
+		createDir(dir)
 		outPath := filepath.Join(dir, d.name+".json")
-		if err := os.WriteFile(outPath, jsonBytes, 0o644); err != nil {
-			fmt.Fprintf(os.Stderr, "error writing %s: %v\n", outPath, err)
-			os.Exit(1)
-		}
-		fmt.Printf("wrote %s\n", outPath)
+		writeFile(outPath, jsonBytes)
 
 		if d.metricsProfiles != nil {
 			for _, p := range d.metricsProfiles() {
-				yamlBytes, err := p.g.Generate()
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error generating metrics profile %s for %s/%s: %v\n", p.suffix, d.category, d.name, err)
-					os.Exit(1)
-				}
-				profilePath := filepath.Join(dir, d.name+p.suffix+".yaml")
-				if err := os.WriteFile(profilePath, yamlBytes, 0o644); err != nil {
-					fmt.Fprintf(os.Stderr, "error writing %s: %v\n", profilePath, err)
-					os.Exit(1)
-				}
-				fmt.Printf("wrote %s\n", profilePath)
+				metricProfilesDir := filepath.Join(outputDir, "metrics")
+				createDir(metricProfilesDir)
+				writeFile(filepath.Join(metricProfilesDir, d.name+p.suffix+".yaml"), p.g.Generate())
 
 				ruleSuffix := strings.Replace(p.suffix, "-metrics", "-rules", 1)
-				rulesBytes, err := p.g.GenerateRules(d.name)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error generating rules %s for %s/%s: %v\n", ruleSuffix, d.category, d.name, err)
-					os.Exit(1)
-				}
 				rulesDir := filepath.Join(outputDir, "rules")
-				if err := os.MkdirAll(rulesDir, 0o755); err != nil {
-					fmt.Fprintf(os.Stderr, "error creating directory %s: %v\n", rulesDir, err)
-					os.Exit(1)
-				}
-				rulesPath := filepath.Join(rulesDir, d.name+ruleSuffix+".yaml")
-				if err := os.WriteFile(rulesPath, rulesBytes, 0o644); err != nil {
-					fmt.Fprintf(os.Stderr, "error writing %s: %v\n", rulesPath, err)
-					os.Exit(1)
-				}
-				fmt.Printf("wrote %s\n", rulesPath)
+				createDir(rulesDir)
+				writeFile(filepath.Join(rulesDir, d.name+ruleSuffix+".yaml"), p.g.GenerateRules(d.name))
 			}
 		}
 	}
+}
+
+func buildDashboardToJson(d dashboardDef) []byte {
+	built, err := d.builder().Build()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error building dashboard %s/%s: %v\n", d.category, d.name, err)
+	}
+
+	jsonBytes, err := json.MarshalIndent(built, "", "  ")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error marshaling dashboard %s/%s: %v\n", d.category, d.name, err)
+	}
+	return jsonBytes
 }
