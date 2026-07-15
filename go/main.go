@@ -7,25 +7,28 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
 )
 
 type dashboardDef struct {
-	name     string
-	category string
-	builder  func() *dashboard.DashboardBuilder
+	name            string
+	category        string
+	builder         func() *dashboard.DashboardBuilder
+	metricsProfiles func() []namedProfile
 }
 
 var dashboards = []dashboardDef{
-	{"vegeta-wrapper", "General", buildVegetaDashboard},
-	{"uperf-perf", "General", buildUperfDashboard},
-	{"ocp-performance", "General", buildOCPPerformanceDashboard},
-	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard},
-	{"ovn-dashboard", "General", buildOVNDashboard},
-	{"api-performance-overview", "General", buildAPIPerformanceDashboard},
-	{"node", "General", buildNodeDashboard},
+	{"vegeta-wrapper", "General", buildVegetaDashboard, nil},
+	{"uperf-perf", "General", buildUperfDashboard, nil},
+	{"ocp-performance", "General", buildOCPPerformanceDashboard, buildOCPProfiles},
+	{"ocp-performance-collected", "General", buildOCPCollectedDashboard, nil},
+	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard, buildEtcdProfiles},
+	{"ovn-dashboard", "General", buildOVNDashboard, nil},
+	{"api-performance-overview", "General", buildAPIPerformanceDashboard, nil},
+	{"node", "General", buildNodeDashboard, nil},
 }
 
 func envDefault(key, fallback string) string {
@@ -36,6 +39,7 @@ func envDefault(key, fallback string) string {
 }
 
 func main() {
+	mergeOutput := flag.String("merge", "", "Merge input profile YAML files into this output path (positional args are inputs)")
 	deployFlag := flag.Bool("deploy", false, "Deploy rendered dashboards to Grafana")
 	loopFlag := flag.Bool("loop", false, "Run deploy in a loop (sidecar mode)")
 	loopInterval := flag.Duration("loop-interval", 60*time.Second, "Interval between deploy loops")
@@ -45,7 +49,14 @@ func main() {
 	gitCommitHash := flag.String("git-commit-hash", envDefault("GIT_COMMIT_HASH", ""), "Git commit hash to append to dashboard tags")
 	flag.Parse()
 
-	// If --input-dir is set, skip rendering and deploy from that directory
+	if *mergeOutput != "" {
+		if err := mergeProfileFiles(flag.Args(), *mergeOutput); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if *inputDir == "" {
 		renderDashboards(*outputDir)
 	}
@@ -85,30 +96,37 @@ func main() {
 
 func renderDashboards(outputDir string) {
 	for _, d := range dashboards {
-		built, err := d.builder().Build()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error building dashboard %s/%s: %v\n", d.category, d.name, err)
-			os.Exit(1)
-		}
-
-		jsonBytes, err := json.MarshalIndent(built, "", "  ")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error marshaling dashboard %s/%s: %v\n", d.category, d.name, err)
-			os.Exit(1)
-		}
+		jsonBytes := buildDashboardToJson(d)
 
 		dir := filepath.Join(outputDir, d.category)
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			fmt.Fprintf(os.Stderr, "error creating directory %s: %v\n", dir, err)
-			os.Exit(1)
-		}
-
+		createDir(dir)
 		outPath := filepath.Join(dir, d.name+".json")
-		if err := os.WriteFile(outPath, jsonBytes, 0o644); err != nil {
-			fmt.Fprintf(os.Stderr, "error writing %s: %v\n", outPath, err)
-			os.Exit(1)
-		}
+		writeFile(outPath, jsonBytes)
 
-		fmt.Printf("wrote %s\n", outPath)
+		if d.metricsProfiles != nil {
+			for _, p := range d.metricsProfiles() {
+				metricProfilesDir := filepath.Join(outputDir, "metrics")
+				createDir(metricProfilesDir)
+				writeFile(filepath.Join(metricProfilesDir, d.name+p.suffix+".yaml"), p.g.Generate())
+
+				ruleSuffix := strings.Replace(p.suffix, "-metrics", "-rules", 1)
+				rulesDir := filepath.Join(outputDir, "rules")
+				createDir(rulesDir)
+				writeFile(filepath.Join(rulesDir, d.name+ruleSuffix+".yaml"), p.g.GenerateRules(d.name))
+			}
+		}
 	}
+}
+
+func buildDashboardToJson(d dashboardDef) []byte {
+	built, err := d.builder().Build()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error building dashboard %s/%s: %v\n", d.category, d.name, err)
+	}
+
+	jsonBytes, err := json.MarshalIndent(built, "", "  ")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error marshaling dashboard %s/%s: %v\n", d.category, d.name, err)
+	}
+	return jsonBytes
 }
