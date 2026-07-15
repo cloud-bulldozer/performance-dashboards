@@ -99,6 +99,16 @@ cd go && go run .
 
 Dashboards with metrics profiles: `ocp-performance`, `etcd-on-cluster-dashboard`.
 
+### Customizing Dashboards
+
+There are three software-level switches in the OpenShift Performance dashboards that help with customizing for a specific environment and improving dashboard performance with large clusters.
+
+| Switch | Purpose | default |
+|--------|---------|------|
+| `summarize` | Plot summary statistics (e.g. avg, 90th-percentile) of all timeseries across a certain role. | OFF in ocp_performance.go, ON in ocp_performance_cudns.go | 
+| `workerNodesFilter` | Filter worker nodes by filtering out infra and control plane nodes. This avoids joins between metrics and the kube_node_role series. | OFF | 
+| `useNodeCpuInstanceRecordingRule` | For node CPU summary panel, use the OpenShift recording rule `instance:node_cpu:rate:sum` instead of the raw metric `node_cpu_seconds_total`. This can help in environments with node counts higher than 250. | OFF |
+
 ### Merging profiles
 
 Combine and deduplicate raw-metrics profiles from multiple dashboards:

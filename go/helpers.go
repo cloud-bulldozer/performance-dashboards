@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
+	"unicode"
 
 	"github.com/grafana/grafana-foundation-sdk/go/cog"
 	"github.com/grafana/grafana-foundation-sdk/go/common"
@@ -113,4 +115,18 @@ func writeFile(name string, data []byte) {
 		os.Exit(1)
 	}
 	fmt.Printf("wrote %s\n", name)
+}
+
+func capitalize(s string) string {
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
+
+func containerToCamel(name string) string {
+	parts := strings.Split(name, "-")
+	for i := 1; i < len(parts); i++ {
+		parts[i] = capitalize(parts[i])
+	}
+	return strings.Join(parts, "")
 }
