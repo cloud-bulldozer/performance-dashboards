@@ -7,15 +7,16 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
 )
 
 type dashboardDef struct {
-	name           string
-	category       string
-	builder        func() *dashboard.DashboardBuilder
+	name            string
+	category        string
+	builder         func() *dashboard.DashboardBuilder
 	metricsProfiles func() []namedProfile
 }
 
@@ -133,6 +134,24 @@ func renderDashboards(outputDir string) {
 					os.Exit(1)
 				}
 				fmt.Printf("wrote %s\n", profilePath)
+
+				ruleSuffix := strings.Replace(p.suffix, "-metrics", "-rules", 1)
+				rulesBytes, err := p.g.GenerateRules(d.name)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error generating rules %s for %s/%s: %v\n", ruleSuffix, d.category, d.name, err)
+					os.Exit(1)
+				}
+				rulesDir := filepath.Join(outputDir, "rules")
+				if err := os.MkdirAll(rulesDir, 0o755); err != nil {
+					fmt.Fprintf(os.Stderr, "error creating directory %s: %v\n", rulesDir, err)
+					os.Exit(1)
+				}
+				rulesPath := filepath.Join(rulesDir, d.name+ruleSuffix+".yaml")
+				if err := os.WriteFile(rulesPath, rulesBytes, 0o644); err != nil {
+					fmt.Fprintf(os.Stderr, "error writing %s: %v\n", rulesPath, err)
+					os.Exit(1)
+				}
+				fmt.Printf("wrote %s\n", rulesPath)
 			}
 		}
 	}

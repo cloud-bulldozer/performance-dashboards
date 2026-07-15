@@ -3,10 +3,10 @@ package main
 import (
 	"regexp"
 
+	mg "github.com/afcollins/metrics-generator/pkg/metrics"
 	"github.com/grafana/grafana-foundation-sdk/go/cog"
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
 	"github.com/grafana/grafana-foundation-sdk/go/prometheus"
-	mg "github.com/afcollins/metrics-generator/pkg/metrics"
 )
 
 var (

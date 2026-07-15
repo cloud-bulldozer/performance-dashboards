@@ -1,9 +1,9 @@
 package main
 
 import (
+	mg "github.com/afcollins/metrics-generator/pkg/metrics"
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
 	"github.com/grafana/grafana-foundation-sdk/go/prometheus"
-	mg "github.com/afcollins/metrics-generator/pkg/metrics"
 )
 
 // panelTracker is implemented by any type that registers panel queries and returns panel targets.
