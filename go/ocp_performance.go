@@ -179,7 +179,6 @@ func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 		WithRow(ocpStackroxRow(t))
 }
 
-
 // Row: Cluster-at-a-Glance
 func ocpClusterAtAGlanceRow(t panelTracker) *dashboard.RowBuilder {
 	return dashboard.NewRowBuilder("Cluster-at-a-Glance").
@@ -669,7 +668,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 					Sub(mg.Q(mg.MetricNodeFsFilesFree, `fstype!="",mountpoint="/run"`)).
 					Agg(mg.AggSum).String(),
 				"sum"),
-			))
+		))
 }
 
 // Row: Cluster Details

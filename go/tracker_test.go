@@ -93,6 +93,12 @@ func TestExtractRawMetrics(t *testing.T) {
 			want: []string{"kube_node_role"},
 			bad:  []string{"label_values", "node", "role"},
 		},
+		{
+			name: "recording rule",
+			expr: `instance:node_cpu:rate:sum{instance="host-01.domain.local"} * on (instance) kube_node_role{role="worker"}`,
+			want: []string{"instance:node_cpu:rate:sum"},
+			bad:  []string{"instance", "node", "role", "host"},
+		},
 	}
 
 	for _, tc := range cases {

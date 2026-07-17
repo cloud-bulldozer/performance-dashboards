@@ -48,7 +48,7 @@ var knownLabels = map[string]struct{}{
 	"instance": {}, "le": {}, "alertname": {}, "severity": {},
 }
 
-var identRe = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9_]*`)
+var identRe = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9_:]*`)
 
 // extractRawMetrics returns all unique raw Prometheus metric names in expr,
 // excluding PromQL function names, keywords, and known label names.
