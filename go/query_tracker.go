@@ -17,6 +17,7 @@ var grafanaVarRe = regexp.MustCompile(`,?\s*\w+[=!~]+=?"[^"]*\$[^"]*"`)
 
 func stripGrafanaVars(expr string) string {
 	clean := grafanaVarRe.ReplaceAllString(expr, "")
+	clean = strings.ReplaceAll(clean, "{,", "{")
 	clean = strings.ReplaceAll(clean, "{}", "")
 	clean = strings.ReplaceAll(clean, "$interval", string(profileInterval))
 	return clean
