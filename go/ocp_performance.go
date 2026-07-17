@@ -80,8 +80,8 @@ var ocpDashboardMetrics = []mg.Metric{
 	mg.MetricClusterOperatorConditions,
 }
 
-func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
-	return dashboard.NewDashboardBuilder("Openshift Performance").
+func ocpBase(t panelTracker, name string) *dashboard.DashboardBuilder {
+	dbBuilder := dashboard.NewDashboardBuilder(name).
 		Description("Performance dashboard for Red Hat Openshift\n").
 		Tags([]string{}).
 		Time("now-1h", "now").
@@ -94,30 +94,6 @@ func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 		WithVariable(dashboard.NewDatasourceVariableBuilder("Datasource").
 			Type("prometheus").
 			Label("Datasource"),
-		).
-		WithVariable(dashboard.NewQueryVariableBuilder("_master_node").
-			Label("Master").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role="master"}, node)`)).
-			Datasource(promDatasourceRef()).
-			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
-			Multi(true).
-			IncludeAll(false),
-		).
-		WithVariable(dashboard.NewQueryVariableBuilder("_worker_node").
-			Label("Worker").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role=~"worker"}, node)`)).
-			Datasource(promDatasourceRef()).
-			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
-			Multi(true).
-			IncludeAll(false),
-		).
-		WithVariable(dashboard.NewQueryVariableBuilder("_infra_node").
-			Label("Infra").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role="infra"}, node)`)).
-			Datasource(promDatasourceRef()).
-			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
-			Multi(true).
-			IncludeAll(false),
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("namespace").
 			Label("Namespace").
@@ -168,15 +144,20 @@ func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 		// Row: Cluster Details
 		WithRow(ocpClusterDetailsRow(t)).
 		// Row: Cluster Operators Details
-		WithRow(ocpClusterOperatorsDetailsRow(t)).
-		// Row: Master
-		WithRow(ocpNodeRow(t, "_master_node", mg.RoleMaster)).
-		// Row: Worker
-		WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker)).
-		// Row: Infra
-		WithRow(ocpNodeRow(t, "_infra_node", mg.RoleInfra)).
-		// Row: Stackrox
-		WithRow(ocpStackroxRow(t))
+		WithRow(ocpClusterOperatorsDetailsRow(t))
+	// Row: Master
+	withMasterNodeDetailRow(dbBuilder, t)
+	// Row: Worker
+	withWorkerNodeDetailRow(dbBuilder, t)
+	// Row: Infra
+	withInfraNodeDetailRow(dbBuilder, t)
+	// Row: Stackrox
+	dbBuilder.WithRow(ocpStackroxRow(t))
+	return dbBuilder
+}
+
+func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
+	return ocpBase(t, "Openshift Performance")
 }
 
 // Row: Cluster-at-a-Glance
@@ -815,6 +796,41 @@ func ocpClusterOperatorsDetailsRow(t panelTracker) *dashboard.RowBuilder {
 			8, 8,
 			t.track("clusterOperatorDegraded", mg.Q(mg.MetricClusterOperatorConditions, `condition="Degraded",name!="",reason!=""`), "{{name}} - {{reason}}"),
 		))
+}
+
+func withMasterNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker) *dashboard.DashboardBuilder {
+	return builder.WithRow(ocpNodeRow(t, "_master_node", mg.RoleMaster)).
+		WithVariable(dashboard.NewQueryVariableBuilder("_master_node").
+			Label("Master").
+			Query(t.trackVarQuery(`label_values(kube_node_role{role="master"}, node)`)).
+			Datasource(promDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(true).
+			IncludeAll(false),
+		)
+}
+func withWorkerNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker) *dashboard.DashboardBuilder {
+	return builder.WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker)).
+		WithVariable(dashboard.NewQueryVariableBuilder("_worker_node").
+			Label("Worker").
+			Query(t.trackVarQuery(`label_values(kube_node_role{role=~"worker"}, node)`)).
+			Datasource(promDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(true).
+			IncludeAll(false),
+		)
+}
+func withInfraNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker) *dashboard.DashboardBuilder {
+	return builder.WithRow(ocpNodeRow(t, "_infra_node", mg.RoleInfra)).
+		WithVariable(dashboard.NewQueryVariableBuilder("_infra_node").
+			Label("Infra").
+			Query(t.trackVarQuery(`label_values(kube_node_role{role="infra"}, node)`)).
+			Datasource(promDatasourceRef()).
+			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
+			Multi(true).
+			IncludeAll(false),
+		)
+
 }
 
 func ocpNodeRow(t panelTracker, nodeVar string, role mg.NodeRole) *dashboard.RowBuilder {
