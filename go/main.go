@@ -26,6 +26,7 @@ var dashboards = []dashboardDef{
 	{"ocp-performance", "General", buildOCPPerformanceDashboard, buildOCPProfiles},
 	{"ocp-performance-collected", "General", buildOCPCollectedDashboard, nil},
 	{"etcd-on-cluster-dashboard", "General", buildEtcdDashboard, buildEtcdProfiles},
+	{"etcd-on-cluster-collected", "General", buildEtcdCollectedDashboard, nil},
 	{"ovn-dashboard", "General", buildOVNDashboard, nil},
 	{"api-performance-overview", "General", buildAPIPerformanceDashboard, nil},
 	{"node", "General", buildNodeDashboard, nil},

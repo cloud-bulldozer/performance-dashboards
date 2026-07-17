@@ -345,8 +345,8 @@ func TestMergeRulesFiles_RealDashboardOutputs(t *testing.T) {
 		byRecord[r.Record] = struct{}{}
 	}
 	mustHave := []string{
-		"nodeCPUWorker",        // OCP
-		"etcdContainerCPU",     // etcd
+		"nodeCPUWorker",    // OCP
+		"etcdContainerCPU", // etcd
 	}
 	for _, m := range mustHave {
 		if _, ok := byRecord[m]; !ok {

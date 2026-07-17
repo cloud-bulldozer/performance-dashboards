@@ -14,6 +14,10 @@ func buildEtcdDashboard() *dashboard.DashboardBuilder {
 	return buildEtcdDash(&queryTracker{})
 }
 
+func buildEtcdCollectedDashboard() *dashboard.DashboardBuilder {
+	return buildEtcdDash(&queryTracker{useMetricNames: true})
+}
+
 func buildEtcdProfiles() []namedProfile {
 	agg := &mg.Generator{}
 	buildEtcdDash(&queryTracker{g: agg})
