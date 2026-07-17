@@ -39,7 +39,7 @@ func envDefault(key, fallback string) string {
 }
 
 func main() {
-	mergeOutput := flag.String("merge", "", "Merge input profile YAML files into this output path (positional args are inputs)")
+	mergeOutput := flag.String("merge", "", "Merge input YAML files (metrics profiles or prometheus rules) into this output path (positional args are inputs)")
 	deployFlag := flag.Bool("deploy", false, "Deploy rendered dashboards to Grafana")
 	loopFlag := flag.Bool("loop", false, "Run deploy in a loop (sidecar mode)")
 	loopInterval := flag.Duration("loop-interval", 60*time.Second, "Interval between deploy loops")
@@ -50,7 +50,7 @@ func main() {
 	flag.Parse()
 
 	if *mergeOutput != "" {
-		if err := mergeProfileFiles(flag.Args(), *mergeOutput); err != nil {
+		if err := mergeFiles(flag.Args(), *mergeOutput); err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
