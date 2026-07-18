@@ -24,6 +24,24 @@ func stripGrafanaVars(expr string) string {
 	return clean
 }
 
+func extractGrafanaVarFilters(expr string) string {
+	matches := grafanaVarRe.FindAllString(expr, -1)
+	if len(matches) == 0 {
+		return ""
+	}
+	seen := map[string]struct{}{}
+	var filters []string
+	for _, m := range matches {
+		f := strings.TrimLeft(m, ", ")
+		if _, dup := seen[f]; dup {
+			continue
+		}
+		seen[f] = struct{}{}
+		filters = append(filters, f)
+	}
+	return "{" + strings.Join(filters, ",") + "}"
+}
+
 // queryTracker implements panelTracker. Registers aggregated PromQL queries in a Generator.
 // When useMetricNames is true, panel targets use the registered metric name as the query
 // expression — for dashboards that visualize already-collected metrics.
@@ -48,11 +66,12 @@ func (t *queryTracker) add(name, stripped string) {
 }
 
 func (t *queryTracker) track(name string, query *mg.Query, legend string) *prometheus.DataqueryBuilder {
-	t.add(name, stripGrafanaVars(query.String()))
+	expr := query.String()
+	t.add(name, stripGrafanaVars(expr))
 	if t.useMetricNames {
-		return promQuery(name, legend)
+		return promQuery(name+extractGrafanaVarFilters(expr), legend)
 	}
-	return promQuery(query.String(), legend)
+	return promQuery(expr, legend)
 }
 
 func (t *queryTracker) trackVarQuery(name string, expr string) dashboard.StringOrMap {
@@ -70,7 +89,7 @@ func (t *queryTracker) trackVarQuery(name string, expr string) dashboard.StringO
 func (t *queryTracker) trackRaw(name string, expr string, legend string) *prometheus.DataqueryBuilder {
 	t.add(name, stripGrafanaVars(expr))
 	if t.useMetricNames {
-		return promQuery(name, legend)
+		return promQuery(name+extractGrafanaVarFilters(expr), legend)
 	}
 	return promQuery(expr, legend)
 }
