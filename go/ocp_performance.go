@@ -97,7 +97,7 @@ func ocpBase(t panelTracker, name string) *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("namespace").
 			Label("Namespace").
-			Query(t.trackVarQuery(`label_values(` + q(mg.MetricKubePodInfo, mg.Filters(mg.NSNotRegex("cluster-density.*|node-density-.*"))) + ",namespace)")).
+			Query(t.trackVarQuery("namespaces", `label_values(`+q(mg.MetricKubePodInfo, mg.Filters(mg.NSNotRegex("cluster-density.*|node-density-.*")))+",namespace)")).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Regex("").
@@ -106,7 +106,7 @@ func ocpBase(t panelTracker, name string) *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("block_device").
 			Label("Block device").
-			Query(t.trackVarQuery(`label_values(node_disk_written_bytes_total, device)`)).
+			Query(t.trackVarQuery("blockDevices", `label_values(node_disk_written_bytes_total, device)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Regex(`/^(?:(?!dm|rb).)*$/`).
@@ -115,7 +115,7 @@ func ocpBase(t panelTracker, name string) *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("net_device").
 			Label("Network device").
-			Query(t.trackVarQuery(`label_values(node_network_receive_bytes_total, device)`)).
+			Query(t.trackVarQuery("netDevices", `label_values(node_network_receive_bytes_total, device)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Regex(`/^((br|en|et).*)$/`).
@@ -802,7 +802,7 @@ func withMasterNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker
 	return builder.WithRow(ocpNodeRow(t, "_master_node", mg.RoleMaster)).
 		WithVariable(dashboard.NewQueryVariableBuilder("_master_node").
 			Label("Master").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role="master"}, node)`)).
+			Query(t.trackVarQuery("masterNodes", `label_values(kube_node_role{role="master"}, node)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(true).
@@ -813,7 +813,7 @@ func withWorkerNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker
 	return builder.WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker)).
 		WithVariable(dashboard.NewQueryVariableBuilder("_worker_node").
 			Label("Worker").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role=~"worker"}, node)`)).
+			Query(t.trackVarQuery("workerNodes", `label_values(kube_node_role{role=~"worker"}, node)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(true).
@@ -824,7 +824,7 @@ func withInfraNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker)
 	return builder.WithRow(ocpNodeRow(t, "_infra_node", mg.RoleInfra)).
 		WithVariable(dashboard.NewQueryVariableBuilder("_infra_node").
 			Label("Infra").
-			Query(t.trackVarQuery(`label_values(kube_node_role{role="infra"}, node)`)).
+			Query(t.trackVarQuery("infraNodes", `label_values(kube_node_role{role="infra"}, node)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(true).

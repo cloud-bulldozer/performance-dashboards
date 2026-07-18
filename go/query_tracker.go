@@ -14,6 +14,7 @@ import (
 const profileInterval = mg.Rate2m
 
 var grafanaVarRe = regexp.MustCompile(`,?\s*\w+[=!~]+=?"[^"]*\$[^"]*"`)
+var labelValuesRe = regexp.MustCompile(`^label_values\((.+),\s*(\w+)\)$`)
 
 func stripGrafanaVars(expr string) string {
 	clean := grafanaVarRe.ReplaceAllString(expr, "")
@@ -54,7 +55,15 @@ func (t *queryTracker) track(name string, query *mg.Query, legend string) *prome
 	return promQuery(query.String(), legend)
 }
 
-func (t *queryTracker) trackVarQuery(expr string) dashboard.StringOrMap {
+func (t *queryTracker) trackVarQuery(name string, expr string) dashboard.StringOrMap {
+	if m := labelValuesRe.FindStringSubmatch(expr); m != nil {
+		metricExpr, label := strings.TrimSpace(m[1]), m[2]
+		t.add(name, "count("+stripGrafanaVars(metricExpr)+") by ("+label+")")
+		if t.useMetricNames {
+			rewritten := "label_values(" + name + ", " + label + ")"
+			return dashboard.StringOrMap{String: cog.ToPtr(rewritten)}
+		}
+	}
 	return dashboard.StringOrMap{String: cog.ToPtr(expr)}
 }
 

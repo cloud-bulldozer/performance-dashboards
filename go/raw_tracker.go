@@ -94,7 +94,7 @@ func (t *rawTracker) trackRaw(_ string, expr string, legend string) *prometheus.
 	return promQuery(expr, legend)
 }
 
-func (t *rawTracker) trackVarQuery(expr string) dashboard.StringOrMap {
+func (t *rawTracker) trackVarQuery(_ string, expr string) dashboard.StringOrMap {
 	t.register(expr)
 	return dashboard.StringOrMap{String: cog.ToPtr(expr)}
 }

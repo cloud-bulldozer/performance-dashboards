@@ -47,7 +47,7 @@ func buildEtcdDash(t panelTracker) *dashboard.DashboardBuilder {
 			Label("Datasource"),
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("etcd_pod").
-			Query(t.trackVarQuery(`label_values(etcd_cluster_version, pod)`)).
+			Query(t.trackVarQuery("etcdPods", `label_values(etcd_cluster_version, pod)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(true).

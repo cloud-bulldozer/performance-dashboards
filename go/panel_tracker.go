@@ -12,7 +12,7 @@ import (
 type panelTracker interface {
 	track(name string, query *mg.Query, legend string) *prometheus.DataqueryBuilder
 	trackRaw(name string, expr string, legend string) *prometheus.DataqueryBuilder
-	trackVarQuery(expr string) dashboard.StringOrMap
+	trackVarQuery(name string, expr string) dashboard.StringOrMap
 }
 
 // namedProfile pairs a filename suffix with a populated Generator.
