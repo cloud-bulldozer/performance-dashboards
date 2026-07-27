@@ -669,7 +669,8 @@ func ocpClusterDetailsRow(t panelTracker) *dashboard.RowBuilder {
 			8, 3,
 			t.track("kubeNamespacePhase",
 				mg.Q(mg.MetricKubeNamespacePhase, "").
-					Agg(mg.AggSum, mg.GroupByPhase),
+					Agg(mg.AggSum, mg.GroupByPhase).
+					Gt("0"),
 				"{{ phase }}"),
 			promQuery(`kube_namespace_status_phase_sum_by_phase`, "{{ phase }}"),
 		)).
@@ -684,27 +685,28 @@ func ocpClusterDetailsRow(t panelTracker) *dashboard.RowBuilder {
 		)).
 		WithPanel(genericTimeSeries("Number of nodes", "none",
 			8, 8,
-			promQuery(mg.Raw("kube_node_info{}").Agg(mg.AggSum).String(), "Number of nodes"),
-			promQuery(
+			t.track("kubeNodeInfo", mg.Raw("kube_node_info{}").Agg(mg.AggSum), "Number of nodes"),
+			t.track("kubeNodeStatusCondition",
 				mg.Q(mg.MetricKubeNodeStatusCondition, `status="true"`).
 					Agg(mg.AggSum, mg.GroupByCondition).
-					Gt("0").String(),
+					Gt("0"),
 				"Node: {{ condition }}"),
 		)).
 		WithPanel(genericTimeSeries("Namespace count", "none",
 			8, 8,
-			promQuery(
+			t.track("kubeNamespacePhase",
 				mg.Q(mg.MetricKubeNamespacePhase, "").
 					Agg(mg.AggSum, mg.GroupByPhase).
-					Gt("0").String(),
+					Gt("0"),
 				"{{ phase }} namespaces"),
 			promQuery(`kube_namespace_status_phase_sum_by_phase > 0`, "{{ phase }} namespaces"),
 		)).
 		WithPanel(genericTimeSeries("Pod count", "none",
 			8, 8,
-			promQuery(
+			t.track("kubePodStatusPhase",
 				mg.Q(mg.MetricKubePodStatusPhase, "").
-					Agg(mg.AggSum, mg.GroupByPhase).String(),
+					Agg(mg.AggSum, mg.GroupByPhase).
+					Gt("0"),
 				"{{phase}} pods"),
 			promQuery(`kube_pod_status_phase_sum_by_failed`, "Failed pods"),
 			promQuery(`kube_pod_status_phase_sum_by_pending`, "Pending pods"),
