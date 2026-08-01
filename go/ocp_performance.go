@@ -927,22 +927,20 @@ func ocpNodeRow(t panelTracker, nodeVar string, role mg.NodeRole) *dashboard.Row
 			t.track("nodeConntrackEntries", mg.Q(mg.MetricNodeNFConntrackEntries, instanceFilter), "conntrack_entries"),
 			t.track("nodeConntrackLimit", mg.Q(mg.MetricNodeNFConntrackEntriesLimit, instanceFilter), "conntrack_limit"),
 		)).
-		WithPanel(genericLegendTimeSeries("Top 10 container CPU: $"+nodeVar, "percent",
+		WithPanel(genericLegendTimeSeries("container CPU: $"+nodeVar, "percent",
 			12, 8,
-			promQuery(
+			t.track("containerCPU",
 				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",`+nodeFilter+`,namespace!="",namespace=~"$namespace"`).
 					IRate(intervalVar).
 					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service").
-					Multiply("100").
-					TopK(10).String(),
+					Multiply("100"),
 				"{{ pod }}: {{ container }}"),
 			promQuery(`topk(10, container_cpu_usage_seconds_total_container_sum_rate_pod_node_container_namespace_name{`+nodeFilter+`,namespace=~"$namespace"})`, "{{ pod }}: {{ container }}"),
 		)).
-		WithPanel(genericLegendCounterTimeSeries("Top 10 container RSS: $"+nodeVar, "bytes",
+		WithPanel(genericLegendCounterTimeSeries("container RSS: $"+nodeVar, "bytes",
 			12, 8,
-			promQuery(
-				mg.Q(mg.MetricContainerMemoryRSS, `container!="POD",name!="",`+nodeFilter+`,namespace!="",namespace=~"$namespace"`).
-					TopK(10).String(),
+			t.track("containerMemoryRSS",
+				mg.Q(mg.MetricContainerMemoryRSS, `container!="POD",name!="",`+nodeFilter+`,namespace!="",namespace=~"$namespace"`),
 				"{{ pod }}: {{ container }}"),
 			promQuery(`topk(10, container_memory_working_set_bytes_container{`+nodeFilter+`,namespace=~"$namespace"})`, "{{pod}} - {{node}}"),
 		))
