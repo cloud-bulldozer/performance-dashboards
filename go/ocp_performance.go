@@ -11,7 +11,7 @@ import (
 const (
 	intervalVar = mg.RateInterval("$interval")
 
-	cgroupIDFilter = `job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/kubepods.slice"`
+	cgroupIDFilter = `job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"`
 
 	fsDeviceFilter   = `device!~".+dm.+"`
 	cgroupFSIDFilter = fsDeviceFilter + `,` + cgroupIDFilter
