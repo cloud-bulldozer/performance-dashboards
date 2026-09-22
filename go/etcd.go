@@ -252,17 +252,17 @@ func etcdBackendCommitRow(t panelTracker) *dashboard.RowBuilder {
 		Collapsed(true).
 		WithPanel(etcdGeneralUsageAgg("Backend Commit Duration", "s",
 			8, 8,
-			t.trackRaw("etcdDiskBackendCommitP99", `histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[5m])) by (pod, le))`, "{{pod}} DB fsync"),
+			t.trackRaw("etcdDiskBackendCommitP99", `histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd",pod=~"$etcd_pod"}[5m])) by (pod, le))`, "{{pod}} commit duration"),
 		)).
 		WithPanel(etcdHistogramStatsRightHand("Backend Commit Duration sum", "none",
 			8, 8, "sum",
-			t.trackRaw("etcdDiskBackendCommitSumRate", `irate(etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])`, "2m irate WAL sum {{instance}} "),
-			t.trackRaw("etcdDiskBackendCommitSum", `etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}`, "WAL sum {{instance}} "),
+			t.trackRaw("etcdDiskBackendCommitSumRate", `irate(etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])`, "2m irate commit duration sum {{instance}} "),
+			t.trackRaw("etcdDiskBackendCommitSum", `etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd",pod=~"$etcd_pod"}`, "commit duration sum {{instance}} "),
 		)).
 		WithPanel(etcdHistogramStatsRightHand("Backend Commit Duration count", "none",
 			8, 8, "count",
-			t.trackRaw("etcdDiskBackendCommitCountRate", `irate(etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])`, "2m irate WAL count {{instance}} "),
-			t.trackRaw("etcdDiskBackendCommitCount", `etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}`, "WAL count {{instance}} "),
+			t.trackRaw("etcdDiskBackendCommitCountRate", `irate(etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}[2m])`, "2m irate commit duration count {{instance}} "),
+			t.trackRaw("etcdDiskBackendCommitCount", `etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd",pod=~"$etcd_pod"}`, "commit duration count {{instance}} "),
 		))
 }
 

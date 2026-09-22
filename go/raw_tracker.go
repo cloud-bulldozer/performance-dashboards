@@ -46,6 +46,9 @@ var promFunctions = map[string]struct{}{
 var knownLabels = map[string]struct{}{
 	"pod": {}, "node": {}, "device": {}, "namespace": {},
 	"instance": {}, "le": {}, "alertname": {}, "severity": {},
+	"apiserver": {}, "resource": {}, "code": {}, "verb": {},
+	"flow_schema": {}, "priority_level": {}, "subresource": {},
+	"component": {}, "request_kind": {},
 }
 
 var identRe = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9_:]*`)

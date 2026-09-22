@@ -1,6 +1,7 @@
 package main
 
 import (
+	mg "github.com/afcollins/metrics-generator/pkg/metrics"
 	"github.com/grafana/grafana-foundation-sdk/go/cog"
 	"github.com/grafana/grafana-foundation-sdk/go/common"
 	"github.com/grafana/grafana-foundation-sdk/go/dashboard"
@@ -9,6 +10,27 @@ import (
 )
 
 func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
+	return buildAPIPerformanceDashboardWithTracker(&queryTracker{})
+}
+
+func buildAPICollectedDashboard() *dashboard.DashboardBuilder {
+	return buildAPIPerformanceDashboardWithTracker(&queryTracker{useMetricNames: true})
+}
+
+func buildAPIProfiles() []namedProfile {
+	agg := &mg.Generator{}
+	buildAPIPerformanceDashboardWithTracker(&queryTracker{g: agg})
+
+	raw := &mg.Generator{}
+	buildAPIPerformanceDashboardWithTracker(&rawTracker{g: raw, seen: map[string]struct{}{}})
+
+	return []namedProfile{
+		{"-metrics", agg},
+		{"-raw-metrics", raw},
+	}
+}
+
+func buildAPIPerformanceDashboardWithTracker(t panelTracker) *dashboard.DashboardBuilder {
 	return dashboard.NewDashboardBuilder("API Performance Dashboard").
 		Description("Dashboard for Api-performance-overview\n").
 		Tags([]string{"Api-performance"}).
@@ -24,7 +46,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("apiserver").
 			Label("apiserver").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(apiserver_request_duration_seconds_bucket, apiserver)`)}).
+			Query(t.trackVarQuery("apiServers", `label_values(apiserver_request_duration_seconds_bucket, apiserver)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -32,7 +54,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("instance").
 			Label("instance").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(apiserver_request_total, instance)`)}).
+			Query(t.trackVarQuery("apiInstances", `label_values(apiserver_request_total, instance)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -40,7 +62,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("resource").
 			Label("resource").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(apiserver_request_duration_seconds_bucket, resource)`)}).
+			Query(t.trackVarQuery("apiResources", `label_values(apiserver_request_duration_seconds_bucket, resource)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -48,7 +70,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("code").
 			Label("code").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(code)`)}).
+			Query(t.trackVarQuery("apiCodes", `label_values(code)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -56,7 +78,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("verb").
 			Label("verb").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(verb)`)}).
+			Query(t.trackVarQuery("apiVerbs", `label_values(verb)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -64,7 +86,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("flow_schema").
 			Label("flow-schema").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(flow_schema)`)}).
+			Query(t.trackVarQuery("apiFlowSchemas", `label_values(flow_schema)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -72,7 +94,7 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithVariable(dashboard.NewQueryVariableBuilder("priority_level").
 			Label("priority-level").
-			Query(dashboard.StringOrMap{String: cog.ToPtr(`label_values(priority_level)`)}).
+			Query(t.trackVarQuery("apiPriorityLevels", `label_values(priority_level)`)).
 			Datasource(promDatasourceRef()).
 			Refresh(dashboard.VariableRefreshOnTimeRangeChanged).
 			Multi(false).
@@ -92,77 +114,77 @@ func buildAPIPerformanceDashboard() *dashboard.DashboardBuilder {
 		).
 		WithPanel(apiLegendRight("request duration - 99th quantile", "s",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(verb,le))`, "{{verb}}"),
+			t.trackRaw("apiRequestDurationP99ByVerb", `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(verb,le))`, "{{verb}}"),
 		)).
 		WithPanel(apiLegendRight("request rate - by instance", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(instance)`, "{{instance}}"),
+			t.trackRaw("apiRequestRateByInstance", `sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(instance)`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("request duration - 99th quantile - by resource", "s",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(resource,le))`, "{{resource}}"),
+			t.trackRaw("apiRequestDurationP99ByResource", `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",subresource!="log",verb=~"$verb",verb!~"WATCH|WATCHLIST|PROXY"}[$interval])) by(resource,le))`, "{{resource}}"),
 		)).
 		WithPanel(apiLegendRight("request rate - by resource", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(resource)`, "{{resource}}"),
+			t.trackRaw("apiRequestRateByResource", `sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",code=~"$code",verb=~"$verb"}[$interval])) by(resource)`, "{{resource}}"),
 		)).
 		WithPanel(apiLegendBottom("request duration - read vs write", "s",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval])) by(le))`, "read"),
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval])) by(le))`, "write"),
+			t.trackRaw("apiRequestDurationP99Read", `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval])) by(le))`, "read"),
+			t.trackRaw("apiRequestDurationP99Write", `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval])) by(le))`, "write"),
 		)).
 		WithPanel(apiLegendBottom("request rate - read vs write", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval]))`, "read"),
-			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval]))`, "write"),
+			t.trackRaw("apiRequestRateRead", `sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"LIST|GET"}[$interval]))`, "read"),
+			t.trackRaw("apiRequestRateWrite", `sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[$interval]))`, "write"),
 		)).
 		WithPanel(apiLegendBottom("requests dropped rate", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_terminations_total{instance=~"$instance"}[$interval])) by (verb)`, ""),
+			t.trackRaw("apiRequestsDroppedRate", `sum(rate(apiserver_request_terminations_total{instance=~"$instance"}[$interval])) by (verb)`, ""),
 		)).
 		WithPanel(apiLegendBottom("requests terminated rate", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_terminations_total{instance=~"$instance",resource=~"$resource",code=~"$code"}[$interval])) by(component)`, ""),
+			t.trackRaw("apiRequestsTerminatedRate", `sum(rate(apiserver_request_terminations_total{instance=~"$instance",resource=~"$resource",code=~"$code"}[$interval])) by(component)`, ""),
 		)).
 		WithPanel(apiLegendRight("requests status rate", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"$verb",code=~"$code"}[$interval])) by(code)`, "{{code}}"),
+			t.trackRaw("apiRequestStatusRate", `sum(rate(apiserver_request_total{apiserver=~"$apiserver",instance=~"$instance",resource=~"$resource",verb=~"$verb",code=~"$code"}[$interval])) by(code)`, "{{code}}"),
 		)).
 		WithPanel(apiLegendRight("long running requests", "short",
 			12, 8,
-			promQuery(`sum(apiserver_longrunning_requests{instance=~"$instance",resource=~"$resource",verb=~"$verb"}) by(instance)`, "{{instance}}"),
+			t.trackRaw("apiLongRunningRequests", `sum(apiserver_longrunning_requests{instance=~"$instance",resource=~"$resource",verb=~"$verb"}) by(instance)`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("request in flight", "short",
 			12, 8,
-			promQuery(`sum(apiserver_current_inflight_requests{instance=~"$instance"}) by (instance,request_kind)`, "{{request_kind}}-{{instance}}"),
+			t.trackRaw("apiRequestsInFlight", `sum(apiserver_current_inflight_requests{instance=~"$instance"}) by (instance,request_kind)`, "{{request_kind}}-{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("response size - 99th quantile", "bytes",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket{instance=~"$instance",resource=~"$resource",verb=~"$verb"}[$interval])) by(instance,le))`, "{{instance}}"),
+			t.trackRaw("apiResponseSizeP99", `histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket{instance=~"$instance",resource=~"$resource",verb=~"$verb"}[$interval])) by(instance,le))`, "{{instance}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request queue length", "short",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
+			t.trackRaw("apiRequestQueueLengthP99", `histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiWaitDuration("p&f - request wait duration - 99th quantile", "s",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[5m])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
+			t.trackRaw("apiRequestWaitDurationP99", `histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[5m])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request dispatch rate", "short",
 			12, 8,
-			promQuery(`sum(rate(apiserver_flowcontrol_dispatched_requests_total{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
+			t.trackRaw("apiRequestDispatchRate", `sum(rate(apiserver_flowcontrol_dispatched_requests_total{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - request execution duration", "s",
 			12, 8,
-			promQuery(`histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
+			t.trackRaw("apiRequestExecutionDurationP99", `histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}[$interval])) by(flow_schema, priority_level, le))`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - pending in queue", "short",
 			12, 8,
-			promQuery(`sum(apiserver_flowcontrol_current_inqueue_requests{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}) by (flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
+			t.trackRaw("apiRequestsPendingInQueue", `sum(apiserver_flowcontrol_current_inqueue_requests{instance=~"$instance",flow_schema=~"$flow_schema",priority_level=~"$priority_level"}) by (flow_schema,priority_level)`, "{{flow_schema}}:{{priority_level}}"),
 		)).
 		WithPanel(apiLegendRight("p&f - concurrency limit by kube-apiserver", "short",
 			12, 8,
-			promQuery(`sum(apiserver_flowcontrol_request_concurrency_in_use{instance=~".*:6443",priority_level=~"$priority_level"}) by (instance,flow_schema)`, "{{instance}}:{{flow_schema}}"),
+			t.trackRaw("apiRequestConcurrencyInUse", `sum(apiserver_flowcontrol_request_concurrency_in_use{instance=~".*:6443",priority_level=~"$priority_level"}) by (instance,flow_schema)`, "{{instance}}:{{flow_schema}}"),
 		))
 }
 
