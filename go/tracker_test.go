@@ -273,3 +273,35 @@ func TestQueryTrackerNoDuplicates(t *testing.T) {
 		}
 	}
 }
+
+func TestAPITrackerProfiles(t *testing.T) {
+	queryGenerator := &mg.Generator{}
+	buildAPIPerformanceDashboardWithTracker(&queryTracker{g: queryGenerator})
+	for _, d := range parseProfile(t, queryGenerator) {
+		if grafanaVarInQuery.MatchString(d.Query) {
+			t.Errorf("Grafana variable in API query for %q: %s", d.MetricName, d.Query)
+		}
+	}
+
+	rawGenerator := &mg.Generator{}
+	buildAPIPerformanceDashboardWithTracker(&rawTracker{g: rawGenerator, seen: map[string]struct{}{}})
+	defs := parseProfile(t, rawGenerator)
+	byName := make(map[string]metricDef, len(defs))
+	for _, d := range defs {
+		byName[d.MetricName] = d
+	}
+	for _, metric := range []string{
+		"apiserver_request_total",
+		"apiserver_request_duration_seconds_bucket",
+		"apiserver_flowcontrol_dispatched_requests_total",
+	} {
+		if _, ok := byName[metric]; !ok {
+			t.Errorf("expected API metric %q missing from raw profile", metric)
+		}
+	}
+	for _, label := range []string{"code", "verb", "flow_schema", "priority_level"} {
+		if _, ok := byName[label]; ok {
+			t.Errorf("label %q registered as a raw metric", label)
+		}
+	}
+}
