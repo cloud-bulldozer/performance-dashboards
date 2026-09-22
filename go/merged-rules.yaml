@@ -1,0 +1,355 @@
+groups:
+    - name: merged
+      rules:
+        - record: alerts
+          expr: topk(10, sum(ALERTS{severity!="none"}) by (alertname,severity))
+        - record: apiInstances
+          expr: count(apiserver_request_total) by (instance)
+        - record: apiLongRunningRequests
+          expr: sum(apiserver_longrunning_requests) by(instance)
+        - record: apiRequestConcurrencyInUse
+          expr: sum(apiserver_flowcontrol_request_concurrency_in_use{instance=~".*:6443"}) by (instance,flow_schema)
+        - record: apiRequestDispatchRate
+          expr: sum(rate(apiserver_flowcontrol_dispatched_requests_total[2m])) by(flow_schema,priority_level)
+        - record: apiRequestDurationP99ByResource
+          expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[2m])) by(resource,le))
+        - record: apiRequestDurationP99ByVerb
+          expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{subresource!="log",verb!~"WATCH|WATCHLIST|PROXY"}[2m])) by(verb,le))
+        - record: apiRequestDurationP99Read
+          expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET"}[2m])) by(le))
+        - record: apiRequestDurationP99Write
+          expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[2m])) by(le))
+        - record: apiRequestExecutionDurationP99
+          expr: histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_execution_seconds_bucket[2m])) by(flow_schema, priority_level, le))
+        - record: apiRequestQueueLengthP99
+          expr: histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_bucket[2m])) by(flow_schema, priority_level, le))
+        - record: apiRequestRateByInstance
+          expr: sum(rate(apiserver_request_total[2m])) by(instance)
+        - record: apiRequestRateByResource
+          expr: sum(rate(apiserver_request_total[2m])) by(resource)
+        - record: apiRequestRateRead
+          expr: sum(rate(apiserver_request_total{verb=~"LIST|GET"}[2m]))
+        - record: apiRequestRateWrite
+          expr: sum(rate(apiserver_request_total{verb=~"POST|PUT|PATCH|UPDATE|DELETE"}[2m]))
+        - record: apiRequestStatusRate
+          expr: sum(rate(apiserver_request_total[2m])) by(code)
+        - record: apiRequestWaitDurationP99
+          expr: histogram_quantile(0.99, sum(rate(apiserver_flowcontrol_request_wait_duration_seconds_bucket[5m])) by(flow_schema, priority_level, le))
+        - record: apiRequestsDroppedRate
+          expr: sum(rate(apiserver_request_terminations_total[2m])) by (verb)
+        - record: apiRequestsInFlight
+          expr: sum(apiserver_current_inflight_requests) by (instance,request_kind)
+        - record: apiRequestsPendingInQueue
+          expr: sum(apiserver_flowcontrol_current_inqueue_requests) by (flow_schema,priority_level)
+        - record: apiRequestsTerminatedRate
+          expr: sum(rate(apiserver_request_terminations_total[2m])) by(component)
+        - record: apiResources
+          expr: count(apiserver_request_duration_seconds_bucket) by (resource)
+        - record: apiResponseSizeP99
+          expr: histogram_quantile(0.99, sum(rate(apiserver_response_sizes_bucket[2m])) by(instance,le))
+        - record: apiServers
+          expr: count(apiserver_request_duration_seconds_bucket) by (apiserver)
+        - record: blockDevices
+          expr: count(node_disk_written_bytes_total) by (device)
+        - record: cgroupCPU
+          expr: sum(rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}[2m])) by (id) * 100
+        - record: cgroupCPUControlPlane
+          expr: sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}[2m]) * 100 * on (node) group_left kube_node_role{role="control-plane"})) by (id)
+        - record: cgroupCPUWorker
+          expr: sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}[2m]) * 100 * on (node) group_left kube_node_role{role="worker"})) by (id)
+        - record: cgroupFSReads
+          expr: sum(rate(container_fs_reads_bytes_total{device!~".+dm.+",job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}[2m])) by (device,id)
+        - record: cgroupFSWrites
+          expr: sum(rate(container_fs_writes_bytes_total{device!~".+dm.+",job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}[2m])) by (device,id)
+        - record: cgroupMemoryRSSControlPlane
+          expr: sum((container_memory_rss{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"} * on (node) group_left kube_node_role{role="control-plane"})) by (id)
+        - record: cgroupMemoryRSSWorker
+          expr: sum((container_memory_rss{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"} * on (node) group_left kube_node_role{role="worker"})) by (id)
+        - record: cgroupRSS
+          expr: sum(container_memory_rss{job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"}) by (id)
+        - record: clusterOperatorConditions
+          expr: sum(cluster_operator_conditions{condition!=""}) by (condition)
+        - record: clusterOperatorDegraded
+          expr: cluster_operator_conditions{condition="Degraded",name!="",reason!=""}
+        - record: clusterOperatorInfo
+          expr: cluster_operator_conditions{name!="",reason!=""}
+        - record: containerCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",namespace!="",namespace=~"openshift-marketplace|openshift-insight"}[2m])) by (pod,container,namespace,name,service,node) * 100
+        - record: containerCPUTop10
+          expr: topk(10, irate(container_cpu_usage_seconds_total{namespace!="",container!="POD",name!=""}[2m]) * 100)
+        - record: containerMemoryRSS
+          expr: container_memory_rss{container!="POD",name!="",namespace!=""}
+        - record: containerMemoryRSSSystemSlice
+          expr: sum(container_memory_rss{id="/system.slice"}) by (node)
+        - record: containerMemoryRSSTop10
+          expr: topk(10, container_memory_rss{namespace!="",container!="POD",name!=""})
+        - record: containerThreadsControlPlane
+          expr: (sum(container_threads{container!=""}) by (node) * on (node) group_left kube_node_role{role="control-plane"})
+        - record: containerThreadsWorker
+          expr: (sum(container_threads{container!=""}) by (node) * on (node) group_left kube_node_role{role="worker"})
+        - record: crioCPU
+          expr: topk(10, (irate(process_cpu_seconds_total{service="kubelet",job="crio"}[2m]) * 100 * on (node) group_left kube_node_role{role="worker"}))
+        - record: crioMemory
+          expr: topk(10, (process_resident_memory_bytes{service="kubelet",job="crio"} * on (node) group_left kube_node_role{role="worker"}))
+        - record: etcdActiveLeaseStreams
+          expr: sum(grpc_server_started_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})
+        - record: etcdActiveWatchStreams
+          expr: sum(grpc_server_started_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{namespace="openshift-etcd",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})
+        - record: etcdCompactionDurationRate
+          expr: delta(etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum{namespace="openshift-etcd"}[1m:30s])/2
+        - record: etcdCompactionDurationSum
+          expr: etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum{namespace="openshift-etcd"}
+        - record: etcdContainerCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{namespace="openshift-etcd", container="etcd"}[2m])) by (pod) * 100
+        - record: etcdContainerFSWrites
+          expr: rate(container_fs_writes_bytes_total{namespace="openshift-etcd",device!~".+dm.+"}[2m])
+        - record: etcdContainerMemory
+          expr: sum(avg_over_time(container_memory_working_set_bytes{container="",pod!="", namespace=~"openshift-etcd.*"}[2m])) by (pod, namespace)
+        - record: etcdContainerNetworkRx
+          expr: sum(rate(container_network_receive_bytes_total{namespace=~"openshift-etcd.*"}[2m])) by (namespace, pod)
+        - record: etcdContainerNetworkTx
+          expr: sum(rate(container_network_transmit_bytes_total{namespace=~"openshift-etcd.*"}[2m])) by (namespace, pod)
+        - record: etcdDBLeftCapacity
+          expr: etcd_server_quota_backend_bytes{namespace="openshift-etcd"} - etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}
+        - record: etcdDBSpaceUsedPct
+          expr: (etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"} / etcd_server_quota_backend_bytes{namespace="openshift-etcd"})*100
+        - record: etcdDebuggingCompactionKeys
+          expr: etcd_debugging_mvcc_db_compaction_keys_total{namespace="openshift-etcd"}
+        - record: etcdDebuggingMvccKeys
+          expr: etcd_debugging_mvcc_keys_total{namespace="openshift-etcd"}
+        - record: etcdDefragDurationRate
+          expr: delta(etcd_disk_backend_defrag_duration_seconds_sum{namespace="openshift-etcd"}[1m:30s])/2
+        - record: etcdDefragDurationSum
+          expr: etcd_disk_backend_defrag_duration_seconds_sum{namespace="openshift-etcd"}
+        - record: etcdDiskBackendCommitCount
+          expr: etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd"}
+        - record: etcdDiskBackendCommitCountRate
+          expr: irate(etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-etcd"}[2m])
+        - record: etcdDiskBackendCommitP99
+          expr: histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{namespace="openshift-etcd"}[5m])) by (pod, le))
+        - record: etcdDiskBackendCommitSum
+          expr: etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd"}
+        - record: etcdDiskBackendCommitSumRate
+          expr: irate(etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-etcd"}[2m])
+        - record: etcdDiskWALFsyncCount
+          expr: etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd"}
+        - record: etcdDiskWALFsyncCountRate
+          expr: irate(etcd_disk_wal_fsync_duration_seconds_count{namespace="openshift-etcd"}[2m])
+        - record: etcdDiskWALFsyncP99
+          expr: histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{namespace="openshift-etcd"}[5m])) by (pod, le))
+        - record: etcdDiskWALFsyncSum
+          expr: etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd"}
+        - record: etcdDiskWALFsyncSumRate
+          expr: irate(etcd_disk_wal_fsync_duration_seconds_sum{namespace="openshift-etcd"}[2m])
+        - record: etcdLeaderElectionsPerDay
+          expr: changes(etcd_server_leader_changes_seen_total{namespace="openshift-etcd"}[1d])
+        - record: etcdMvccDBTotalSize
+          expr: etcd_mvcc_db_total_size_in_bytes{namespace="openshift-etcd"}
+        - record: etcdMvccDBTotalSizeInUse
+          expr: etcd_mvcc_db_total_size_in_use_in_bytes{namespace="openshift-etcd"}
+        - record: etcdMvccDeletes
+          expr: rate(etcd_mvcc_delete_total{namespace="openshift-etcd"}[2m])
+        - record: etcdMvccPuts
+          expr: rate(etcd_mvcc_put_total{namespace="openshift-etcd"}[2m])
+        - record: etcdNetworkGRPCRx
+          expr: rate(etcd_network_client_grpc_received_bytes_total{namespace="openshift-etcd"}[2m])
+        - record: etcdNetworkGRPCTx
+          expr: rate(etcd_network_client_grpc_sent_bytes_total{namespace="openshift-etcd"}[2m])
+        - record: etcdNetworkPeerRTTP99
+          expr: histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket{namespace="openshift-etcd"}[2m]))
+        - record: etcdNetworkPeerRx
+          expr: rate(etcd_network_peer_received_bytes_total{namespace="openshift-etcd"}[2m])
+        - record: etcdNetworkPeerTx
+          expr: rate(etcd_network_peer_sent_bytes_total{namespace="openshift-etcd"}[2m])
+        - record: etcdPods
+          expr: count(etcd_cluster_version) by (pod)
+        - record: etcdServerHasLeader
+          expr: max(etcd_server_has_leader{namespace="openshift-etcd"})
+        - record: etcdServerHealthFailures
+          expr: etcd_server_health_failures{namespace="openshift-etcd"}
+        - record: etcdServerHeartbeatFailures
+          expr: etcd_server_heartbeat_send_failures_total{namespace="openshift-etcd"}
+        - record: etcdServerLeaderChanges
+          expr: sum(rate(etcd_server_leader_changes_seen_total{namespace="openshift-etcd"}[2m]))
+        - record: etcdServerProposalsApplied
+          expr: sum(rate(etcd_server_proposals_applied_total{namespace="openshift-etcd"}[2m]))
+        - record: etcdServerProposalsCommitted
+          expr: sum(rate(etcd_server_proposals_committed_total{namespace="openshift-etcd"}[2m]))
+        - record: etcdServerProposalsCommittedTotal
+          expr: max(etcd_server_proposals_committed_total{namespace="openshift-etcd"})
+        - record: etcdServerProposalsFailed
+          expr: sum(rate(etcd_server_proposals_failed_total{namespace="openshift-etcd"}[2m]))
+        - record: etcdServerProposalsPending
+          expr: sum(etcd_server_proposals_pending{namespace="openshift-etcd"})
+        - record: etcdServerQuotaBackendBytes
+          expr: etcd_server_quota_backend_bytes{namespace="openshift-etcd"}
+        - record: etcdSlowApply
+          expr: delta(etcd_server_slow_apply_total{namespace="openshift-etcd"}[2m])
+        - record: etcdSlowReadIndexes
+          expr: delta(etcd_server_slow_read_indexes_total{namespace="openshift-etcd"}[2m])
+        - record: etcdSnapSaveDuration
+          expr: sum(rate(etcd_debugging_snap_save_total_duration_seconds_sum{namespace="openshift-etcd"}[2m]))
+        - record: goGoroutines
+          expr: topk(10, sum(go_goroutines) by (job,instance))
+        - record: infraNodes
+          expr: count(kube_node_role{role="infra"}) by (node)
+        - record: kubeConfigmapInfo
+          expr: count(kube_configmap_info)
+        - record: kubeDeploymentReplicas
+          expr: count(kube_deployment_spec_replicas)
+        - record: kubeNamespacePhase
+          expr: sum(kube_namespace_status_phase) by (phase) > 0
+        - record: kubeNodeInfo
+          expr: sum(kube_node_info)
+        - record: kubeNodeStatusCondition
+          expr: sum(kube_node_status_condition{status="true"}) by (condition) > 0
+        - record: kubePodDistribution
+          expr: count(kube_pod_info) by (node)
+        - record: kubePodStatusPhase
+          expr: sum(kube_pod_status_phase) by (phase) > 0
+        - record: kubeSecretInfo
+          expr: count(kube_secret_info)
+        - record: kubeServiceInfo
+          expr: count(kube_service_info)
+        - record: kubeletCPU
+          expr: topk(10, (irate(process_cpu_seconds_total{service="kubelet",job="kubelet"}[2m]) * 100 * on (node) group_left kube_node_role{role="worker"}))
+        - record: kubeletMemory
+          expr: topk(10, (process_resident_memory_bytes{service="kubelet",job="kubelet"} * on (node) group_left kube_node_role{role="worker"}))
+        - record: masterNodes
+          expr: count(kube_node_role{role="control-plane"}) by (node)
+        - record: metricsServerCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"metrics-server-.*",namespace!="",name!=""}[2m])) by (pod,container) * 100
+        - record: metricsServerMemory
+          expr: sum(container_memory_rss{pod=~"metrics-server-.*",namespace!="",name!=""}) by (pod)
+        - record: namespaces
+          expr: count(kube_pod_info{namespace!~"cluster-density.*|node-density-.*"}) by (namespace)
+        - record: nbdbCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}[2m]) * 100) by (pod,node)
+        - record: nbdbMemory
+          expr: sum(container_memory_rss{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="nbdb"}) by (pod,node)
+        - record: netDevices
+          expr: count(node_network_receive_bytes_total) by (device)
+        - record: nodeCPU
+          expr: sum(rate((node_cpu_seconds_total * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))[2m:])) by (instance) * 100
+        - record: nodeCPUControlPlane
+          expr: (instance:node_cpu:rate:sum{mode!="idle"} * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeCPUWorker
+          expr: (instance:node_cpu:rate:sum{mode!="idle"} * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeConntrackEntries
+          expr: node_nf_conntrack_entries
+        - record: nodeConntrackLimit
+          expr: node_nf_conntrack_entries_limit
+        - record: nodeDiskRead
+          expr: rate(node_disk_read_bytes_total[2m])
+        - record: nodeDiskReadsCompleted
+          expr: rate(node_disk_reads_completed_total[2m])
+        - record: nodeDiskReadsControlPlane
+          expr: rate((node_disk_reads_completed_total * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)"))[2m:])
+        - record: nodeDiskReadsWorker
+          expr: rate((node_disk_reads_completed_total * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))[2m:])
+        - record: nodeDiskWritesCompleted
+          expr: rate(node_disk_writes_completed_total[2m])
+        - record: nodeDiskWritesControlPlane
+          expr: rate((node_disk_writes_completed_total * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)"))[2m:])
+        - record: nodeDiskWritesWorker
+          expr: rate((node_disk_writes_completed_total * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))[2m:])
+        - record: nodeDiskWritten
+          expr: rate(node_disk_written_bytes_total[2m])
+        - record: nodeInodesCountRun
+          expr: node_filesystem_files{fstype!="",mountpoint="/run"} - node_filesystem_files_free{fstype!="",mountpoint="/run"}
+        - record: nodeInodesUsageRun
+          expr: (1 - node_filesystem_files_free{fstype!="",mountpoint="/run"} / node_filesystem_files{fstype!="",mountpoint="/run"}) * 100
+        - record: nodeLoad1ControlPlane
+          expr: (node_load1 * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeLoad1Worker
+          expr: (node_load1 * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeMemoryActive
+          expr: node_memory_Active_bytes
+        - record: nodeMemoryAvailable
+          expr: node_memory_MemAvailable_bytes
+        - record: nodeMemoryAvailableControlPlane
+          expr: (node_memory_MemAvailable_bytes * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeMemoryAvailableControlPlaneSum
+          expr: sum((node_memory_MemAvailable_bytes * on (instance) group_left label_replace(kube_node_role{role="control-plane"}, "instance", "$1", "node", "(.+)")))
+        - record: nodeMemoryAvailableWorker
+          expr: (node_memory_MemAvailable_bytes * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)"))
+        - record: nodeMemoryAvailableWorkerSum
+          expr: sum((node_memory_MemAvailable_bytes * on (instance) group_left label_replace(kube_node_role{role="worker"}, "instance", "$1", "node", "(.+)")))
+        - record: nodeMemoryCachedBuffers
+          expr: node_memory_Cached_bytes + node_memory_Buffers_bytes
+        - record: nodeMemoryTotal
+          expr: node_memory_MemTotal_bytes
+        - record: nodeMemoryUsed
+          expr: node_memory_MemTotal_bytes - (node_memory_MemFree_bytes)
+        - record: nodeNetworkRx
+          expr: rate(node_network_receive_bytes_total[2m]) * 8
+        - record: nodeNetworkRxDrop
+          expr: topk(10, rate(node_network_receive_drop_total[2m]))
+        - record: nodeNetworkRxPackets
+          expr: rate(node_network_receive_packets_total[2m])
+        - record: nodeNetworkTx
+          expr: rate(node_network_transmit_bytes_total[2m]) * 8
+        - record: nodeNetworkTxDrop
+          expr: topk(10, rate(node_network_transmit_drop_total[2m]))
+        - record: nodeNetworkTxPackets
+          expr: rate(node_network_transmit_packets_total[2m])
+        - record: nodeVmstatPgMajFault
+          expr: node_vmstat_pgmajfault * on (instance) group_left label_replace(kube_node_role{role="control-plane"},"instance","$1","node","(.*)")
+        - record: nodeVmstatPgMajFaultRate
+          expr: rate(node_vmstat_pgmajfault[2m])* on (instance) group_left label_replace(kube_node_role{role="control-plane"},"instance","$1","node","(.*)")
+        - record: northdCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}[2m]) * 100) by (pod,node)
+        - record: northdMemory
+          expr: sum(container_memory_rss{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="northd"}) by (pod,node)
+        - record: openshiftRouteInfo
+          expr: count(openshift_route_info)
+        - record: ovnCNIAddLatencyP99
+          expr: histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="ADD"}[2m])) by (instance,pod,le)) > 0
+        - record: ovnCNIDelLatencyP99
+          expr: histogram_quantile(0.99, sum(rate(ovnkube_node_cni_request_duration_seconds_bucket{command="DEL"}[2m])) by (instance,pod,le)) > 0
+        - record: ovnControllerCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}[2m]) * 100) by (pod,node)
+        - record: ovnControllerMemory
+          expr: sum(container_memory_rss{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovn-controller"}) by (pod,node)
+        - record: ovnPodAnnotationLatencyP99
+          expr: histogram_quantile(0.99, sum(rate(ovnkube_controller_pod_creation_latency_seconds_bucket[2m])) by (instance,pod,le)) > 0
+        - record: ovnkubeControlPlaneCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}[2m]) * 100) by (pod,node)
+        - record: ovnkubeControlPlaneMemory
+          expr: container_memory_rss{pod=~"(ovnkube-master|ovnkube-control-plane).+",namespace="openshift-ovn-kubernetes",container!~"POD|"}
+        - record: ovnkubeControllerCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}[2m]) * 100) by (pod,node)
+        - record: ovnkubeControllerMemory
+          expr: sum(container_memory_rss{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="ovnkube-controller"}) by (pod,node)
+        - record: ovsMasterOvsdbCPU
+          expr: irate(container_cpu_usage_seconds_total{id=~"/.*/ovsdb-server.service"}[2m]) * 100
+        - record: ovsMasterOvsdbMemory
+          expr: container_memory_rss{id=~"/.*/ovsdb-server.service"}
+        - record: ovsMasterVswitchdCPU
+          expr: irate(container_cpu_usage_seconds_total{id=~"/.*/ovs-vswitchd.service"}[2m]) * 100
+        - record: ovsMasterVswitchdMemory
+          expr: container_memory_rss{id=~"/.*/ovs-vswitchd.service"}
+        - record: podFSReads
+          expr: sum(rate(container_fs_reads_bytes_total{device!~".+dm.+",pod!=""}[2m])) by (device,pod)
+        - record: podFSWrites
+          expr: sum(rate(container_fs_writes_bytes_total{device!~".+dm.+",pod!=""}[2m])) by (device,pod)
+        - record: promAdapterCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}[2m])) by (pod,container) * 100
+        - record: promAdapterMemory
+          expr: sum(container_memory_rss{pod=~"prometheus-adapter-.*",namespace="openshift-monitoring",name!=""}) by (pod)
+        - record: prometheusCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}[2m])) by (pod,container,node) * 100
+        - record: prometheusMemory
+          expr: sum(container_memory_rss{pod=~"prometheus-k8s-[01]",namespace!="",name!="",container="prometheus"}) by (pod)
+        - record: sbdbCPU
+          expr: sum(irate(container_cpu_usage_seconds_total{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}[2m]) * 100) by (pod,node)
+        - record: sbdbMemory
+          expr: sum(container_memory_rss{pod=~"ovnkube-.*",namespace="openshift-ovn-kubernetes",container="sbdb"}) by (pod,node)
+        - record: stackroxContainerCPU
+          expr: topk(25, sum(irate(container_cpu_usage_seconds_total{container!="POD",name!="",namespace!="",namespace=~"stackrox"}[2m])) by (pod,container,namespace,name,service) * 100)
+        - record: stackroxContainerMemoryRSS
+          expr: topk(25, container_memory_rss{container!="POD",name!="",namespace!="",namespace=~"stackrox"})
+        - record: workerCgroupCpuById
+          expr: sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"}[2m]) * 100 * on (node) group_left kube_node_role{role="worker"})) by (id)
+        - record: workerNodes
+          expr: count(kube_node_role{role="worker"}) by (node)

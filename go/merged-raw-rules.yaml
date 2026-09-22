@@ -1,0 +1,195 @@
+groups:
+    - name: merged
+      rules:
+        - record: ALERTS
+          expr: ALERTS
+        - record: apiserver_current_inflight_requests
+          expr: apiserver_current_inflight_requests
+        - record: apiserver_flowcontrol_current_inqueue_requests
+          expr: apiserver_flowcontrol_current_inqueue_requests
+        - record: apiserver_flowcontrol_dispatched_requests_total
+          expr: apiserver_flowcontrol_dispatched_requests_total
+        - record: apiserver_flowcontrol_request_concurrency_in_use
+          expr: apiserver_flowcontrol_request_concurrency_in_use
+        - record: apiserver_flowcontrol_request_execution_seconds_bucket
+          expr: apiserver_flowcontrol_request_execution_seconds_bucket
+        - record: apiserver_flowcontrol_request_queue_length_after_enqueue_bucket
+          expr: apiserver_flowcontrol_request_queue_length_after_enqueue_bucket
+        - record: apiserver_flowcontrol_request_wait_duration_seconds_bucket
+          expr: apiserver_flowcontrol_request_wait_duration_seconds_bucket
+        - record: apiserver_longrunning_requests
+          expr: apiserver_longrunning_requests
+        - record: apiserver_request_duration_seconds_bucket
+          expr: apiserver_request_duration_seconds_bucket
+        - record: apiserver_request_terminations_total
+          expr: apiserver_request_terminations_total
+        - record: apiserver_request_total
+          expr: apiserver_request_total
+        - record: apiserver_response_sizes_bucket
+          expr: apiserver_response_sizes_bucket
+        - record: cluster_operator_conditions
+          expr: cluster_operator_conditions
+        - record: container_cpu_usage_seconds_total
+          expr: container_cpu_usage_seconds_total
+        - record: container_fs_reads_bytes_total
+          expr: container_fs_reads_bytes_total
+        - record: container_fs_writes_bytes_total
+          expr: container_fs_writes_bytes_total
+        - record: container_memory_rss
+          expr: container_memory_rss
+        - record: container_memory_working_set_bytes
+          expr: container_memory_working_set_bytes
+        - record: container_network_receive_bytes_total
+          expr: container_network_receive_bytes_total{namespace=~"openshift-etcd.*"}
+        - record: container_network_transmit_bytes_total
+          expr: container_network_transmit_bytes_total{namespace=~"openshift-etcd.*"}
+        - record: container_threads
+          expr: container_threads
+        - record: etcd_cluster_version
+          expr: etcd_cluster_version
+        - record: etcd_debugging_mvcc_db_compaction_keys_total
+          expr: etcd_debugging_mvcc_db_compaction_keys_total
+        - record: etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum
+          expr: etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum
+        - record: etcd_debugging_mvcc_keys_total
+          expr: etcd_debugging_mvcc_keys_total
+        - record: etcd_debugging_snap_save_total_duration_seconds_sum
+          expr: etcd_debugging_snap_save_total_duration_seconds_sum
+        - record: etcd_disk_backend_commit_duration_seconds_bucket
+          expr: etcd_disk_backend_commit_duration_seconds_bucket
+        - record: etcd_disk_backend_commit_duration_seconds_count
+          expr: etcd_disk_backend_commit_duration_seconds_count
+        - record: etcd_disk_backend_commit_duration_seconds_sum
+          expr: etcd_disk_backend_commit_duration_seconds_sum
+        - record: etcd_disk_backend_defrag_duration_seconds_sum
+          expr: etcd_disk_backend_defrag_duration_seconds_sum
+        - record: etcd_disk_wal_fsync_duration_seconds_bucket
+          expr: etcd_disk_wal_fsync_duration_seconds_bucket
+        - record: etcd_disk_wal_fsync_duration_seconds_count
+          expr: etcd_disk_wal_fsync_duration_seconds_count
+        - record: etcd_disk_wal_fsync_duration_seconds_sum
+          expr: etcd_disk_wal_fsync_duration_seconds_sum
+        - record: etcd_mvcc_db_total_size_in_bytes
+          expr: etcd_mvcc_db_total_size_in_bytes
+        - record: etcd_mvcc_db_total_size_in_use_in_bytes
+          expr: etcd_mvcc_db_total_size_in_use_in_bytes
+        - record: etcd_mvcc_delete_total
+          expr: etcd_mvcc_delete_total
+        - record: etcd_mvcc_put_total
+          expr: etcd_mvcc_put_total
+        - record: etcd_network_client_grpc_received_bytes_total
+          expr: etcd_network_client_grpc_received_bytes_total
+        - record: etcd_network_client_grpc_sent_bytes_total
+          expr: etcd_network_client_grpc_sent_bytes_total
+        - record: etcd_network_peer_received_bytes_total
+          expr: etcd_network_peer_received_bytes_total
+        - record: etcd_network_peer_round_trip_time_seconds_bucket
+          expr: etcd_network_peer_round_trip_time_seconds_bucket
+        - record: etcd_network_peer_sent_bytes_total
+          expr: etcd_network_peer_sent_bytes_total
+        - record: etcd_server_has_leader
+          expr: etcd_server_has_leader
+        - record: etcd_server_health_failures
+          expr: etcd_server_health_failures
+        - record: etcd_server_heartbeat_send_failures_total
+          expr: etcd_server_heartbeat_send_failures_total
+        - record: etcd_server_leader_changes_seen_total
+          expr: etcd_server_leader_changes_seen_total
+        - record: etcd_server_proposals_applied_total
+          expr: etcd_server_proposals_applied_total
+        - record: etcd_server_proposals_committed_total
+          expr: etcd_server_proposals_committed_total
+        - record: etcd_server_proposals_failed_total
+          expr: etcd_server_proposals_failed_total
+        - record: etcd_server_proposals_pending
+          expr: etcd_server_proposals_pending
+        - record: etcd_server_quota_backend_bytes
+          expr: etcd_server_quota_backend_bytes
+        - record: etcd_server_slow_apply_total
+          expr: etcd_server_slow_apply_total
+        - record: etcd_server_slow_read_indexes_total
+          expr: etcd_server_slow_read_indexes_total
+        - record: go_goroutines
+          expr: go_goroutines
+        - record: grpc_server_handled_total
+          expr: grpc_server_handled_total
+        - record: grpc_server_started_total
+          expr: grpc_server_started_total
+        - record: instance:node_cpu:rate:sum
+          expr: instance:node_cpu:rate:sum
+        - record: kube_configmap_info
+          expr: kube_configmap_info
+        - record: kube_deployment_spec_replicas
+          expr: kube_deployment_spec_replicas
+        - record: kube_namespace_status_phase
+          expr: kube_namespace_status_phase
+        - record: kube_node_info
+          expr: kube_node_info
+        - record: kube_node_role
+          expr: kube_node_role
+        - record: kube_node_status_condition
+          expr: kube_node_status_condition
+        - record: kube_pod_info
+          expr: kube_pod_info
+        - record: kube_pod_status_phase
+          expr: kube_pod_status_phase
+        - record: kube_secret_info
+          expr: kube_secret_info
+        - record: kube_service_info
+          expr: kube_service_info
+        - record: node_cpu_seconds_total
+          expr: node_cpu_seconds_total
+        - record: node_disk_read_bytes_total
+          expr: node_disk_read_bytes_total
+        - record: node_disk_reads_completed_total
+          expr: node_disk_reads_completed_total
+        - record: node_disk_writes_completed_total
+          expr: node_disk_writes_completed_total
+        - record: node_disk_written_bytes_total
+          expr: node_disk_written_bytes_total
+        - record: node_filesystem_files
+          expr: node_filesystem_files
+        - record: node_filesystem_files_free
+          expr: node_filesystem_files_free
+        - record: node_load1
+          expr: node_load1
+        - record: node_memory_Active_bytes
+          expr: node_memory_Active_bytes
+        - record: node_memory_Buffers_bytes
+          expr: node_memory_Buffers_bytes
+        - record: node_memory_Cached_bytes
+          expr: node_memory_Cached_bytes
+        - record: node_memory_MemAvailable_bytes
+          expr: node_memory_MemAvailable_bytes
+        - record: node_memory_MemFree_bytes
+          expr: node_memory_MemFree_bytes
+        - record: node_memory_MemTotal_bytes
+          expr: node_memory_MemTotal_bytes
+        - record: node_network_receive_bytes_total
+          expr: node_network_receive_bytes_total
+        - record: node_network_receive_drop_total
+          expr: node_network_receive_drop_total
+        - record: node_network_receive_packets_total
+          expr: node_network_receive_packets_total
+        - record: node_network_transmit_bytes_total
+          expr: node_network_transmit_bytes_total
+        - record: node_network_transmit_drop_total
+          expr: node_network_transmit_drop_total
+        - record: node_network_transmit_packets_total
+          expr: node_network_transmit_packets_total
+        - record: node_nf_conntrack_entries
+          expr: node_nf_conntrack_entries
+        - record: node_nf_conntrack_entries_limit
+          expr: node_nf_conntrack_entries_limit
+        - record: node_vmstat_pgmajfault
+          expr: node_vmstat_pgmajfault
+        - record: openshift_route_info
+          expr: openshift_route_info
+        - record: ovnkube_controller_pod_creation_latency_seconds_bucket
+          expr: ovnkube_controller_pod_creation_latency_seconds_bucket
+        - record: ovnkube_node_cni_request_duration_seconds_bucket
+          expr: ovnkube_node_cni_request_duration_seconds_bucket
+        - record: process_cpu_seconds_total
+          expr: process_cpu_seconds_total
+        - record: process_resident_memory_bytes
+          expr: process_resident_memory_bytes

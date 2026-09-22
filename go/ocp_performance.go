@@ -16,14 +16,13 @@ const (
 	fsDeviceFilter   = `device!~".+dm.+"`
 	cgroupFSIDFilter = fsDeviceFilter + `,` + cgroupIDFilter
 
-	// TODO refactor these constants to more easily configurable variables, that might even be supplied or discovered at runtime
-	infraList                       = "" //`ip-10-0-31-91.us-west-2.compute.internal|ip-10-0-47-124.us-west-2.compute.internal|ip-10-0-69-138.us-west-2.compute.internal`
-	controlPlaneList                = "" //`ip-10-0-7-201.us-west-2.compute.internal|ip-10-0-95-165.us-west-2.compute.internal|ip-10-0-32-128.us-west-2.compute.internal`
+	infraList                       = "" //`ip-10-0-33-1.us-west-2.compute.internal|ip-10-0-8-17.us-west-2.compute.internal|ip-10-0-90-75.us-west-2.compute.internal`
+	controlPlaneList                = "" //`ip-10-0-114-227.us-west-2.compute.internal|ip-10-0-3-212.us-west-2.compute.internal|ip-10-0-44-126.us-west-2.compute.internal|ip-10-0-5-89.us-west-2.compute.internal|ip-10-0-95-116.us-west-2.compute.internal`
 	nonWorkerList                   = infraList + `|` + controlPlaneList
 	controlPlaneInstanceFilter      = `instance=~"` + controlPlaneList + `"`
 	workerInstanceFilter            = "" //`instance!~"` + nonWorkerList + `"`
 	workerNodesFilter               = "" //`node!~"` + nonWorkerList + `"`
-	useNodeCpuInstanceRecordingRule = false
+	useNodeCpuInstanceRecordingRule = true
 )
 
 func q(metric mg.Metric, filters string) string {
@@ -142,6 +141,13 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 				intervalOption("5m"),
 			}),
 		).
+		WithVariable(dashboard.NewCustomVariableBuilder("mode").
+			Label("mode").
+			Values(dashboard.StringOrMap{String: cog.ToPtr("idle,user,system,iowait,irq,softirq,steal,nice")}).
+			Multi(true).
+			Current(intervalOption("iowait")),
+		).
+		WithRow(ocpNoisyGoAppsRow(t)).
 		WithRow(ocpClusterAtAGlanceRow(t, summarize)).
 		// Row: OVN
 		WithRow(ocpOVNRow(t, summarize)).
@@ -168,6 +174,44 @@ func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 	return ocpBase(t, "OpenShift Performance", false)
 }
 
+func ocpNoisyGoAppsRow(t panelTracker) *dashboard.RowBuilder {
+	return dashboard.NewRowBuilder("Loud Go Applications").
+		Collapsed(true).
+		WithPanel(genericLegendRightHandAxisTimeSeries("Select Go Apps CPU Rate", "percent",
+			12, 8, `secondary-scheduler.*`, "secondary-scheduler",
+			t.track("containerCPU",
+				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",namespace!="",namespace=~"openshift-marketplace|openshift-insight"`).
+					IRate(intervalVar).
+					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service", mg.GroupByNode).
+					Multiply("100"),
+				"{{ pod }}: {{ container }} {{node}}"),
+			t.track("containerCPU",
+				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",pod=~"numaresources-controller-manager.*|secondary-scheduler.*",namespace="openshift-numaresources"`).
+					IRate(intervalVar).
+					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service", mg.GroupByNode).
+					Multiply("100"),
+				"{{ pod }}: {{ container }} {{node}}"),
+		)).
+		WithPanel(genericLegendTimeSeries("Workers /system.slice breakdown CPU Rate", "percent",
+			12, 8,
+			t.trackRaw("workerCgroupCpuById",
+				`sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"}[$interval]) * 100 * on (node) group_left kube_node_role{role="worker-1"})) by (id)`,
+				"{{ instance }}"),
+		)).
+		WithPanel(genericLegendTimeSeries("Worker1 CPU Usage $mode", "percent",
+			12, 8,
+			t.trackRaw("nodeCPU",
+				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(kube_node_role{role="worker-1"}, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
+				"{{ instance }}"),
+		)).
+		WithPanel(genericLegendTimeSeries("Control Plane CPU Usage $mode", "percent",
+			12, 8,
+			t.trackRaw("nodeCPU",
+				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(kube_node_role{role="master"}, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
+				"{{ instance }}"),
+		))
+}
+
 // Row: Cluster-at-a-Glance
 func ocpClusterAtAGlanceRow(t panelTracker, summarize bool) *dashboard.RowBuilder {
 	clusterAtAGlanceRow := dashboard.NewRowBuilder("Cluster-at-a-Glance").
@@ -184,7 +228,7 @@ func ocpClusterAtAGlanceRow(t panelTracker, summarize bool) *dashboard.RowBuilde
 
 func rolesCpuUsageRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
 	return clusterAtAGlanceRow.
-		WithPanel(glanceNodeCpuPanel(mg.RoleWorker, summarize, t)).
+		WithPanel(glanceNodeCpuPanel(mg.RoleWorker1, summarize, t)).
 		WithPanel(glanceNodeCpuPanel(mg.RoleControlPlane, false, t))
 }
 
@@ -219,7 +263,7 @@ func nodeCpuQueryFn(role mg.NodeRole) func() *mg.Query {
 		baseMetric = mg.MetricNodeCPU
 	}
 	var query func() *mg.Query
-	if workerInstanceFilter != "" && role == mg.RoleWorker {
+	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
 		query = func() *mg.Query {
 			baseQuery := mg.Q(baseMetric, `mode!="idle", `+workerInstanceFilter)
 			if useNodeCpuInstanceRecordingRule {
@@ -249,7 +293,7 @@ func nodeCpuQueryFn(role mg.NodeRole) func() *mg.Query {
 }
 
 func rolesLoad1Row(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *dashboard.RowBuilder {
-	for _, role := range []mg.NodeRole{mg.RoleWorker, mg.RoleControlPlane} {
+	for _, role := range []mg.NodeRole{mg.RoleWorker1, mg.RoleControlPlane} {
 		roleName := capitalCamelName(role)
 		clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendTimeSeries(roleName+" Load1", "short",
 			12, 8,
@@ -265,7 +309,7 @@ func rolesLoad1Row(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *d
 
 func rolesAvailableMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
 	return clusterAtAGlanceRow.
-		WithPanel(roleAvailableMemoryPanel(mg.RoleWorker, summarize, t)).
+		WithPanel(roleAvailableMemoryPanel(mg.RoleWorker1, summarize, t)).
 		WithPanel(roleAvailableMemoryPanel(mg.RoleControlPlane, false, t))
 }
 
@@ -320,7 +364,7 @@ func rolesCgroupCpuRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker
 }
 
 func glanceWorkerCGroupCpuQueries(t panelTracker) *prometheus.DataqueryBuilder {
-	const role = mg.RoleWorker
+	const role = mg.RoleWorker1
 	// TODO not summarize, but instance filter
 	if workerInstanceFilter != "" {
 		return t.track("cgroupCPU"+capitalCamelName(role),
@@ -346,6 +390,32 @@ func glanceCGroupCpuQueries(t panelTracker, role mg.NodeRole) *prometheus.Dataqu
 		"{{instance}}")
 }
 
+func loudWorkerCGroupSystemCpuQueries(t panelTracker) *prometheus.DataqueryBuilder {
+	const role = mg.RoleWorker1
+	if workerInstanceFilter != "" {
+		return t.track("cgroupCPU"+capitalCamelName(role),
+			mg.Q(mg.MetricContainerCPU, `job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"`+`,`+workerNodesFilter).
+				Rate(intervalVar).
+				Multiply("100").
+				Agg(mg.AggSum, mg.GroupByID),
+			"{{instance}}")
+	} else {
+		return loudCGroupSystemCpuQueries(t, role)
+	}
+}
+
+func loudCGroupSystemCpuQueries(t panelTracker, role mg.NodeRole) *prometheus.DataqueryBuilder {
+	metricName := "cgroupCPU" + capitalCamelName(role)
+	return t.track(metricName,
+		mg.Q(mg.MetricContainerCPU, `job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"`).
+			Rate(intervalVar).
+			Multiply("100").
+			MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
+				mg.NodeRoleFilter(role)).
+			Agg(mg.AggSum, mg.GroupByID),
+		"{{instance}}")
+}
+
 func rolesCgroupMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *dashboard.RowBuilder {
 	const metricRoot = "cgroupMemoryRSS"
 	var workerCgroupMemory *mg.Query
@@ -355,7 +425,7 @@ func rolesCgroupMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTrac
 	} else {
 		workerCgroupMemory = mg.Q(mg.MetricContainerMemoryRSS, cgroupIDFilter).
 			MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-				mg.NodeRoleFilter(mg.RoleWorker)).
+				mg.NodeRoleFilter(mg.RoleWorker1)).
 			Agg(mg.AggSum, mg.GroupByID)
 	}
 	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendCounterTimeSeries("Workers CGroup Memory RSS", "bytes",
@@ -380,7 +450,7 @@ func rolesCgroupMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTrac
 
 func rolesContainerThreadsRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
 	return clusterAtAGlanceRow.
-		WithPanel(containerThreadsPanel(mg.RoleWorker, summarize, t)).
+		WithPanel(containerThreadsPanel(mg.RoleWorker1, summarize, t)).
 		WithPanel(containerThreadsPanel(mg.RoleControlPlane, false, t))
 }
 
@@ -388,7 +458,7 @@ func containerThreadsPanel(role mg.NodeRole, summarize bool, t panelTracker) *ti
 	const metricRoot = "containerThreads"
 	var containerThreadsQuery func() *mg.Query
 	roleCamel := capitalCamelName(role)
-	if workerNodesFilter != "" && role == mg.RoleWorker {
+	if workerNodesFilter != "" && role == mg.RoleWorker1 {
 		containerThreadsQuery = func() *mg.Query {
 			return mg.Q(mg.MetricContainerThreads, `container!="",`+workerNodesFilter).
 				Agg(mg.AggSum, mg.GroupByNode)
@@ -415,14 +485,14 @@ func containerThreadsPanel(role mg.NodeRole, summarize bool, t panelTracker) *ti
 }
 
 func rolesDiskIops(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(diskIopsRolePanel(t, mg.RoleWorker, summarize))
+	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(diskIopsRolePanel(t, mg.RoleWorker1, summarize))
 	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(diskIopsRolePanel(t, mg.RoleControlPlane, false))
 	return clusterAtAGlanceRow
 }
 
 func diskIopsRolePanel(t panelTracker, role mg.NodeRole, summarize bool) *timeseries.PanelBuilder {
 	var readQuery, writeQuery func() *mg.Query
-	if workerInstanceFilter != "" && role == mg.RoleWorker {
+	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
 		readQuery = func() *mg.Query {
 			return mg.Q(mg.MetricNodeDiskReadsCompleted, workerInstanceFilter).
 				RateSubquery(intervalVar)
@@ -664,7 +734,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 				mg.Q(mg.MetricProcessCPU, `service="kubelet",job="kubelet"`).
 					IRate(intervalVar).Multiply("100").
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker)).
+						mg.NodeRoleFilter(mg.RoleWorker1)).
 					TopK(10),
 				"kubelet - {{node}}"),
 		)).
@@ -674,7 +744,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 				mg.Q(mg.MetricProcessCPU, `service="kubelet",job="crio"`).
 					IRate(intervalVar).Multiply("100").
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker)).
+						mg.NodeRoleFilter(mg.RoleWorker1)).
 					TopK(10),
 				"crio - {{node}}"),
 		)).
@@ -683,7 +753,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 			t.track("kubeletMemory",
 				mg.Q(mg.MetricProcessMemory, `service="kubelet",job="kubelet"`).
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker)).
+						mg.NodeRoleFilter(mg.RoleWorker1)).
 					TopK(10),
 				"kubelet - {{node}}"),
 		)).
@@ -692,7 +762,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 			t.track("crioMemory",
 				mg.Q(mg.MetricProcessMemory, `service="kubelet",job="crio"`).
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker)).
+						mg.NodeRoleFilter(mg.RoleWorker1)).
 					TopK(10),
 				"crio - {{node}}"),
 		)).
@@ -893,9 +963,9 @@ func withWorkerNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker
 	if workerNodesFilter != "" {
 		nodesQuery = `label_values(kube_node_role{` + workerNodesFilter + `}, node)`
 	} else {
-		nodesQuery = `label_values(` + mg.NodeRoleFilter(mg.RoleWorker).String() + `, node)`
+		nodesQuery = `label_values(` + mg.NodeRoleFilter(mg.RoleWorker1).String() + `, node)`
 	}
-	return builder.WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker)).
+	return builder.WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker1)).
 		WithVariable(dashboard.NewQueryVariableBuilder("_worker_node").
 			Label("Worker").
 			Query(t.trackVarQuery("workerNodes", nodesQuery)).

@@ -107,10 +107,16 @@ func genericLegendCounterTimeSeries(title, unit string, span, height uint32, tar
 
 // Panel type: genericLegendCounterSumRightHand - extends genericLegendCounter with override for 'sum' series on right axis
 func genericLegendCounterSumRightHandTimeSeries(title, unit string, span, height uint32, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
+	const rhsAxisLabel = "sum"
+	const rhsRegex = "sum"
+	return genericLegendRightHandAxisTimeSeries(title, unit, span, height, rhsRegex, rhsAxisLabel, targets...)
+}
+
+func genericLegendRightHandAxisTimeSeries(title string, unit string, span uint32, height uint32, rhsRegex string, rhsAxisLabel string, targets ...*prometheus.DataqueryBuilder) *timeseries.PanelBuilder {
 	p := genericLegendCounterTimeSeries(title, unit, span, height, targets...)
-	return p.OverrideByRegexp("sum", []dashboard.DynamicConfigValue{
+	return p.OverrideByRegexp(rhsRegex, []dashboard.DynamicConfigValue{
 		{Id: "custom.axisPlacement", Value: "right"},
-		{Id: "custom.axisLabel", Value: "sum"},
+		{Id: "custom.axisLabel", Value: rhsAxisLabel},
 	})
 }
 
