@@ -33,6 +33,7 @@ var dashboards = []dashboardDef{
 	{"api-performance-overview", "General", buildAPIPerformanceDashboard, nil},
 	{"node", "General", buildNodeDashboard, nil},
 	{"node-comparison", "General", buildNodeComparisonDashboard, buildNodeComparisonProfiles},
+	{"node-cpu-comparison", "General", buildNodeCPUComparisonDashboard, buildNodeCPUComparisonProfiles},
 }
 
 func envDefault(key, fallback string) string {
