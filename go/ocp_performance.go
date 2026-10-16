@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	intervalVar = mg.RateInterval("$interval")
+	intervalVar    = mg.RateInterval("$interval")
+	clusterRoleVar = "_cluster_role"
+	workerNodeRole = mg.RoleWorker
 
 	cgroupIDFilter = `job=~".*", id =~"/system.slice|/system.slice/.*.service|/.*/ovs-vswitchd.service|/.*/ovsdb-server.service|/kubepods.slice"`
 
@@ -147,6 +149,13 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 			Multi(true).
 			Current(intervalOption("iowait")),
 		).
+		WithVariable(dashboard.NewCustomVariableBuilder(clusterRoleVar).
+			Values(dashboard.StringOrMap{String: cog.ToPtr("worker-1,worker-2,control-plane")}).
+			Multi(true).
+			IncludeAll(true).
+			Hide(dashboard.VariableHideHideVariable).
+			Current(clusterRoleOption()),
+		).
 		WithRow(ocpNoisyGoAppsRow(t)).
 		WithRow(ocpClusterAtAGlanceRow(t, summarize)).
 		// Row: OVN
@@ -175,12 +184,14 @@ func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 }
 
 func ocpNoisyGoAppsRow(t panelTracker) *dashboard.RowBuilder {
+	workerRoleSelector := mg.NodeRoleFilter(workerNodeRole).String()
+	workerRoleName := capitalCamelName(workerNodeRole)
 	return dashboard.NewRowBuilder("Loud Go Applications").
 		Collapsed(true).
 		WithPanel(genericLegendRightHandAxisTimeSeries("Select Go Apps CPU Rate", "percent",
 			12, 8, `secondary-scheduler.*`, "secondary-scheduler",
 			t.track("containerCPU",
-				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",namespace!="",namespace=~"openshift-marketplace|openshift-insight"`).
+				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",namespace!="",namespace=~"openshift-marketplace|openshift-insights"`).
 					IRate(intervalVar).
 					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service", mg.GroupByNode).
 					Multiply("100"),
@@ -192,16 +203,16 @@ func ocpNoisyGoAppsRow(t panelTracker) *dashboard.RowBuilder {
 					Multiply("100"),
 				"{{ pod }}: {{ container }} {{node}}"),
 		)).
-		WithPanel(genericLegendTimeSeries("Workers /system.slice breakdown CPU Rate", "percent",
+		WithPanel(genericLegendTimeSeries(workerRoleName+" /system.slice breakdown CPU Rate", "percent",
 			12, 8,
 			t.trackRaw("workerCgroupCpuById",
-				`sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"}[$interval]) * 100 * on (node) group_left kube_node_role{role="worker-1"})) by (id)`,
+				`sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"}[$interval]) * 100 * on (node) group_left `+workerRoleSelector+`)) by (id)`,
 				"{{ instance }}"),
 		)).
-		WithPanel(genericLegendTimeSeries("Worker1 CPU Usage $mode", "percent",
+		WithPanel(genericLegendTimeSeries(workerRoleName+" CPU Usage $mode", "percent",
 			12, 8,
 			t.trackRaw("nodeCPU",
-				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(kube_node_role{role="worker-1"}, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
+				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(`+workerRoleSelector+`, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
 				"{{ instance }}"),
 		)).
 		WithPanel(genericLegendTimeSeries("Control Plane CPU Usage $mode", "percent",
@@ -226,14 +237,38 @@ func ocpClusterAtAGlanceRow(t panelTracker, summarize bool) *dashboard.RowBuilde
 	return clusterAtAGlanceRow
 }
 
+func clusterRoleOption() dashboard.VariableOption {
+	const all = "$__all"
+	return dashboard.VariableOption{
+		Text:     dashboard.StringOrArrayOfString{String: cog.ToPtr("All")},
+		Value:    dashboard.StringOrArrayOfString{String: cog.ToPtr(all)},
+		Selected: cog.ToPtr(true),
+	}
+}
+
+func repeatedRolePanel(panel *timeseries.PanelBuilder) *timeseries.PanelBuilder {
+	return panel.
+		Repeat(clusterRoleVar).
+		RepeatDirection(dashboard.PanelRepeatDirectionH)
+}
+
+func clusterRole() mg.NodeRole {
+	return mg.NodeRole("$" + clusterRoleVar)
+}
+
+func rolePanelName(role mg.NodeRole) string {
+	if role == clusterRole() {
+		return "$" + clusterRoleVar
+	}
+	return capitalCamelName(role)
+}
+
 func rolesCpuUsageRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
-	return clusterAtAGlanceRow.
-		WithPanel(glanceNodeCpuPanel(mg.RoleWorker1, summarize, t)).
-		WithPanel(glanceNodeCpuPanel(mg.RoleControlPlane, false, t))
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(glanceNodeCpuPanel(clusterRole(), summarize, t)))
 }
 
 func glanceNodeCpuPanel(role mg.NodeRole, summarize bool, t panelTracker) *timeseries.PanelBuilder {
-	rolePretty := capitalCamelName(role)
+	rolePretty := rolePanelName(role)
 	trackedName := "nodeCPU" + rolePretty
 	var nodeCpuDqBuilder []*prometheus.DataqueryBuilder
 	if summarize {
@@ -293,28 +328,23 @@ func nodeCpuQueryFn(role mg.NodeRole) func() *mg.Query {
 }
 
 func rolesLoad1Row(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *dashboard.RowBuilder {
-	for _, role := range []mg.NodeRole{mg.RoleWorker1, mg.RoleControlPlane} {
-		roleName := capitalCamelName(role)
-		clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendTimeSeries(roleName+" Load1", "short",
-			12, 8,
-			t.track("nodeLoad1"+roleName,
-				mg.QRaw(mg.MetricNodeLoad1).
-					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByInstance},
-						mg.NodeRoleLabelReplace(role)),
-				"{{instance}}"),
-		))
-	}
-	return clusterAtAGlanceRow
+	role := clusterRole()
+	roleName := rolePanelName(role)
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(genericLegendTimeSeries(roleName+" Load1", "short",
+		12, 8,
+		t.track("nodeLoad1"+roleName,
+			mg.QRaw(mg.MetricNodeLoad1).
+				MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByInstance}, mg.NodeRoleLabelReplace(role)),
+			"{{instance}}"),
+	)))
 }
 
 func rolesAvailableMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
-	return clusterAtAGlanceRow.
-		WithPanel(roleAvailableMemoryPanel(mg.RoleWorker1, summarize, t)).
-		WithPanel(roleAvailableMemoryPanel(mg.RoleControlPlane, false, t))
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(roleAvailableMemoryPanel(clusterRole(), summarize, t)))
 }
 
 func roleAvailableMemoryPanel(role mg.NodeRole, summarize bool, t panelTracker) *timeseries.PanelBuilder {
-	newVar := genericLegendCounterSumRightHandTimeSeries(capitalCamelName(role)+" Memory Available", "bytes",
+	newVar := genericLegendCounterSumRightHandTimeSeries(rolePanelName(role)+" Memory Available", "bytes",
 		12, 8,
 		nodeMemoryDqBuilder(summarize, t, role)...,
 	)
@@ -325,7 +355,7 @@ func nodeMemoryDqBuilder(summarize bool, t panelTracker, role mg.NodeRole) []*pr
 	var nodeMemDqBuilders []*prometheus.DataqueryBuilder
 	trackedName := `nodeMemoryAvailable` + capitalCamelName(role)
 	var query func() *mg.Query
-	if workerInstanceFilter != "" {
+	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
 		query = func() *mg.Query {
 			return mg.Q(mg.MetricNodeMemoryAvailable, workerInstanceFilter)
 		}
@@ -350,17 +380,30 @@ func nodeMemoryDqBuilder(summarize bool, t panelTracker, role mg.NodeRole) []*pr
 }
 
 func rolesCgroupCpuRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *dashboard.RowBuilder {
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendTimeSeries("Workers CGroup CPU Rate", "percent",
+	role := clusterRole()
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(genericLegendTimeSeries(rolePanelName(role)+" CGroup CPU Rate", "percent",
 		12, 8,
-		glanceWorkerCGroupCpuQueries(t),
-		promQuery(`sum by (id) (container_cpu_usage_seconds_total_cgroup_sum_rate_id_node * on (node) group_left kube_node_role{ role = "worker" })`, "{{id}}"),
-	))
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendTimeSeries("Control Plane CGroup CPU Rate", "percent",
-		12, 8,
-		glanceCGroupCpuQueries(t, mg.RoleControlPlane),
-		promQuery(`sum by (id) (container_cpu_usage_seconds_total_cgroup_sum_rate_id_node * on (node) group_left kube_node_role{ role = "master" })`, "{{id}}"),
-	))
-	return clusterAtAGlanceRow
+		glanceCGroupCpuQueries(t, role),
+		legacyCgroupCPUQuery(role),
+	)))
+}
+
+func legacyCgroupCPUQuery(role mg.NodeRole) *prometheus.DataqueryBuilder {
+	return promQuery(`sum by (id) (container_cpu_usage_seconds_total_cgroup_sum_rate_id_node * on (node) group_left kube_node_role{ role = "`+legacyCgroupRole(role)+`" })`, "{{id}}")
+}
+
+func legacyCgroupMemoryQuery(role mg.NodeRole) *prometheus.DataqueryBuilder {
+	return promQuery(`sum by (id) (container_memory_working_set_bytes_cgroup * on (node) group_left kube_node_role{ role = "`+legacyCgroupRole(role)+`" })`, "{{id}}")
+}
+
+func legacyCgroupRole(role mg.NodeRole) string {
+	if role == mg.RoleWorker1 {
+		return string(mg.RoleWorker)
+	}
+	if role == mg.RoleControlPlane {
+		return string(mg.RoleMaster)
+	}
+	return string(role)
 }
 
 func glanceWorkerCGroupCpuQueries(t panelTracker) *prometheus.DataqueryBuilder {
@@ -418,46 +461,24 @@ func loudCGroupSystemCpuQueries(t panelTracker, role mg.NodeRole) *prometheus.Da
 
 func rolesCgroupMemoryRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker) *dashboard.RowBuilder {
 	const metricRoot = "cgroupMemoryRSS"
-	var workerCgroupMemory *mg.Query
-	if workerNodesFilter != "" {
-		workerCgroupMemory = mg.Q(mg.MetricContainerMemoryRSS, cgroupIDFilter+`,`+workerNodesFilter).
-			Agg(mg.AggSum, mg.GroupByID)
-	} else {
-		workerCgroupMemory = mg.Q(mg.MetricContainerMemoryRSS, cgroupIDFilter).
-			MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-				mg.NodeRoleFilter(mg.RoleWorker1)).
-			Agg(mg.AggSum, mg.GroupByID)
-	}
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendCounterTimeSeries("Workers CGroup Memory RSS", "bytes",
+	role := clusterRole()
+	cgroupMemory := mg.Q(mg.MetricContainerMemoryRSS, cgroupIDFilter).
+		MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode}, mg.NodeRoleFilter(role))
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(genericLegendCounterTimeSeries(rolePanelName(role)+" CGroup Memory RSS", "bytes",
 		12, 8,
-		t.track(metricRoot+"Worker",
-			workerCgroupMemory,
-			"{{instance}}"),
-		promQuery(`sum by (id) (container_memory_working_set_bytes_cgroup * on (node) group_left kube_node_role{ role = "worker" })`, "{{id}}"),
-	))
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(genericLegendCounterTimeSeries("Control Plane CGroup Memory RSS", "bytes",
-		12, 8,
-		t.track(metricRoot+"ControlPlane",
-			mg.Q(mg.MetricContainerMemoryRSS, cgroupIDFilter).
-				MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-					mg.NodeRoleFilter(mg.RoleControlPlane)).
-				Agg(mg.AggSum, mg.GroupByID),
-			"{{instance}}"),
-		promQuery(`sum by (id) (container_memory_working_set_bytes_cgroup * on (node) group_left kube_node_role{ role = "master" })`, "{{id}}"),
-	))
-	return clusterAtAGlanceRow
+		t.track(metricRoot+capitalCamelName(role), cgroupMemory.Agg(mg.AggSum, mg.GroupByID), "{{instance}}"),
+		legacyCgroupMemoryQuery(role),
+	)))
 }
 
 func rolesContainerThreadsRow(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
-	return clusterAtAGlanceRow.
-		WithPanel(containerThreadsPanel(mg.RoleWorker1, summarize, t)).
-		WithPanel(containerThreadsPanel(mg.RoleControlPlane, false, t))
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(containerThreadsPanel(clusterRole(), summarize, t)))
 }
 
 func containerThreadsPanel(role mg.NodeRole, summarize bool, t panelTracker) *timeseries.PanelBuilder {
 	const metricRoot = "containerThreads"
 	var containerThreadsQuery func() *mg.Query
-	roleCamel := capitalCamelName(role)
+	roleCamel := rolePanelName(role)
 	if workerNodesFilter != "" && role == mg.RoleWorker1 {
 		containerThreadsQuery = func() *mg.Query {
 			return mg.Q(mg.MetricContainerThreads, `container!="",`+workerNodesFilter).
@@ -485,9 +506,7 @@ func containerThreadsPanel(role mg.NodeRole, summarize bool, t panelTracker) *ti
 }
 
 func rolesDiskIops(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, summarize bool) *dashboard.RowBuilder {
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(diskIopsRolePanel(t, mg.RoleWorker1, summarize))
-	clusterAtAGlanceRow = clusterAtAGlanceRow.WithPanel(diskIopsRolePanel(t, mg.RoleControlPlane, false))
-	return clusterAtAGlanceRow
+	return clusterAtAGlanceRow.WithPanel(repeatedRolePanel(diskIopsRolePanel(t, clusterRole(), summarize)))
 }
 
 func diskIopsRolePanel(t panelTracker, role mg.NodeRole, summarize bool) *timeseries.PanelBuilder {
@@ -516,7 +535,7 @@ func diskIopsRolePanel(t panelTracker, role mg.NodeRole, summarize bool) *timese
 		}
 	}
 	var dqBuilders []*prometheus.DataqueryBuilder
-	roleCamel := capitalCamelName(role)
+	roleCamel := rolePanelName(role)
 	if summarize {
 		dqBuilders = append(dqBuilders, summaryStatsQueries(t, "nodeDiskReads"+roleCamel, readQuery, "read")...)
 		dqBuilders = append(dqBuilders, summaryStatsQueries(t, "nodeDiskWrites"+roleCamel, writeQuery, "write")...)
@@ -963,9 +982,9 @@ func withWorkerNodeDetailRow(builder *dashboard.DashboardBuilder, t panelTracker
 	if workerNodesFilter != "" {
 		nodesQuery = `label_values(kube_node_role{` + workerNodesFilter + `}, node)`
 	} else {
-		nodesQuery = `label_values(` + mg.NodeRoleFilter(mg.RoleWorker1).String() + `, node)`
+		nodesQuery = `label_values(` + mg.NodeRoleFilter(workerNodeRole).String() + `, node)`
 	}
-	return builder.WithRow(ocpNodeRow(t, "_worker_node", mg.RoleWorker1)).
+	return builder.WithRow(ocpNodeRow(t, "_worker_node", workerNodeRole)).
 		WithVariable(dashboard.NewQueryVariableBuilder("_worker_node").
 			Label("Worker").
 			Query(t.trackVarQuery("workerNodes", nodesQuery)).
