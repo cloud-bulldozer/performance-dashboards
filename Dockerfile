@@ -1,5 +1,4 @@
-#TODO needs to specify which golang
-FROM rhel8/go-toolset AS builder
+FROM golang:1.25.14-bookworm AS builder
 WORKDIR /opt/app-root/src
 COPY go/go.mod go/go.sum ./
 RUN go mod download

@@ -2,6 +2,8 @@ module github.com/cloud-bulldozer/performance-dashboards
 
 go 1.25.8
 
+toolchain go1.25.14
+
 require (
 	github.com/afcollins/metrics-generator v0.0.4
 	github.com/google/uuid v1.6.0

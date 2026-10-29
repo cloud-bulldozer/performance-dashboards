@@ -150,7 +150,7 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 			Current(intervalOption("iowait")),
 		).
 		WithVariable(dashboard.NewCustomVariableBuilder(clusterRoleVar).
-			Values(dashboard.StringOrMap{String: cog.ToPtr("worker-1,worker-2,control-plane")}).
+			Values(dashboard.StringOrMap{String: cog.ToPtr("worker-1,infra,control-plane")}).
 			Multi(true).
 			IncludeAll(true).
 			Hide(dashboard.VariableHideHideVariable).

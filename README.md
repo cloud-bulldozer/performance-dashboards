@@ -82,11 +82,31 @@ Dashboards Available after Migration to Grafonnet v10.1.0(latest):
 
 A parallel implementation using the [grafana-foundation-sdk](https://github.com/grafana/grafana-foundation-sdk) Go builders. The Go builder is the single source of truth for both dashboard JSON **and** kube-burner metrics-profile YAML — profiles are generated as a by-product of building the dashboard, with no separate query list to maintain.
 
+This project is pinned to Go 1.25.14. Standard Go tooling reads the `toolchain` directive in `go/go.mod`; [goenv](https://github.com/go-nv/goenv) reads `go/.go-version`. With goenv, install the version once and ensure goenv's shims precede other Go installations on `PATH`:
+
+```bash
+goenv install -s 1.25.14
+eval "$(goenv init -)"
+cd go
+go version # go1.25.14
+```
+
+If `command -v go` reports `/usr/local/go/bin/go` instead of `~/.goenv/shims/go`, initialize goenv after adding any system Go directory to `PATH` (or remove that system Go entry). This prevents a Go command from one installation invoking compiler tools from another.
+
 ```bash
 cd go && go run .
 # Writes to go/rendered/<category>/<name>.json
 # Writes metrics profiles to go/rendered/<category>/<name>-metrics.yaml / <name>-raw-metrics.yaml
 ```
+
+For screenshot automation, create a separate compact dashboard set with legends hidden:
+
+```bash
+cd go && go run . --rendering
+# Writes to go/rendered-for-rendering/<category>/<name>.json
+```
+
+`--rendering` reduces legend-bearing panel heights by two Grafana grid units and compacts the following rows, keeping the graph area close to the regular dashboard while avoiding oversized legends. `--output-dir` can override the output directory when needed.
 
 ### Outputs
 
@@ -126,6 +146,8 @@ Output is sorted alphabetically by `metricName`.
 ```bash
 cd go && go test ./...
 ```
+
+Equivalent project commands are `make test-go`, `make render-go`, and `make render-go-for-screenshots`.
 
 Tests enforce: no garbage tokens in raw profiles, no Grafana variables in aggregated profiles, merge deduplication and sort order.
 

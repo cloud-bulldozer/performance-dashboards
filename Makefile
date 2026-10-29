@@ -58,6 +58,15 @@ $(OUTPUTDIR)/%.json: $(TEMPLATESDIR)/%.jsonnet $(ASSETS)
 build-go:
 	cd go && go build -o ../bin/deployer .
 
+test-go:
+	cd go && go test ./...
+
+render-go:
+	cd go && go run .
+
+render-go-for-screenshots:
+	cd go && go run . --rendering
+
 deploy: build-go
 	bin/deployer --deploy
 
