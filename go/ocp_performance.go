@@ -156,7 +156,6 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 			Hide(dashboard.VariableHideHideVariable).
 			Current(clusterRoleOption()),
 		).
-		WithRow(ocpNoisyGoAppsRow(t)).
 		WithRow(ocpClusterAtAGlanceRow(t, summarize)).
 		// Row: OVN
 		WithRow(ocpOVNRow(t, summarize)).
@@ -181,46 +180,6 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 
 func buildOCPDashboard(t panelTracker) *dashboard.DashboardBuilder {
 	return ocpBase(t, "OpenShift Performance", false)
-}
-
-func ocpNoisyGoAppsRow(t panelTracker) *dashboard.RowBuilder {
-	workerRoleSelector := mg.NodeRoleFilter(workerNodeRole).String()
-	workerRoleName := capitalCamelName(workerNodeRole)
-	return dashboard.NewRowBuilder("Loud Go Applications").
-		Collapsed(true).
-		WithPanel(genericLegendRightHandAxisTimeSeries("Select Go Apps CPU Rate", "percent",
-			12, 8, `secondary-scheduler.*`, "secondary-scheduler",
-			t.track("containerCPU",
-				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",namespace!="",namespace=~"openshift-marketplace|openshift-insights"`).
-					IRate(intervalVar).
-					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service", mg.GroupByNode).
-					Multiply("100"),
-				"{{ pod }}: {{ container }} {{node}}"),
-			t.track("containerCPU",
-				mg.Q(mg.MetricContainerCPU, `container!="POD",name!="",pod=~"numaresources-controller-manager.*|secondary-scheduler.*",namespace="openshift-numaresources"`).
-					IRate(intervalVar).
-					Agg(mg.AggSum, mg.GroupByPod, mg.GroupByContainer, mg.GroupByNamespace, mg.GroupByName, "service", mg.GroupByNode).
-					Multiply("100"),
-				"{{ pod }}: {{ container }} {{node}}"),
-		)).
-		WithPanel(genericLegendTimeSeries(workerRoleName+" /system.slice breakdown CPU Rate", "percent",
-			12, 8,
-			t.trackRaw("workerCgroupCpuById",
-				`sum((rate(container_cpu_usage_seconds_total{job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"}[$interval]) * 100 * on (node) group_left `+workerRoleSelector+`)) by (id)`,
-				"{{ instance }}"),
-		)).
-		WithPanel(genericLegendTimeSeries(workerRoleName+" CPU Usage $mode", "percent",
-			12, 8,
-			t.trackRaw("nodeCPU",
-				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(`+workerRoleSelector+`, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
-				"{{ instance }}"),
-		)).
-		WithPanel(genericLegendTimeSeries("Control Plane CPU Usage $mode", "percent",
-			12, 8,
-			t.trackRaw("nodeCPU",
-				`sum(rate((node_cpu_seconds_total{mode=~"$mode"} * on (instance) group_left label_replace(kube_node_role{role="master"}, "instance", "$1", "node", "(.+)"))[$interval:])) by (instance) * 100`,
-				"{{ instance }}"),
-		))
 }
 
 // Row: Cluster-at-a-Glance
