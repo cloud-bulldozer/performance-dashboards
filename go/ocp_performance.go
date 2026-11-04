@@ -150,7 +150,7 @@ func ocpBase(t panelTracker, name string, summarize bool) *dashboard.DashboardBu
 			Current(intervalOption("iowait")),
 		).
 		WithVariable(dashboard.NewCustomVariableBuilder(clusterRoleVar).
-			Values(dashboard.StringOrMap{String: cog.ToPtr("worker-1,infra,control-plane")}).
+			Values(dashboard.StringOrMap{String: cog.ToPtr("worker,infra,control-plane")}).
 			Multi(true).
 			IncludeAll(true).
 			Hide(dashboard.VariableHideHideVariable).
@@ -257,7 +257,7 @@ func nodeCpuQueryFn(role mg.NodeRole) func() *mg.Query {
 		baseMetric = mg.MetricNodeCPU
 	}
 	var query func() *mg.Query
-	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
+	if workerInstanceFilter != "" && role == mg.RoleWorker {
 		query = func() *mg.Query {
 			baseQuery := mg.Q(baseMetric, `mode!="idle", `+workerInstanceFilter)
 			if useNodeCpuInstanceRecordingRule {
@@ -314,7 +314,7 @@ func nodeMemoryDqBuilder(summarize bool, t panelTracker, role mg.NodeRole) []*pr
 	var nodeMemDqBuilders []*prometheus.DataqueryBuilder
 	trackedName := `nodeMemoryAvailable` + capitalCamelName(role)
 	var query func() *mg.Query
-	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
+	if workerInstanceFilter != "" && role == mg.RoleWorker {
 		query = func() *mg.Query {
 			return mg.Q(mg.MetricNodeMemoryAvailable, workerInstanceFilter)
 		}
@@ -356,7 +356,7 @@ func legacyCgroupMemoryQuery(role mg.NodeRole) *prometheus.DataqueryBuilder {
 }
 
 func legacyCgroupRole(role mg.NodeRole) string {
-	if role == mg.RoleWorker1 {
+	if role == mg.RoleWorker {
 		return string(mg.RoleWorker)
 	}
 	if role == mg.RoleControlPlane {
@@ -366,7 +366,7 @@ func legacyCgroupRole(role mg.NodeRole) string {
 }
 
 func glanceWorkerCGroupCpuQueries(t panelTracker) *prometheus.DataqueryBuilder {
-	const role = mg.RoleWorker1
+	const role = mg.RoleWorker
 	// TODO not summarize, but instance filter
 	if workerInstanceFilter != "" {
 		return t.track("cgroupCPU"+capitalCamelName(role),
@@ -393,7 +393,7 @@ func glanceCGroupCpuQueries(t panelTracker, role mg.NodeRole) *prometheus.Dataqu
 }
 
 func loudWorkerCGroupSystemCpuQueries(t panelTracker) *prometheus.DataqueryBuilder {
-	const role = mg.RoleWorker1
+	const role = mg.RoleWorker
 	if workerInstanceFilter != "" {
 		return t.track("cgroupCPU"+capitalCamelName(role),
 			mg.Q(mg.MetricContainerCPU, `job=~".*", id =~"/system.slice/.*.service|/.*/ovs-vswitchd.service"`+`,`+workerNodesFilter).
@@ -438,7 +438,7 @@ func containerThreadsPanel(role mg.NodeRole, summarize bool, t panelTracker) *ti
 	const metricRoot = "containerThreads"
 	var containerThreadsQuery func() *mg.Query
 	roleCamel := rolePanelName(role)
-	if workerNodesFilter != "" && role == mg.RoleWorker1 {
+	if workerNodesFilter != "" && role == mg.RoleWorker {
 		containerThreadsQuery = func() *mg.Query {
 			return mg.Q(mg.MetricContainerThreads, `container!="",`+workerNodesFilter).
 				Agg(mg.AggSum, mg.GroupByNode)
@@ -470,7 +470,7 @@ func rolesDiskIops(clusterAtAGlanceRow *dashboard.RowBuilder, t panelTracker, su
 
 func diskIopsRolePanel(t panelTracker, role mg.NodeRole, summarize bool) *timeseries.PanelBuilder {
 	var readQuery, writeQuery func() *mg.Query
-	if workerInstanceFilter != "" && role == mg.RoleWorker1 {
+	if workerInstanceFilter != "" && role == mg.RoleWorker {
 		readQuery = func() *mg.Query {
 			return mg.Q(mg.MetricNodeDiskReadsCompleted, workerInstanceFilter).
 				RateSubquery(intervalVar)
@@ -712,7 +712,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 				mg.Q(mg.MetricProcessCPU, `service="kubelet",job="kubelet"`).
 					IRate(intervalVar).Multiply("100").
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker1)).
+						mg.NodeRoleFilter(mg.RoleWorker)).
 					TopK(10),
 				"kubelet - {{node}}"),
 		)).
@@ -722,7 +722,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 				mg.Q(mg.MetricProcessCPU, `service="kubelet",job="crio"`).
 					IRate(intervalVar).Multiply("100").
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker1)).
+						mg.NodeRoleFilter(mg.RoleWorker)).
 					TopK(10),
 				"crio - {{node}}"),
 		)).
@@ -731,7 +731,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 			t.track("kubeletMemory",
 				mg.Q(mg.MetricProcessMemory, `service="kubelet",job="kubelet"`).
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker1)).
+						mg.NodeRoleFilter(mg.RoleWorker)).
 					TopK(10),
 				"kubelet - {{node}}"),
 		)).
@@ -740,7 +740,7 @@ func ocpClusterKubeletRow(t panelTracker) *dashboard.RowBuilder {
 			t.track("crioMemory",
 				mg.Q(mg.MetricProcessMemory, `service="kubelet",job="crio"`).
 					MultiplyOnGroupLeft([]mg.GroupBy{mg.GroupByNode},
-						mg.NodeRoleFilter(mg.RoleWorker1)).
+						mg.NodeRoleFilter(mg.RoleWorker)).
 					TopK(10),
 				"crio - {{node}}"),
 		)).
